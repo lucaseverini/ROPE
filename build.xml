@@ -70,4 +70,19 @@
     nbproject/build-impl.xml file. 
 
     -->
+	
+	 <target name="-post-jar"> 
+        <copy todir="${dist.dir}/tools" includeEmptyDirs="true" verbose="true" overwrite="true" preservelastmodified="true"> 
+			<fileset dir="tools/" followsymlinks="true" excludes=".*">
+				<include name="*/*"/>
+			</fileset>
+		</copy>
+		
+		<chmod perm="ug+x">
+			<fileset dir="${dist.dir}/tools">
+				<include name="*/*"/>
+			</fileset>
+		</chmod>
+    </target>
+	
 </project>
