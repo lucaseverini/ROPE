@@ -24,6 +24,8 @@ import javax.swing.*;
 
 public class RopeFrame extends JFrame implements WindowListener, FocusListener
 {
+	private final boolean askConfirmationToQuit = false;	// This should go in general preferences
+
  	private static final long serialVersionUID = 1L;
 	private static final String TITLE = "ROPE/1401 by Ronald Mak, Stan Paddock and Luca Severini (Version 2.0 April 12 2014)";
     private JDesktopPane desktop = new JDesktopPane();
@@ -496,16 +498,21 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 				editFrame.saveAction();
 			}
 		}
-		
-		int result = JOptionPane.showConfirmDialog(null, "Do you want to quit Rope?", "Exit Rope", JOptionPane.YES_NO_OPTION);
-		if (result == JOptionPane.YES_OPTION)
+	
+		if(askConfirmationToQuit)
 		{
-			savePreferences();
-
-			this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-			closed = true;
+			int result = JOptionPane.showConfirmDialog(null, "Do you want to quit Rope?", "Exit Rope", JOptionPane.YES_NO_OPTION);
+			if (result == JOptionPane.NO_OPTION)
+			{
+				return false;
+			}
 		}
+		
+		savePreferences();
+
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		closed = true;
 		
 		return closed;
 	}
