@@ -93,7 +93,7 @@ public class Rope
 			AssemblerOptions.assemblerPath = userPrefs.get("assemblerPath", "tools/mac/autocoder");
 			SimulatorOptions.simulatorPath = userPrefs.get("simulatorPath", "tools/mac/i1401");			
 		}
-		else
+		else if(RopeHelper.isUnix)
 		{
 			AssemblerOptions.assemblerPath = userPrefs.get("assemblerPath", "tools/linux/autocoder");
 			SimulatorOptions.simulatorPath = userPrefs.get("simulatorPath", "tools/linux/i1401");			
