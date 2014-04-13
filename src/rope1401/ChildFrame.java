@@ -59,7 +59,7 @@ public class ChildFrame extends JInternalFrame implements InternalFrameListener
 
 		setupMenus();	// setup menus accordingly
 
-		System.out.println("Activated " + title);
+		// System.out.println("Activated " + title);
 	}
 
 	@Override
@@ -94,7 +94,7 @@ public class ChildFrame extends JInternalFrame implements InternalFrameListener
 			}
 		}
 		
-		System.out.println("Deactivated " + title);
+		// System.out.println("Deactivated " + title);
 	}
 	
 	public void setupMenus()
