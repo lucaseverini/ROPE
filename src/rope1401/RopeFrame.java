@@ -25,7 +25,7 @@ import javax.swing.*;
 public class RopeFrame extends JFrame implements WindowListener, FocusListener
 {
  	private static final long serialVersionUID = 1L;
-	private static final String TITLE = "ROPE/1401 by Ronald Mak, Stan Paddock and Luca Severini (Version 2.0 April 11 2014)";
+	private static final String TITLE = "ROPE/1401 by Ronald Mak, Stan Paddock and Luca Severini (Version 2.0 April 12 2014)";
     private JDesktopPane desktop = new JDesktopPane();
     private ExecFrame execFrame;
     private PrintoutFrame printoutFrame;
@@ -415,7 +415,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 		File execFile = new File(AssemblerOptions.assemblerPath);
 		if(!execFile.exists() || execFile.isDirectory()) 
 		{
-			String message = String.format("Invalid path to Autocoder: %s", AssemblerOptions.assemblerPath);
+			String message = String.format("Invalid path to Assembler: %s", AssemblerOptions.assemblerPath);
 			System.out.println(message);
 			
 			JOptionPane.showMessageDialog(this, message);
@@ -424,7 +424,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 		execFile = new File(SimulatorOptions.simulatorPath);
 		if(!execFile.exists() || execFile.isDirectory()) 
 		{
-			String message = String.format("Invalid path to SimH: %s", SimulatorOptions.simulatorPath);
+			String message = String.format("Invalid path to Simulator: %s", SimulatorOptions.simulatorPath);
 			System.out.println(message);
 
 			JOptionPane.showMessageDialog(this, message);

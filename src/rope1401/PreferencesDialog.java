@@ -82,8 +82,8 @@ public class PreferencesDialog extends JDialog implements ActionListener
 		JPanel checkPanel = new JPanel();
 		JPanel buttonsPanel = new JPanel();
 
-		TitledBorder assemblerBorder = new TitledBorder(BorderFactory.createLineBorder(Color.white, 1), "Assembler/Autocoder Path");
-        TitledBorder simulatorBorder = new TitledBorder(BorderFactory.createLineBorder(Color.white, 1), "Simulator/SimH Path");
+		TitledBorder assemblerBorder = new TitledBorder(BorderFactory.createLineBorder(Color.white, 1), "Assembler Path");
+        TitledBorder simulatorBorder = new TitledBorder(BorderFactory.createLineBorder(Color.white, 1), "Simulator Path");
   
         assemblerPanel.setBorder(assemblerBorder);
         assemblerPanel.setLayout(new GridBagLayout());
@@ -139,12 +139,37 @@ public class PreferencesDialog extends JDialog implements ActionListener
     {
         RopeFileChooser chooser = new RopeFileChooser(DataOptions.directoryPath, filePath, filters, directories, multiple);
 		chooser.setDialogTitle(title);
-		chooser.setFileFilter(filters.firstElement()); 
+		
+		if(filters != null)
+		{
+			chooser.setFileFilter(filters.firstElement()); 
+		}
+		
         chooser.choose(textField, this, multiple);
     }
 
     private void confirmAction()
     {
+		File file = new File(assemblerPath.getText());
+		if(!file.exists() || file.isDirectory())
+		{
+			String message = String.format("Assembler is not available: %s.\n Continue?", assemblerPath.getText());
+			if (JOptionPane.showConfirmDialog(null, message , "Warning", JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION)
+			{
+				return;
+			}
+		}
+		
+		file = new File(simulatorPath.getText());
+		if(!file.exists() || file.isDirectory())
+		{
+			String message = String.format("Simulator is not available: %s.\n Continue?", simulatorPath.getText());
+			if (JOptionPane.showConfirmDialog(null, message , "Warning", JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION)
+			{
+				return;
+			}
+		}
+
 		AssemblerOptions.saveBeforeAssembly = saveBeforeAssemblyChk.isSelected();
 		SimulatorOptions.useOldConversion = useOldConversionChk.isSelected();
 		AssemblerOptions.assemblerPath = assemblerPath.getText();
@@ -187,7 +212,7 @@ public class PreferencesDialog extends JDialog implements ActionListener
 				filters.add(new RopeFileFilter( new String[] {".exe",}, "Windows executable (*.exe)"));
 				// filters.add(new RopeFileFilter( new String[] {".bat",}, "Windows batch (*.bat)"));
 			}
-            browseAction("Assembler/Autocoder selection", AssemblerOptions.assemblerPath, assemblerPath, filters, false, false);
+            browseAction("Assembler selection", AssemblerOptions.assemblerPath, assemblerPath, filters, false, false);
         }
         else if (source == simulatorBrowseBtn) 
 		{
@@ -198,7 +223,7 @@ public class PreferencesDialog extends JDialog implements ActionListener
 				filters.add(new RopeFileFilter( new String[] {".exe",}, "Windows executable (*.exe)"));
 				// filters.add(new RopeFileFilter( new String[] {".bat",}, "Windows batch (*.bat)"));
 			}
-            browseAction("Simulator/SimH selection", SimulatorOptions.simulatorPath, simulatorPath, filters, false, false);
+            browseAction("Simulator selection", SimulatorOptions.simulatorPath, simulatorPath, filters, false, false);
         }
         else if (source == confirmBtn) 
 		{
