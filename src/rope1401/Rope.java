@@ -85,13 +85,18 @@ public class Rope
 		// default value is returned if the preference does not exist
 		if(RopeHelper.isWindows)
 		{
-			AssemblerOptions.assemblerPath = userPrefs.get("assemblerPath", "autocoder.exe");
-			SimulatorOptions.simulatorPath = userPrefs.get("simulatorPath", "i1401.exe");
+			AssemblerOptions.assemblerPath = userPrefs.get("assemblerPath", "tools/windows/autocoder.exe");
+			SimulatorOptions.simulatorPath = userPrefs.get("simulatorPath", "tools/windows/i1401.exe");
+		}
+		else if(RopeHelper.isMac)
+		{
+			AssemblerOptions.assemblerPath = userPrefs.get("assemblerPath", "tools/mac/autocoder");
+			SimulatorOptions.simulatorPath = userPrefs.get("simulatorPath", "tools/mac/i1401");			
 		}
 		else
 		{
-			AssemblerOptions.assemblerPath = userPrefs.get("assemblerPath", "./autocoder");
-			SimulatorOptions.simulatorPath = userPrefs.get("simulatorPath", "./i1401");			
+			AssemblerOptions.assemblerPath = userPrefs.get("assemblerPath", "tools/linux/autocoder");
+			SimulatorOptions.simulatorPath = userPrefs.get("simulatorPath", "tools/linux/i1401");			
 		}
 		
 		AssemblerOptions.saveBeforeAssembly = userPrefs.getBoolean("saveBeforeAssembly", false);
