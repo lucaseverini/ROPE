@@ -1,4 +1,10 @@
+# Last change: April-12-2014 by Luca Severini
+
+# OS specific #
+.DS_Store
+
 # NetBeans specific #
+nbproject/build-impl.xml
 nbproject/private/
 build/
 nbbuild/
