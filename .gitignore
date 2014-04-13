@@ -4,7 +4,7 @@
 .DS_Store
 
 # NetBeans specific #
-nbproject/build-impl.xml
+build-impl.xml
 nbproject/private/
 build/
 nbbuild/
