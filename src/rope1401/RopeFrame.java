@@ -43,6 +43,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 	public JMenuBar menuBar;
 	public JMenu fileMenu;
  	public JMenu editMenu;
+ 	public JMenu helpMenu;
  	public JMenuItem undoItem;
 	public JMenuItem redoItem;
 	public JMenuItem cutItem;
@@ -60,6 +61,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 	public JMenuItem printItem;	
 	public JMenuItem prefsItem;	
 	public JMenuItem quitItem;	
+	public JMenuItem aboutItem;	
 
     public RopeFrame()
     {			
@@ -487,7 +489,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 	
 	public boolean aboutRope() 
 	{	
-        JOptionPane.showConfirmDialog(this, "About", "About", JOptionPane.OK_OPTION);
+        JOptionPane.showMessageDialog(this, "ROPE beta (April 12 2014)\nby Luca Severini", "About ROPE", JOptionPane.INFORMATION_MESSAGE);
         return true;
     }
 	
@@ -643,6 +645,19 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 				}
 			});		
 			fileMenu.add(quitItem);
+			
+			helpMenu = new JMenu("Help");
+
+			aboutItem = new JMenuItem("about ROPE...");
+			aboutItem.addActionListener(new ActionListener()
+			{
+				@Override
+				public void actionPerformed(ActionEvent e) 
+				{
+					aboutRope();
+				}
+			});		
+			helpMenu.add(aboutItem);
 		}
 				
         editMenu = new JMenu("Edit");
@@ -758,6 +773,11 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 
 		menuBar.add(fileMenu);
 		menuBar.add(editMenu);
+		
+		if(helpMenu != null)
+		{
+			menuBar.add(helpMenu);
+		}
 		
         this.setJMenuBar(menuBar);
 	}
