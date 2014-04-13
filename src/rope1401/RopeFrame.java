@@ -361,20 +361,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
     {
         return editFrame.haveAssemblyErrors();
     }
-/*
-	@Override
-    protected void processWindowEvent(WindowEvent event)
-    {
-        super.processWindowEvent(event);
 
-        if (event.getID() == WindowEvent.WINDOW_CLOSED) 
-		{
-            Simulator.kill();
-			
-            System.exit(0);
-        }
-    }
-*/	
 	@Override
 	public void windowClosing(WindowEvent e) 
 	{	
