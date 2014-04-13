@@ -22,6 +22,7 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.swing.*;
 
+
 public class RopeFrame extends JFrame implements WindowListener, FocusListener
 {
  	private static final long serialVersionUID = 1L;
