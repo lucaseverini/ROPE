@@ -443,7 +443,7 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
 
         try 
 		{
-            listFile = new BufferedReader( new FileReader(AssemblerOptions.listingPath));
+            listFile = new BufferedReader(new FileReader(AssemblerOptions.listingPath));
 
             while ((line = listFile.readLine()) != null) 
 			{

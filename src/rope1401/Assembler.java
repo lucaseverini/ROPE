@@ -10,6 +10,7 @@
 package rope1401;
 
 import java.io.*;
+import java.util.Vector;
 
 class Assembler
 {
@@ -25,12 +26,14 @@ class Assembler
     }
 
     static boolean version()
-    {
-        String command = AssemblerOptions.assemblerPath + " -V";
+    {		
+		String[] args = new String[2];
+		args[0] = AssemblerOptions.assemblerPath;
+		args[1] = "-V";
 
         try 
 		{
-            process = Runtime.getRuntime().exec(command);
+            process = Runtime.getRuntime().exec(args);
             stdout = new BufferedReader(new InputStreamReader(process.getInputStream()));
  
 			process = null;
@@ -51,7 +54,8 @@ class Assembler
 		{
 			Simulator.kill();
 			
-            process = Runtime.getRuntime().exec(AssemblerOptions.command);
+			String[] args = AssemblerOptions.command.toArray(new String[0]);
+            process = Runtime.getRuntime().exec(args);
             stdout = new BufferedReader(new InputStreamReader(process.getInputStream()));
 			
 			process = null;

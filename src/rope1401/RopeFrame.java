@@ -27,7 +27,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 	private final boolean askConfirmationToQuit = false;	// This should go in general preferences
 
  	private static final long serialVersionUID = 1L;
-	private static final String TITLE = "ROPE/1401 by Ronald Mak, Stan Paddock and Luca Severini (Version 2.0 April 12 2014)";
+	private static final String TITLE = "ROPE/1401 by Ronald Mak, Stan Paddock and Luca Severini (Version 2.0 beta - April 13 2014)";
     private JDesktopPane desktop = new JDesktopPane();
     private ExecFrame execFrame;
     private PrintoutFrame printoutFrame;

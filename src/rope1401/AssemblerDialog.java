@@ -409,6 +409,7 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
         commandArea.setLineWrap(true);
         commandArea.setWrapStyleWord(true);
         commandArea.setText("");
+		commandArea.setEditable(false);
 
         commandScrollPanel.setBorder(titledBorder1);
         commandScrollPanel.setLayout(gridBagLayout9);
@@ -678,7 +679,12 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
         enablePage();
         enableTrace();
         enableExtras();
-    }
+    	enableListing();
+		enableObject();
+		enableMacro();
+		enableTape();
+		enableDiagnostic();
+	}
 
     private void enableBoot()
     {
@@ -708,17 +714,54 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
         encodingHRadioButton.setEnabled(enabled);
         encodingPrintRadioButton.setEnabled(enabled);
 
-        encodingSimhRadioButton.setSelected(
-            AssemblerOptions.encodingChoice.equals(
-                AssemblerOptions.ENCODING_SIMH));
+        encodingSimhRadioButton.setSelected(AssemblerOptions.encodingChoice.equals(AssemblerOptions.ENCODING_SIMH));
     }
 
     private void enableInterleave()
     {
-        boolean enabled = listingCheckBox.isSelected() &&
-                          objectCheckBox.isSelected();
+        boolean enabled = listingCheckBox.isSelected() && objectCheckBox.isSelected();
 
         interleaveCheckBox.setEnabled(enabled);
+    }
+
+	private void enableListing()
+    {
+        boolean enabled = listingCheckBox.isSelected();
+
+        listingText.setEnabled(enabled);
+		listingBrowseButton.setEnabled(enabled);
+    }
+
+	private void enableObject()
+    {
+        boolean enabled = objectCheckBox.isSelected();
+
+        objectText.setEnabled(enabled);
+		objectBrowseButton.setEnabled(enabled);
+    }
+
+	private void enableTape()
+    {
+        boolean enabled = tapeCheckBox.isSelected();
+
+        tapeText.setEnabled(enabled);
+		tapeBrowseButton.setEnabled(enabled);
+    }
+
+	private void enableDiagnostic()
+    {
+        boolean enabled = diagnosticCheckBox.isSelected();
+
+        diagnosticText.setEnabled(enabled);
+		diagnosticBrowseButton.setEnabled(enabled);
+    }
+
+	private void enableMacro()
+    {
+        boolean enabled = macroCheckBox.isSelected();
+
+        macroText.setEnabled(enabled);
+		macroBrowseButton.setEnabled(enabled);
     }
 
     private void enablePage()
@@ -747,134 +790,182 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
         extrasReloaderCheckBox.setEnabled(enabled);
     }
 
-    String buildCommand()
+    Vector<String> buildCommand()
     {
-        StringBuffer command = new StringBuffer(512);
+        Vector<String> command = new Vector<String>();
 
-        command.append(assemblerText.getText());
+        command.add(assemblerText.getText());
 
-        if (bootCheckBox.isSelected() && !bootNoneRadioButton.isSelected()) {
-            command.append(" -b ");
+        if (bootCheckBox.isSelected() && !bootNoneRadioButton.isSelected()) 
+		{
+            command.add("-b");
 
-            if (bootIBMRadioButton.isSelected()) {
-                command.append('I');
-                command.append( size1400RadioButton.isSelected()  ? "1"
-                              : size2000RadioButton.isSelected()  ? "2"
-                              : size4000RadioButton.isSelected()  ? "4"
-                              : size8000RadioButton.isSelected()  ? "8"
-                              : size12000RadioButton.isSelected() ? "v"
-                              : "x");
-            }
-            else {
-                command.append(bootVan1RadioButton.isSelected() ? "B" : "V");
+            if (bootIBMRadioButton.isSelected()) 
+			{
+                command.add(size1400RadioButton.isSelected()      ? "I1"
+                              : size2000RadioButton.isSelected()  ? "I2"
+                              : size4000RadioButton.isSelected()  ? "I4"
+                              : size8000RadioButton.isSelected()  ? "I8"
+                              : size12000RadioButton.isSelected() ? "Iv"
+                              : "Ix");
+           }
+            else 
+			{
+                command.add(bootVan1RadioButton.isSelected() ? "B" : "V");
             }
         }
 
-        if (encodingCheckBox.isSelected()) {
-            command.append(" -e ");
-            command.append( encodingSimhRadioButton.isSelected() ? "S"
-                          : encodingARadioButton.isSelected()    ? "A"
-                          : encodingHRadioButton.isSelected()    ? "H"
+        if (encodingCheckBox.isSelected())
+		{
+            command.add("-e");
+            command.add( encodingSimhRadioButton.isSelected() ? "S"
+                          : encodingARadioButton.isSelected() ? "A"
+                          : encodingHRadioButton.isSelected() ? "H"
                           : "?");
         }
 
-        if (listingCheckBox.isSelected()) {
-            command.append(" -l ");
-            command.append(listingText.getText());
+        if (listingCheckBox.isSelected()) 
+		{
+            command.add("-l");			
+            command.add(listingText.getText());
         }
 
-        if (objectCheckBox.isSelected()) {
-            command.append(" -o ");
-            command.append(objectText.getText());
+        if (objectCheckBox.isSelected()) 
+		{
+            command.add("-o");
+            command.add(objectText.getText());
         }
 
         if (macroCheckBox.isSelected()) 
 		{
-			command.append(" -m macro");
+			command.add("-m");
+			command.add("macro");
 			
-            String paths[] = macroText.getText().split(";");
-
-            for (int i = 0; i < paths.length; ++i) 
+            for (String path : macroText.getText().split(";")) 
 			{
-                command.append(" -I ");
-                command.append(paths[i]);
+                command.add("-I");
+                command.add(path);
             }
         }
 
-        if (tapeCheckBox.isSelected()) {
-            command.append(" -t ");
-            command.append(tapeText.getText());
+        if (tapeCheckBox.isSelected()) 
+		{
+            command.add("-t");
+            command.add(tapeText.getText());
         }
 
-        if (diagnosticCheckBox.isSelected()) {
-            command.append(" -d ");
-            command.append(diagnosticText.getText());
+        if (diagnosticCheckBox.isSelected()) 
+		{			
+            command.add("-d");
+            command.add(diagnosticText.getText());
         }
 
-        if (codeOkCheckBox.isSelected()) {
-            command.append(" -a");
+        if (codeOkCheckBox.isSelected()) 
+		{
+            command.add("-a");
         }
 
-        if (interleaveCheckBox.isEnabled() && interleaveCheckBox.isSelected()) {
-            command.append(" -i");
+        if (interleaveCheckBox.isEnabled() && interleaveCheckBox.isSelected()) 
+		{
+            command.add("-i");
         }
 
-        if (storeCheckBox.isSelected()) {
-            command.append(" -L");
+        if (storeCheckBox.isSelected()) 
+		{
+            command.add("-L");
         }
 
-        if (dumpCheckBox.isSelected()) {
-            command.append(" -s");
+        if (dumpCheckBox.isSelected()) 
+		{
+            command.add("-s");
         }
 
-        if (pageCheckBox.isSelected()) {
+        if (pageCheckBox.isSelected()) 
+		{
             String pageLength = pageText.getText();
 
-            if (pageLength.length() > 0) {
-                command.append(" -p ").append(pageLength);
+            if (pageLength.length() > 0) 
+			{
+                command.add("-p");
+			    command.add(pageLength);
             }
         }
 
-        if (traceCheckBox.isSelected()) {
+        if (traceCheckBox.isSelected()) 
+		{
             StringBuffer letters = new StringBuffer(3);
 
-            if (traceLexerCheckBox.isSelected()) {
+            if (traceLexerCheckBox.isSelected()) 
+			{
                 letters.append('l');
             }
-            if (traceParserCheckBox.isSelected()) {
+			
+            if (traceParserCheckBox.isSelected()) 
+			{
                 letters.append('p');
             }
-            if (traceProcessCheckBox.isSelected()) {
+			
+            if (traceProcessCheckBox.isSelected()) 
+			{
                 letters.append('P');
             }
-            if (letters.length() > 0) {
-                command.append(" -T ").append(letters);
+			
+            if (letters.length() > 0) 
+			{
+                command.add("-T");
+                command.add(letters.toString());
             }
         }
 
-        if (extrasCheckBox.isSelected()) {
+        if (extrasCheckBox.isSelected()) 
+		{
             int flag = 0;
-            if (extrasExCheckBox.isSelected()) {
+			
+            if (extrasExCheckBox.isSelected()) 
+			{
                 flag += 1;
             }
-            if (extrasEndCheckBox.isSelected()) {
+			
+            if (extrasEndCheckBox.isSelected()) 
+			{
                 flag += 2;
             }
-            if (extrasQueueCheckBox.isSelected()) {
+			
+            if (extrasQueueCheckBox.isSelected()) 
+			{
                 flag += 4;
             }
-            if (extrasReloaderCheckBox.isSelected()) {
+			
+            if (extrasReloaderCheckBox.isSelected()) 
+			{
                 flag += 8;
             }
-            if (flag > 0) {
-                command.append(" -X " + flag);
+			
+            if (flag > 0) 
+			{
+                command.add("-X");
+                command.add("" + flag);
             }
         }
+		
+        command.add(AssemblerOptions.sourcePath);
+		
+		String commandStr = "";
+		for(int idx = 0; idx < command.size(); idx++)
+		{
+			if(idx < command.size() - 1)
+			{
+				commandStr = commandStr.concat(command.get(idx) + " ");
+			}
+			else
+			{
+				commandStr = commandStr.concat(command.get(idx));
+			}
+		}
+		
+        commandArea.setText(commandStr);
 
-        command.append(' ').append(AssemblerOptions.sourcePath);
-        commandArea.setText(command.toString());
-
-        return command.toString();
+        return command;
     }
 
     private void browseAction(String title, String filePath, JTextField textField, Vector<RopeFileFilter> filters, 
@@ -937,7 +1028,7 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
         AssemblerOptions.extrasQueue = extrasQueueCheckBox.isSelected();
         AssemblerOptions.extrasReloader = extrasReloaderCheckBox.isSelected();
 
-        AssemblerOptions.command = commandArea.getText();
+        AssemblerOptions.command = buildCommand();
 		
 		Rope.savePreferences();
 		
@@ -1033,20 +1124,43 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
     {
         Object source = event.getSource();
 
-        if ((source == bootCheckBox) || (source == bootIBMRadioButton)) {
+        if ((source == bootCheckBox) || (source == bootIBMRadioButton)) 
+		{
             enableBoot();
         }
-        else if ((source == listingCheckBox) || (source == objectCheckBox)) {
+        else if ((source == listingCheckBox) || (source == objectCheckBox)) 
+		{
+			enableListing();
+			enableObject();
             enableInterleave();
         }
-        else if (source == pageCheckBox) {
+        else if (source == pageCheckBox) 
+		{
             pageText.setEnabled(pageCheckBox.isSelected());
         }
-        else if (source == traceCheckBox) {
+        else if (source == traceCheckBox) 
+		{
             enableTrace();
         }
-        else if (source == extrasCheckBox) {
+        else if (source == extrasCheckBox) 
+		{
             enableExtras();
+        }
+        else if (source == macroCheckBox) 
+		{
+            enableMacro();
+        }
+        else if (source == tapeCheckBox) 
+		{
+            enableTape();
+        }
+        else if (source == diagnosticCheckBox) 
+		{
+            enableDiagnostic();
+        }
+        else if (source == encodingCheckBox) 
+		{
+            enableEncoding();
         }
 
         buildCommand();

@@ -9,6 +9,8 @@
 
 package rope1401;
 
+import java.util.Vector;
+
 class AssemblerOptions
 {
     static final int BOOT_NONE  = 0;
@@ -37,7 +39,7 @@ class AssemblerOptions
     static String tapePath;
     static String diagnosticPath;
     static String pageLength = "60";
-    static String command;
+    static Vector<String> command;
 
     static boolean boot       = true;
     static boolean encoding   = true;

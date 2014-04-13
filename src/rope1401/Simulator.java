@@ -41,7 +41,9 @@ class Simulator
 		{
             cleanup();
 
-		    process = Runtime.getRuntime().exec(SimulatorOptions.simulatorPath);
+			String[] args = new String[1];
+			args[0] = SimulatorOptions.simulatorPath;
+		    process = Runtime.getRuntime().exec(args);
 			
             isActive = true;
 
