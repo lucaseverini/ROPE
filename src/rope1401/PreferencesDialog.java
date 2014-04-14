@@ -169,7 +169,7 @@ public class PreferencesDialog extends JDialog implements ActionListener
 				return;
 			}
 		}
-
+		
 		AssemblerOptions.saveBeforeAssembly = saveBeforeAssemblyChk.isSelected();
 		SimulatorOptions.useOldConversion = useOldConversionChk.isSelected();
 		AssemblerOptions.assemblerPath = assemblerPath.getText();

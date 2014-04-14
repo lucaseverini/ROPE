@@ -55,6 +55,10 @@ class Assembler
 			Simulator.kill();
 			
 			String[] args = AssemblerOptions.command.toArray(new String[0]);
+			
+			// The path to the assembler executable may be changed so we re-set it be safe
+			args[0] = AssemblerOptions.assemblerPath;
+			
             process = Runtime.getRuntime().exec(args);
             stdout = new BufferedReader(new InputStreamReader(process.getInputStream()));
 			

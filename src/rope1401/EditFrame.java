@@ -379,6 +379,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
             }
 
             dialog.initialize();
+			
             AssemblerOptions.command = dialog.buildCommand();
 
             sourceArea.setText(null);
@@ -450,7 +451,9 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
     private void optionsAction()
     {
    		dialog.initialize();
+		
  	    dialog.buildCommand();
+		
         dialog.setVisible(true);
 	}
 
