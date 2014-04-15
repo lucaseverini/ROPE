@@ -70,14 +70,32 @@
     nbproject/build-impl.xml file. 
 
     -->
+<!--
+	Last changes by Luca Severini (lucaseverini@mac.com) on April 14 2014.
+-->
 	
-	 <target name="-post-jar"> 
+<!--
+	Execute the script that creates the property file containing some properties used as strings
+-->		
+	<target name="-pre-compile">
+		<exec dir="." executable="/bin/sh">
+			<arg line="create_properties.sh"/>
+		</exec>
+	</target>
+	
+<!--
+	Copy the tools folder with all its content except invisible files
+-->		
+	<target name="-post-jar"> 
         <copy todir="${dist.dir}/tools" includeEmptyDirs="true" verbose="true" overwrite="true" preservelastmodified="true"> 
 			<fileset dir="tools/" followsymlinks="true" excludes=".*">
 				<include name="*/*"/>
 			</fileset>
 		</copy>
 		
+<!--
+	Make the mac tools executable
+-->		
 		<chmod perm="ug+x">
 			<fileset dir="${dist.dir}/tools">
 				<include name="*/*"/>

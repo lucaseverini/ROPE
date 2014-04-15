@@ -838,8 +838,11 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
 
         if (macroCheckBox.isSelected()) 
 		{
-			command.add("-m");
-			command.add("macro");
+            for (String macro : AssemblerOptions.macros.split(";")) 
+			{
+                command.add("-m");
+                command.add(macro);
+            }
 			
             for (String path : macroText.getText().split(";")) 
 			{

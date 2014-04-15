@@ -35,6 +35,7 @@ class AssemblerOptions
     static String sourcePath;
     static String listingPath;
     static String objectPath;
+	static String macros = "mac";
     static String macroPath;
     static String tapePath;
     static String diagnosticPath;
