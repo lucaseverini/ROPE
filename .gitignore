@@ -1,4 +1,4 @@
-# Last change: April-12-2014 by Luca Severini
+# Last change: April-14-2014 by Luca Severini
 
 # OS specific #
 .DS_Store
@@ -12,6 +12,9 @@ dist/
 nbdist/
 nbactions.xml
 nb-configuration.xml
+
+# Project specific #
+BuildTimeStrings.properties
 
 # Class Files #
 *.class
