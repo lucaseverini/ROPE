@@ -78,8 +78,13 @@
 	Execute the script that creates the property file containing some properties used as strings
 -->		
 	<target name="-pre-compile">
-		<exec dir="." executable="/bin/sh">
+		<exec dir="." executable="/bin/sh" os="Mac OS X">
 			<arg line="create_properties.sh"/>
+		</exec>
+		
+		<!-- For windows it's necessary to have MingW installed -->
+		<exec dir="." executable="C:\Programmi\Git\bin\sh.exe" os="Windows XP 5.1">
+			<arg line="--login -i create_properties.sh"/>
 		</exec>
 	</target>
 	
