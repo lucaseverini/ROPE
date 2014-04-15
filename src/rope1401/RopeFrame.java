@@ -492,7 +492,8 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 			s3 = MessageFormat.format(RopeResources.getString("AboutText3"), compilerJDK, compilerTime);
 		}
 
-		String s4 = MessageFormat.format(RopeResources.getString("AboutText4"), System.getProperty("java.version"));
+		String s4 = MessageFormat.format(RopeResources.getString("AboutText4"), System.getProperty("java.version"),
+														System.getProperty("os.name") + " " + System.getProperty("os.version"));
 
 		String message = "";
 		if(!s1.isEmpty())
