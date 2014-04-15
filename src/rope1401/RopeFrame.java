@@ -15,6 +15,7 @@ import java.beans.PropertyVetoException;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.text.MessageFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,7 +28,6 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 	private final boolean askConfirmationToQuit = false;	// This should go in general preferences
 
  	private static final long serialVersionUID = 1L;
-	private static final String TITLE = "ROPE/1401 by Ronald Mak, Stan Paddock and Luca Severini (Version 2.0 beta - April 13 2014)";
     private JDesktopPane desktop = new JDesktopPane();
     private ExecFrame execFrame;
     private PrintoutFrame printoutFrame;
@@ -88,7 +88,8 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
         this.setSize(frameSize);
         this.setLocation((screenSize.width - frameSize.width) / 2, 10);
 		
-        this.setTitle(TITLE);
+		
+        this.setTitle(MessageFormat.format(RopeResources.getString("RopeFrameTitle"), RopeResources.getString("RopeVersion")));
     
         JPanel contentPanel = (JPanel)this.getContentPane();
         contentPanel.add(desktop);
@@ -478,9 +479,34 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 	
 	public boolean aboutRope() 
 	{	
-        JOptionPane.showMessageDialog(this, "ROPE beta (April 12 2014)\nby Luca Severini", "About ROPE", 
-																			JOptionPane.INFORMATION_MESSAGE);
-        return true;
+		String ropeVersion = RopeResources.getString("RopeVersion");
+		String s1 = MessageFormat.format(RopeResources.getString("AboutText1"), ropeVersion);
+
+		String s2 = RopeResources.getString("AboutText2");
+
+		String s3 = "";
+		String compilerJDK = RopeResources.getBuildString("CompilerJDK");
+		String compilerTime = RopeResources.getBuildString("CompilerTime");
+		if(!compilerJDK.isEmpty() && !compilerTime.isEmpty()) // Dont' use this part if there are no real informations to provide
+		{
+			s3 = MessageFormat.format(RopeResources.getString("AboutText3"), compilerJDK, compilerTime);
+		}
+
+		String s4 = MessageFormat.format(RopeResources.getString("AboutText4"), System.getProperty("java.version"));
+
+		String message = "";
+		if(!s1.isEmpty())
+			message = message.concat(s1);
+		if(!s2.isEmpty())
+			message = message.concat("\n" + s2);
+		if(!s3.isEmpty())
+			message = message.concat("\n" + s3);
+		if(!s4.isEmpty())
+			message = message.concat("\n" + s4);
+	
+		JOptionPane.showMessageDialog(this, message, "About ROPE", JOptionPane.INFORMATION_MESSAGE);
+		
+		return true;	
     }
 	
 	public boolean quitRope()
