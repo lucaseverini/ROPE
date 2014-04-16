@@ -485,7 +485,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 					
 					messages.addElement(line);
 					
-					if(line.startsWith("[ERROR:"))
+					if(line.startsWith(" [ERROR:"))
 					{
 						haveAssemblyErrors = true;
 					}
@@ -523,22 +523,24 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 
         if ((i != -1) && (i < 10)) 
 		{
-            int lineNumber = Integer.parseInt(message.substring(0, i).trim()) - 1;
-
-            try 
+			try 
 			{
-                int start = sourceArea.getLineStartOffset(lineNumber);
-                int end = sourceArea.getLineEndOffset(lineNumber);
+				int lineNumber = Integer.parseInt(message.substring(0, i).trim()) - 1;
+				if(lineNumber < sourceArea.getLineCount())
+				{
+					int start = sourceArea.getLineStartOffset(lineNumber);
+					int end = sourceArea.getLineEndOffset(lineNumber);
 
-                sourceArea.requestFocus();
-                sourceArea.setSelectionStart(start);
-                sourceArea.setSelectionEnd(end - 1);
-            }
-            catch (BadLocationException ex) 
+					sourceArea.requestFocus();
+					sourceArea.setSelectionStart(start);
+					sourceArea.setSelectionEnd(end - 1);
+				}
+			}
+			catch (Exception ex) 
 			{
-                ex.printStackTrace();
-            }
-        }
+				ex.printStackTrace();
+			}
+		}
     }
 
 	@Override
