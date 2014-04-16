@@ -481,8 +481,14 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 			{
 				while ((line = Assembler.output()) != null) 
 				{
+					System.out.println(line);
+					
 					messages.addElement(line);
-					haveAssemblyErrors = true;
+					
+					if(line.startsWith("[ERROR:"))
+					{
+						haveAssemblyErrors = true;
+					}
 				}
 
 				messageList.setListData(messages);
