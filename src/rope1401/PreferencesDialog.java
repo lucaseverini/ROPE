@@ -30,6 +30,7 @@ public class PreferencesDialog extends JDialog implements ActionListener
     JButton simulatorBrowseBtn;
     JButton confirmBtn;
     JButton cancelBtn;
+    JButton resetBtn;
  
     PreferencesDialog(Frame owner, String title)
     {
@@ -53,6 +54,7 @@ public class PreferencesDialog extends JDialog implements ActionListener
         simulatorBrowseBtn.addActionListener(this);
 		confirmBtn.addActionListener(this);
 		cancelBtn.addActionListener(this);
+		resetBtn.addActionListener(this);
 		
 		assemblerPath.setText(AssemblerOptions.assemblerPath);
         simulatorPath.setText(SimulatorOptions.simulatorPath);
@@ -72,6 +74,7 @@ public class PreferencesDialog extends JDialog implements ActionListener
 		simulatorBrowseBtn = new JButton("Select...");
 		confirmBtn = new JButton("Confirm");
 		cancelBtn = new JButton("Cancel");
+		resetBtn = new JButton("Reset...");
 		
 		JPanel mainPanel = new JPanel();
 		JPanel assemblerPanel = new JPanel();
@@ -114,6 +117,9 @@ public class PreferencesDialog extends JDialog implements ActionListener
         buttonsPanel.add(cancelBtn, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
                                                GridBagConstraints.CENTER, GridBagConstraints.NONE,
                                                new Insets(0, 10, 15, 0), 0, 0));
+        buttonsPanel.add(resetBtn, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+                                               GridBagConstraints.CENTER, GridBagConstraints.NONE,
+                                               new Insets(0, 100, 15, 0), 0, 0));
 
 		mainPanel.setLayout(new GridBagLayout());
         mainPanel.add(assemblerPanel, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
@@ -132,7 +138,7 @@ public class PreferencesDialog extends JDialog implements ActionListener
     }
 
     private void browseAction(String title, String filePath, JTextField textField, Vector<RopeFileFilter> filters, 
-																	boolean directories, boolean multiple)
+																				boolean directories, boolean multiple)
     {
         RopeFileChooser chooser = new RopeFileChooser(DataOptions.directoryPath, filePath, filters, directories, multiple);
 		chooser.setDialogTitle(title);
@@ -194,6 +200,31 @@ public class PreferencesDialog extends JDialog implements ActionListener
     {
 		dispose();
     }
+	
+	private void resetAction()
+	{
+		try
+		{
+			String message = "Do you want to reset all Rope preferences to default value and quit immediately?";
+			int result = JOptionPane.showConfirmDialog(null, message, "Reset Preferences", JOptionPane.OK_CANCEL_OPTION);
+			if (result == JOptionPane.OK_OPTION)
+			{
+				Preferences userPrefs = Preferences.userRoot();
+				userPrefs.clear();
+				userPrefs.sync();
+				userPrefs.flush();
+
+				Assembler.kill();
+				Simulator.kill();
+			
+				System.exit(0);
+			}
+		}
+		catch(BackingStoreException ex)
+		{
+			Logger.getLogger(RopeFrame.class.getName()).log(Level.SEVERE, null, ex);
+		}
+	}
 
 	@Override
     public void actionPerformed(ActionEvent event)
@@ -230,7 +261,11 @@ public class PreferencesDialog extends JDialog implements ActionListener
 		{
             cancelAction();
         }
-    }
+        else if (source == resetBtn) 
+		{
+            resetAction();
+        }
+   }
 
 	@Override
     protected void processWindowEvent(WindowEvent event)

@@ -736,7 +736,7 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
 		
         mainFrame.unlockCommandWindows();
         mainFrame.showPrintoutWindow(baseName);
-
+ 
         simulatorRunning = true;
         simulatorButton.setText("Kill simulator");
 		

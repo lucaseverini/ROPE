@@ -88,7 +88,6 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
         this.setSize(frameSize);
         this.setLocation((screenSize.width - frameSize.width) / 2, 10);
 		
-		
         this.setTitle(MessageFormat.format(RopeResources.getString("RopeFrameTitle"), RopeResources.getString("RopeVersion")));
     
         JPanel contentPanel = (JPanel)this.getContentPane();
@@ -97,7 +96,8 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 					
 		setupMenus();
 				
-		Dimension ropeFrameSize = this.getContentPane().getSize();
+		Dimension ropeFrameSize = getSize();
+		// Dimension ropeFrameSize = contentPanel.getSize();
 
 		editFrame = new EditFrame(this);
 	    Point frameLocation = new Point(0, 0);
@@ -106,29 +106,38 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 		frameLocation = RopeHelper.parsePoint(userPrefs.get("editFrameLocation", editFrame.getLocation().toString()));	
 		frameSize = RopeHelper.parseDimension(userPrefs.get("editFrameSize", editFrame.getSize().toString()));
 
+		verifyFrameLocation(frameLocation);
+		verifyFrameSize(frameSize);
+
         editFrame.setLocation(frameLocation);
 		editFrame.setSize(frameSize);
 		editFrame.setVisible(true);
         desktop.add(editFrame);
         
         execFrame = new ExecFrame(this);
-	    frameLocation.setLocation((ropeFrameSize.width / 2), 0);
+	    frameLocation.setLocation(ropeFrameSize.width / 2, 0);
 		frameSize = execFrame.getSize();
 	 	
 		frameLocation = RopeHelper.parsePoint(userPrefs.get("execFrameLocation", execFrame.getLocation().toString()));	
 		frameSize = RopeHelper.parseDimension(userPrefs.get("execFrameSize", execFrame.getSize().toString()));
-
+		
+		verifyFrameLocation(frameLocation);
+		verifyFrameSize(frameSize);
+	
         execFrame.setLocation(frameLocation);
 		execFrame.setSize(frameSize);
 		execFrame.setVisible(false);
 		desktop.add(execFrame);
 		
         printoutFrame = new PrintoutFrame(this);
-	 	frameSize.setSize(printoutFrame.getWidth(), ropeFrameSize.height - editFrame.getHeight());
-        frameLocation.setLocation(0, ropeFrameSize.height - frameSize.height);
+        frameLocation.setLocation(ropeFrameSize.width / 2, ropeFrameSize.height / 2);
+	 	frameSize = printoutFrame.getSize();
 		
 		frameLocation = RopeHelper.parsePoint(userPrefs.get("printoutFrameLocation", frameLocation.toString()));	
 		frameSize = RopeHelper.parseDimension(userPrefs.get("printoutFrameSize", frameSize.toString()));	
+		
+		verifyFrameLocation(frameLocation);		
+		verifyFrameSize(frameSize);
 		
         printoutFrame.setLocation(frameLocation);
 		printoutFrame.setSize(frameSize);
@@ -142,6 +151,34 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 		clipboardListener = new ClipboardListener(this);
 	}
 	
+	void verifyFrameLocation(Point frameLocation)
+	{
+		Dimension ropeFrameSize = getSize();
+		
+		if(frameLocation.getX() < 0 || frameLocation.getY() < 0)
+		{
+			frameLocation.setLocation(0, 0);
+		}
+		else if(frameLocation.getX() > ropeFrameSize.getWidth()- 20 || frameLocation.getY() > ropeFrameSize.getHeight()- 20)
+		{
+			frameLocation.setLocation(ropeFrameSize.getWidth() - 20, ropeFrameSize.getHeight() - 20);
+		}
+	}
+	
+	void verifyFrameSize(Dimension frameSize)
+	{
+		Dimension ropeFrameSize = getSize();
+
+		if(frameSize.getWidth() < 20 || frameSize.getHeight() < 20)
+		{
+			frameSize.setSize(20, 20);
+		}
+		else if(frameSize.getWidth() > ropeFrameSize.getWidth() || frameSize.getHeight() > ropeFrameSize.getHeight())
+		{
+			frameSize.setSize(ropeFrameSize.getWidth(), ropeFrameSize.getHeight());
+		}
+	}
+	
 	boolean closed()
 	{
 		return closed;
@@ -153,14 +190,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
         execFrame.setTitle("EXEC: " + baseName);
         execFrame.setVisible(true);
         execFrame.initialize(baseName, DataOptions.outputPath);
-
-        if (haveAssemblyErrors()) 
-		{
-            try {
-                editFrame.setSelected(true);
-            }
-            catch(PropertyVetoException ignore) {}
-        }
+		execFrame.toFront();
     }
 
     void resetExecWindow()
@@ -170,20 +200,21 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 
     void showPrintoutWindow(String baseName)
     {
-        desktop.getDesktopManager().deiconifyFrame(printoutFrame);
-        printoutFrame.setTitle("PRINTOUT: " + baseName);
-        printoutFrame.setVisible(true);
-        printoutFrame.initialize();
-        printoutFrame.toBack();
+		desktop.getDesktopManager().deiconifyFrame(printoutFrame);
+		printoutFrame.setTitle("PRINTOUT: " + baseName);
+		printoutFrame.setVisible(true);
+		printoutFrame.initialize();
+		printoutFrame.toFront();
 
-        commandWindows.addElement(printoutFrame);
+		commandWindows.addElement(printoutFrame);
 
-        try 
+		try 
 		{
-            execFrame.setSelected(true);
-        }
-        catch(PropertyVetoException ignore) {}
-    }
+			execFrame.toFront();
+			execFrame.setSelected(true);
+		}
+		catch(PropertyVetoException ignore) {}
+	}
 	
 	void resetMemoryFrame()
 	{
@@ -207,6 +238,9 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 			frameLocation = RopeHelper.parsePoint(userPrefs.get("memoryFrameLocation", frameLocation.toString()));	
 			frameSize = RopeHelper.parseDimension(userPrefs.get("memoryFrameSize", frameSize.toString()));	
 
+			verifyFrameLocation(frameLocation);
+			verifyFrameSize(frameSize);
+		
 			memoryFrame.setLocation(frameLocation);
 			memoryFrame.setSize(frameSize);
 			memoryFrame.setVisible(true);
