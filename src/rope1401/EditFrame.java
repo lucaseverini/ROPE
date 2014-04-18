@@ -341,10 +341,16 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 					JOptionPane.showMessageDialog(null, message , "ROPE", JOptionPane.WARNING_MESSAGE);
 					selectedPath = null;
 				}
+				else
+				{
+					System.out.println("Source folder path set from ROPE_SOURCES_DIR: " + selectedPath);
+				}
 			}
 			if(selectedPath == null)
 			{
 				selectedPath = System.getProperty("user.dir");
+
+				System.out.println("Source folder path set to current directory: " + selectedPath);
 			}
 		}
 
