@@ -33,14 +33,8 @@ class RopeFileChooser extends JFileChooser
 		{
             this.setSelectedFile(new File(filePath));
         }
-        else 
+        else if(directoryPath != null)
 		{
-            if (directoryPath == null) 
-			{
-                directoryPath = System.getProperties().
-							getProperty("file.separator").equals("/") ? System.getProperties().getProperty("user.home") : "c:\\";
-            }
-
             this.setCurrentDirectory(new File(directoryPath));
         }
 
