@@ -176,7 +176,7 @@ public class PreferencesDialog extends JDialog implements ActionListener
 		File file = new File(assemblerPath.getText());
 		if(!file.exists() || file.isDirectory())
 		{
-			String message = String.format("Assembler is not available: %s.\n Continue?", assemblerPath.getText());
+			String message = String.format("The path to Assembler program is not available: %s.\n Continue?", assemblerPath.getText());
 			if (JOptionPane.showConfirmDialog(null, message , "ROPE", JOptionPane.ERROR_MESSAGE, JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION)
 			{
 				return;
@@ -186,7 +186,7 @@ public class PreferencesDialog extends JDialog implements ActionListener
 		file = new File(simulatorPath.getText());
 		if(!file.exists() || file.isDirectory())
 		{
-			String message = String.format("Simulator is not available: %s.\n Continue?", simulatorPath.getText());
+			String message = String.format("The path to Simulator program is not available: %s.\n Continue?", simulatorPath.getText());
 			if (JOptionPane.showConfirmDialog(null, message , "ROPE", JOptionPane.ERROR_MESSAGE, JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION)
 			{
 				return;

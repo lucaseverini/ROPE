@@ -440,6 +440,8 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 	{
 		String simulatorPref = "", assemblerPref = "";
 		
+		System.out.println("Current directory: " + System.getProperty("user.dir"));
+		
 		if(RopeHelper.isWindows)
 		{
 			assemblerPref = userPrefs.get("assemblerPath", "tools/windows/autocoder.exe");
@@ -459,36 +461,42 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 		AssemblerOptions.saveBeforeAssembly = userPrefs.getBoolean("saveBeforeAssembly", false);
 		SimulatorOptions.useOldConversion = userPrefs.getBoolean("useOldConversion", true);
 		
-		File file = new File(assemblerPref);
-		if(!file.exists() || file.isDirectory()) 
+		if(!assemblerPref.isEmpty())
 		{
-			String message = String.format("The path to Assembler program set in preferences is not available.\n%s", assemblerPref);
-			System.out.println(message);
-			
-			JOptionPane.showMessageDialog(this, message, "ROPE", JOptionPane.ERROR_MESSAGE);
-		}
-		else
-		{
-			AssemblerOptions.assemblerPath = assemblerPref;
+			File file = new File(assemblerPref);
+			if(!file.exists() || file.isDirectory()) 
+			{
+				String message = String.format("The path to Assembler program set in preferences is not available.\n%s", assemblerPref);
+				System.out.println(message);
+
+				JOptionPane.showMessageDialog(this, message, "ROPE", JOptionPane.ERROR_MESSAGE);
+			}
+			else
+			{
+				AssemblerOptions.assemblerPath = assemblerPref;
+			}
 		}
 
-		file = new File(simulatorPref);
-		if(!file.exists() || file.isDirectory()) 
+		if(!simulatorPref.isEmpty())
 		{
-			String message = String.format("The path to Simulator program set in preferences is not available.\n%s", simulatorPref);
-			System.out.println(message);
+			File file = new File(simulatorPref);
+			if(!file.exists() || file.isDirectory()) 
+			{
+				String message = String.format("The path to Simulator program set in preferences is not available.\n%s", simulatorPref);
+				System.out.println(message);
 
-			JOptionPane.showMessageDialog(this, message, "ROPE", JOptionPane.ERROR_MESSAGE);
-		}
-		else
-		{
-			SimulatorOptions.simulatorPath = simulatorPref;
+				JOptionPane.showMessageDialog(this, message, "ROPE", JOptionPane.ERROR_MESSAGE);
+			}
+			else
+			{
+				SimulatorOptions.simulatorPath = simulatorPref;
+			}
 		}
 
 		assemblerPref = System.getenv("ROPE_ASSEMBLER");
 		if(assemblerPref != null && !assemblerPref.isEmpty())
 		{
-			file = new File(assemblerPref);
+			File file = new File(assemblerPref);
 			if(!file.exists() || file.isDirectory()) 
 			{
 				String message = String.format("The path to Assembler program set in environment variable ROPE_ASSEMBLER is not available.\n%s",  
@@ -508,7 +516,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 		simulatorPref = System.getenv("ROPE_SIMULATOR");
 		if(simulatorPref != null && !simulatorPref.isEmpty())
 		{
-			file = new File(simulatorPref);
+			File file = new File(simulatorPref);
 			if(!file.exists() || file.isDirectory()) 
 			{
 				String message = String.format("The path to Simulator program set in environment variable ROPE_SIMULATOR is not available.\n%s", 
@@ -537,6 +545,24 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 
 				JOptionPane.showMessageDialog(this, message, "ROPE", JOptionPane.ERROR_MESSAGE);
 			}
+		}
+		
+		if(AssemblerOptions.assemblerPath == null || AssemblerOptions.assemblerPath.isEmpty())
+		{
+			String message = "The path to Assembler program is not set."; 
+			
+			System.out.println(message);
+
+			JOptionPane.showMessageDialog(this, message, "ROPE", JOptionPane.ERROR_MESSAGE);
+		}
+
+		if(SimulatorOptions.simulatorPath == null || SimulatorOptions.simulatorPath.isEmpty())
+		{
+			String message = "The path to Simulator program is not set."; 
+			
+			System.out.println(message);
+
+			JOptionPane.showMessageDialog(this, message, "ROPE", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 	
