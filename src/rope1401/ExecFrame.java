@@ -382,7 +382,7 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
 				String message = String.format("SimH failed!\nVerify the correctness of SimH path\n%s", 
 																			SimulatorOptions.simulatorPath);
 				System.out.println(message);
-				JOptionPane.showMessageDialog(this, message);
+				JOptionPane.showMessageDialog(this, message, "ROPE", JOptionPane.ERROR_MESSAGE);
 			}
        }
     }
@@ -702,7 +702,7 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
 				String message = String.format("SimH failed!\nVerify the correctness of SimH path\n%s", 
 																			SimulatorOptions.simulatorPath);
 				System.out.println(message);
-				JOptionPane.showMessageDialog(this, message);
+				JOptionPane.showMessageDialog(this, message, "ROPE", JOptionPane.ERROR_MESSAGE);
 			}
 		}
     }

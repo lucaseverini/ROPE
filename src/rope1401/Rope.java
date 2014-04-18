@@ -13,6 +13,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
+import javax.swing.JOptionPane;
 
 public class Rope
 {
@@ -41,8 +42,6 @@ public class Rope
 				Simulator.kill();
 			}
 		});
-	
-		loadPreferences();
 		
 	    mainFrame = new RopeFrame();
     }
@@ -54,15 +53,11 @@ public class Rope
 	
 	public static void savePreferences()
 	{
+/*
 		try
 		{
 			// Retrieve the user preference node
 			Preferences userPrefs = Preferences.userRoot();
-
-			userPrefs.put("assemblerPath", AssemblerOptions.assemblerPath);
-			userPrefs.put("simulatorPath", SimulatorOptions.simulatorPath);
-			userPrefs.putBoolean("saveBeforeAssembly", AssemblerOptions.saveBeforeAssembly);
-			userPrefs.putBoolean("useOldConversion", SimulatorOptions.useOldConversion);
 
 			userPrefs.sync();
 			userPrefs.flush();
@@ -71,18 +66,13 @@ public class Rope
 		{
 			Logger.getLogger(RopeFrame.class.getName()).log(Level.SEVERE, null, ex);
 		}
+*/
 	}
-	
+/*	
 	public static void loadPreferences()
 	{
-		// Retrieve the user preference node
 		Preferences userPrefs = Preferences.userRoot();
 
-		//userPrefs.remove("assemblerPath");
-		//userPrefs.remove("simulatorPath");
-
-		// Get the value of the preference;
-		// default value is returned if the preference does not exist
 		if(RopeHelper.isWindows)
 		{
 			AssemblerOptions.assemblerPath = userPrefs.get("assemblerPath", "tools/windows/autocoder.exe");
@@ -101,5 +91,18 @@ public class Rope
 		
 		AssemblerOptions.saveBeforeAssembly = userPrefs.getBoolean("saveBeforeAssembly", false);
 		SimulatorOptions.useOldConversion = userPrefs.getBoolean("useOldConversion", true);
+		
+		String var = System.getenv("ROPE_ASSEMBLER");
+		if(var != null && !var.isEmpty())
+		{
+			AssemblerOptions.assemblerPath = var;
+		}
+		
+		var = System.getenv("ROPE_SIMULATOR");
+		if(var != null && !var.isEmpty())
+		{
+			SimulatorOptions.simulatorPath = var;
+		}
 	}
+*/
 }

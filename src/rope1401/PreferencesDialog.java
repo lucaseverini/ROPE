@@ -56,10 +56,30 @@ public class PreferencesDialog extends JDialog implements ActionListener
 		cancelBtn.addActionListener(this);
 		resetBtn.addActionListener(this);
 		
-		assemblerPath.setText(AssemblerOptions.assemblerPath);
-        simulatorPath.setText(SimulatorOptions.simulatorPath);
-		saveBeforeAssemblyChk.setSelected(AssemblerOptions.saveBeforeAssembly);
-		useOldConversionChk.setSelected(SimulatorOptions.useOldConversion);
+		Preferences userPrefs = Preferences.userRoot();
+		
+		String path1 = "", path2 = "";
+		
+		if(RopeHelper.isWindows)
+		{
+			path1 = userPrefs.get("assemblerPath", "tools/windows/autocoder.exe");
+			path2 = userPrefs.get("simulatorPath", "tools/windows/i1401.exe");
+		}
+		else if(RopeHelper.isMac)
+		{
+			path1 = userPrefs.get("assemblerPath", "tools/mac/autocoder");
+			path2 = userPrefs.get("simulatorPath", "tools/mac/i1401");			
+		}
+		else if(RopeHelper.isUnix)
+		{
+			path1 = userPrefs.get("assemblerPath", "tools/linux/autocoder");
+			path2 = userPrefs.get("simulatorPath", "tools/linux/i1401");			
+		}
+	
+		assemblerPath.setText(path1);
+        simulatorPath.setText(path2);
+		saveBeforeAssemblyChk.setSelected(userPrefs.getBoolean("saveBeforeAssembly", false));
+		useOldConversionChk.setSelected(userPrefs.getBoolean("useOldConversion", true));
      }
 
     private void jbInit() throws Exception
@@ -157,7 +177,7 @@ public class PreferencesDialog extends JDialog implements ActionListener
 		if(!file.exists() || file.isDirectory())
 		{
 			String message = String.format("Assembler is not available: %s.\n Continue?", assemblerPath.getText());
-			if (JOptionPane.showConfirmDialog(null, message , "Warning", JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION)
+			if (JOptionPane.showConfirmDialog(null, message , "ROPE", JOptionPane.ERROR_MESSAGE, JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION)
 			{
 				return;
 			}
@@ -167,24 +187,21 @@ public class PreferencesDialog extends JDialog implements ActionListener
 		if(!file.exists() || file.isDirectory())
 		{
 			String message = String.format("Simulator is not available: %s.\n Continue?", simulatorPath.getText());
-			if (JOptionPane.showConfirmDialog(null, message , "Warning", JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION)
+			if (JOptionPane.showConfirmDialog(null, message , "ROPE", JOptionPane.ERROR_MESSAGE, JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION)
 			{
 				return;
 			}
 		}
-		
-		AssemblerOptions.saveBeforeAssembly = saveBeforeAssemblyChk.isSelected();
-		SimulatorOptions.useOldConversion = useOldConversionChk.isSelected();
-		AssemblerOptions.assemblerPath = assemblerPath.getText();
-		SimulatorOptions.simulatorPath = simulatorPath.getText();
-		
+				
 		try
 		{
 			Preferences userPrefs = Preferences.userRoot();
-			userPrefs.put("assemblerPath", AssemblerOptions.assemblerPath);
-			userPrefs.put("simulatorPath", SimulatorOptions.simulatorPath);
-			userPrefs.putBoolean("saveBeforeAssembly", AssemblerOptions.saveBeforeAssembly);
-			userPrefs.putBoolean("useOldConversion", SimulatorOptions.useOldConversion);
+			
+			userPrefs.put("assemblerPath", assemblerPath.getText());
+			userPrefs.put("simulatorPath", simulatorPath.getText());
+			userPrefs.putBoolean("saveBeforeAssembly", saveBeforeAssemblyChk.isSelected());
+			userPrefs.putBoolean("useOldConversion", useOldConversionChk.isSelected());
+			
 			userPrefs.sync();
 			userPrefs.flush();
 		}
@@ -192,7 +209,24 @@ public class PreferencesDialog extends JDialog implements ActionListener
 		{
 			Logger.getLogger(RopeFrame.class.getName()).log(Level.SEVERE, null, ex);
 		}
-			
+	
+		AssemblerOptions.saveBeforeAssembly = saveBeforeAssemblyChk.isSelected();
+		SimulatorOptions.useOldConversion = useOldConversionChk.isSelected();
+		AssemblerOptions.assemblerPath = assemblerPath.getText();
+		SimulatorOptions.simulatorPath = simulatorPath.getText();
+
+		String var = System.getenv("ROPE_ASSEMBLER");
+		if(var == null || var.isEmpty())
+		{
+			AssemblerOptions.assemblerPath = assemblerPath.getText();
+		}
+		
+		var = System.getenv("ROPE_SIMULATOR");
+		if(var == null || var.isEmpty())
+		{
+			SimulatorOptions.simulatorPath = simulatorPath.getText();
+		}
+
 		dispose();
     }
 
@@ -206,7 +240,7 @@ public class PreferencesDialog extends JDialog implements ActionListener
 		try
 		{
 			String message = "Do you want to reset all Rope preferences to default value and quit immediately?";
-			int result = JOptionPane.showConfirmDialog(null, message, "Reset Preferences", JOptionPane.OK_CANCEL_OPTION);
+			int result = JOptionPane.showConfirmDialog(null, message, "ROPE", JOptionPane.WARNING_MESSAGE, JOptionPane.OK_CANCEL_OPTION);
 			if (result == JOptionPane.OK_OPTION)
 			{
 				Preferences userPrefs = Preferences.userRoot();

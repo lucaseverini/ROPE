@@ -14,6 +14,10 @@ import java.awt.Dimension;
 import java.awt.event.*;
 import java.io.*;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
@@ -53,6 +57,7 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
     JTextField macroText = new JTextField();
     JTextField tapeText = new JTextField();
     JTextField pageText = new JTextField();
+    JTextField diagnosticText = new JTextField();
     JTextArea commandArea = new JTextArea();
 
     JLabel coreLabel = new JLabel();
@@ -64,7 +69,6 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
     JCheckBox macroCheckBox = new JCheckBox();
     JCheckBox tapeCheckBox = new JCheckBox();
     JCheckBox diagnosticCheckBox = new JCheckBox();
-    JTextField diagnosticText = new JTextField();
     JCheckBox codeOkCheckBox = new JCheckBox();
     JCheckBox interleaveCheckBox = new JCheckBox();
     JCheckBox storeCheckBox = new JCheckBox();
@@ -107,6 +111,8 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
     JButton diagnosticBrowseButton = new JButton();
     JButton okButton = new JButton();
     JButton cancelButton = new JButton();
+	
+	String selectedPath;
 
     public AssemblerDialog(Frame frame, String title, boolean modal)
     {
@@ -127,7 +133,15 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
     {
         this(frame, title, true);
 
-        assemblerBrowseButton.addActionListener(this);
+		assemblerText.addCaretListener(this);
+ 		listingText.addCaretListener(this);
+		objectText.addCaretListener(this);
+		macroText.addCaretListener(this);
+		tapeText.addCaretListener(this);
+        pageText.addCaretListener(this);
+		diagnosticText.addCaretListener(this);
+		 
+        assemblerBrowseButton.addActionListener(this);		
         listingBrowseButton.addActionListener(this);
         objectBrowseButton.addActionListener(this);
         macroBrowseButton.addActionListener(this);
@@ -135,10 +149,7 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
         diagnosticBrowseButton.addActionListener(this);
         okButton.addActionListener(this);
         cancelButton.addActionListener(this);
-
         pageText.addActionListener(this);
-        pageText.addCaretListener(this);
-
         bootCheckBox.addChangeListener(this);
         bootNoneRadioButton.addChangeListener(this);
         bootIBMRadioButton.addChangeListener(this);
@@ -194,13 +205,11 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
 
         assemblerPanel.setBorder(titledBorder2);
         assemblerPanel.setLayout(gridBagLayout7);
-        assemblerPanel.add(assemblerText,
-                           new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
+        assemblerPanel.add(assemblerText, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
                                                   GridBagConstraints.CENTER,
                                                   GridBagConstraints.HORIZONTAL,
                                                   new Insets(0, 5, 5, 0), 0, 0));
-        assemblerPanel.add(assemblerBrowseButton,
-                           new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+        assemblerPanel.add(assemblerBrowseButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
                                                   GridBagConstraints.CENTER,
                                                   GridBagConstraints.NONE,
                                                   new Insets(0, 5, 5, 5), 0, 0));
@@ -301,27 +310,28 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
         encodingButtonGroup.add(encodingPrintRadioButton);
 
         encodingPanel.setLayout(gridBagLayout8);
-        encodingPanel.add(encodingARadioButton,
+ 
+		encodingPanel.add(encodingSimhRadioButton,
+                          new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+                                                 GridBagConstraints.WEST,
+                                                 GridBagConstraints.NONE,
+                                                 new Insets(5, 0, 0, 0), 0, 0));
+		encodingPanel.add(encodingARadioButton,
                           new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-                                                 GridBagConstraints.CENTER,
+                                                 GridBagConstraints.WEST,
                                                  GridBagConstraints.NONE,
                                                  new Insets(5, 5, 0, 0), 0, 0));
         encodingPanel.add(encodingHRadioButton,
                           new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-                                                 GridBagConstraints.CENTER,
+                                                 GridBagConstraints.WEST,
                                                  GridBagConstraints.NONE,
                                                  new Insets(5, 5, 0, 0), 0, 0));
         encodingPanel.add(encodingPrintRadioButton,
                           new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
-                                                 GridBagConstraints.CENTER,
+                                                 GridBagConstraints.WEST,
                                                  GridBagConstraints.NONE,
                                                  new Insets(5, 5, 0, 5), 0, 0));
-        encodingPanel.add(encodingSimhRadioButton,
-                          new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-                                                 GridBagConstraints.CENTER,
-                                                 GridBagConstraints.NONE,
-                                                 new Insets(5, 0, 0, 0), 0, 0));
-
+    
         listingCheckBox.setText("Listing:");
         listingText.setText("");
         listingBrowseButton.setText("Browse ...");
@@ -453,7 +463,7 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
         optionsPanel.add(encodingPanel,
                          new GridBagConstraints(2, 2, 3, 1, 0.0, 0.0,
                                                 GridBagConstraints.WEST,
-                                                GridBagConstraints.HORIZONTAL,
+                                                GridBagConstraints.NONE,
                                                 new Insets(0, 0, 0, 5), 0, 0));
         optionsPanel.add(listingCheckBox,
                          new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
@@ -629,20 +639,25 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
         bootVan1RadioButton.setSelected(false);
         bootVan2RadioButton.setSelected(false);
 
-        switch (AssemblerOptions.bootLoader) {
-            case AssemblerOptions.BOOT_NONE: {
+        switch (AssemblerOptions.bootLoader) 
+		{
+            case AssemblerOptions.BOOT_NONE: 
+			{
                 bootNoneRadioButton.setSelected(true);
                 break;
             }
-            case AssemblerOptions.BOOT_IBM: {
+            case AssemblerOptions.BOOT_IBM: 
+			{
                 bootIBMRadioButton.setSelected(true);
                 break;
             }
-            case AssemblerOptions.BOOT_VAN_1: {
+            case AssemblerOptions.BOOT_VAN_1: 
+			{
                 bootVan1RadioButton.setSelected(true);
                 break;
             }
-            case AssemblerOptions.BOOT_VAN_2: {
+            case AssemblerOptions.BOOT_VAN_2: 
+			{
                 bootVan2RadioButton.setSelected(true);
                 break;
             }
@@ -972,20 +987,89 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
     }
 
     private void browseAction(String title, String filePath, JTextField textField, Vector<RopeFileFilter> filters, 
-																	 boolean directories, boolean multiple)
+																				boolean directories, boolean multiple)
     {
-        RopeFileChooser chooser = new RopeFileChooser(DataOptions.directoryPath, filePath, filters, directories, multiple);
+		if(selectedPath == null)
+		{
+			selectedPath = System.getProperty("user.dir");
+		}
+		
+        RopeFileChooser chooser = new RopeFileChooser(selectedPath, filePath, filters, directories, multiple);
 		chooser.setDialogTitle(title);
         File file = chooser.choose(textField, this, multiple);
         if (file != null) 
 		{
-            DataOptions.directoryPath = file.getParent();
+            selectedPath = file.getParent();
         }
     }
 
     private void okAction()
     {
-        AssemblerOptions.assemblerPath = assemblerText.getText();
+ 		File file = new File(assemblerText.getText());
+		if(!file.exists() || file.isDirectory())
+		{
+			String message = String.format("Assembler path is not available: %s.\n Continue?", assemblerText.getText());
+			if (JOptionPane.showConfirmDialog(null, message , "ROPE", JOptionPane.WARNING_MESSAGE, JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION)
+			{
+				return;
+			}
+		}
+		
+		file = new File(listingText.getText());
+		if(!file.exists() || file.isDirectory())
+		{
+			String message = String.format("Listing path is not available: %s.\n Continue?", listingText.getText());
+			if (JOptionPane.showConfirmDialog(null, message , "ROPE", JOptionPane.WARNING_MESSAGE, JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION)
+			{
+				return;
+			}
+		}
+
+		file = new File(objectText.getText());
+		if(!file.exists() || file.isDirectory())
+		{
+			String message = String.format("Object path is not available: %s.\n Continue?", objectText.getText());
+			if (JOptionPane.showConfirmDialog(null, message , "ROPE", JOptionPane.WARNING_MESSAGE, JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION)
+			{
+				return;
+			}
+		}
+
+        for (String path : macroText.getText().split(";")) 
+		{
+  
+			file = new File(path);
+			if(!file.exists() || file.isDirectory())
+			{
+				String message = String.format("Macro path is not available: %s.\n Continue?", path);
+				if (JOptionPane.showConfirmDialog(null, message , "ROPE", JOptionPane.WARNING_MESSAGE, JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION)
+				{
+					return;
+				}
+			}
+		}
+
+		file = new File(tapeText.getText());
+		if(!file.exists() || file.isDirectory())
+		{
+			String message = String.format("Tape path is not available: %s.\n Continue?", tapeText.getText());
+			if (JOptionPane.showConfirmDialog(null, message , "ROPE", JOptionPane.WARNING_MESSAGE, JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION)
+			{
+				return;
+			}
+		}
+
+		file = new File(diagnosticText.getText());
+		if(!file.exists() || file.isDirectory())
+		{
+			String message = String.format("Diagnostic path is not available: %s.\n Continue?", diagnosticText.getText());
+			if (JOptionPane.showConfirmDialog(null, message , "ROPE", JOptionPane.WARNING_MESSAGE, JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION)
+			{
+				return;
+			}
+		}
+
+		AssemblerOptions.assemblerPath = assemblerText.getText();
 
         AssemblerOptions.boot = bootCheckBox.isSelected();
         AssemblerOptions.bootLoader =
@@ -1033,8 +1117,6 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
 
         AssemblerOptions.command = buildCommand();
 		
-		Rope.savePreferences();
-		
         this.setVisible(false);
     }
 
@@ -1056,36 +1138,45 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
 				filters = new Vector<RopeFileFilter>();
 				filters.add(new RopeFileFilter( new String[] {".exe",}, "Windows executable (*.exe)"));
 			}
-            browseAction("Assembler/Autocoder selection", AssemblerOptions.assemblerPath, assemblerText, filters, false, false);
+			
+            browseAction("Assembler/Autocoder selection", null, assemblerText, filters, false, false);
+			
             buildCommand();
         }
         else if (source == listingBrowseButton) 
 		{
 			Vector<RopeFileFilter> filters = new Vector<RopeFileFilter>();
 			filters.add(new RopeFileFilter( new String[] {".lst", ".txt"}, "Assembly files (*.lst, *.txt)"));
-            browseAction("Listing path selection", AssemblerOptions.listingPath, listingText, filters, false, false);
+			
+            browseAction("Listing path selection", null, listingText, filters, false, false);
+			
             buildCommand();
         }
         else if (source == objectBrowseButton) 
 		{
 			Vector<RopeFileFilter> filters = new Vector<RopeFileFilter>();
 			filters.add(new RopeFileFilter( new String[] {".cd", ".crd", ".obj"}, "Object deck files (*.cd, *.crd, *.obj)"));
-            browseAction("Object path selection", AssemblerOptions.objectPath, objectText, filters, false, false);
+			
+            browseAction("Object path selection", null, objectText, filters, false, false);
+			
             buildCommand();
         }
         else if (source == macroBrowseButton) 
 		{
-            browseAction("Macro path selection", AssemblerOptions.macroPath, macroText, null, true, true);
+            browseAction("Macro path selection", null, macroText, null, true, true);
+			
             buildCommand();
         }
         else if (source == tapeBrowseButton) 
 		{
-            browseAction("Tape path selection", AssemblerOptions.tapePath, tapeText, null, false, false);
+            browseAction("Tape path selection", null, tapeText, null, false, false);
+			
             buildCommand();
         }
         else if (source == diagnosticBrowseButton) 
 		{
-            browseAction("Diagnostic path selection", AssemblerOptions.diagnosticPath, diagnosticText, null, false, false);
+            browseAction("Diagnostic path selection", null, diagnosticText, null, false, false);
+			
             buildCommand();
         }
         else if (source == pageText) 
@@ -1105,11 +1196,7 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
 	@Override
     public void caretUpdate(CaretEvent event)
     {
-        Object source = event.getSource();
-
-        if (source == pageText) {
-            buildCommand();
-        }
+        buildCommand();
     }
 
 	@Override
@@ -1117,7 +1204,8 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
     {
         super.processWindowEvent(event);
 
-        if (event.getID() == WindowEvent.WINDOW_CLOSING) {
+        if (event.getID() == WindowEvent.WINDOW_CLOSING) 
+		{
             cancelAction();
         }
     }
@@ -1167,5 +1255,5 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
         }
 
         buildCommand();
-    }
+    }	
 }

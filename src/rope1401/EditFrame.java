@@ -61,6 +61,8 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 	private Document document;
 	private Action undoAction;
 	private Action redoAction;
+	
+	private String selectedPath;
 
     EditFrame(RopeFrame parent)
     {
@@ -326,10 +328,31 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 
     private void browseAction()
     {
+		if(selectedPath == null)
+		{
+			selectedPath = System.getenv("ROPE_SOURCES_DIR");			
+			if(selectedPath != null)
+			{
+				File dir = new File(selectedPath);
+				if(!dir.exists() || !dir.isDirectory())
+				{
+					String message = String.format("The sources path set in environment variable ROPE_SOURCES_DIR is not avaliable.\n%s", 
+																														selectedPath);
+					JOptionPane.showMessageDialog(null, message , "ROPE", JOptionPane.WARNING_MESSAGE);
+					selectedPath = null;
+				}
+			}
+			if(selectedPath == null)
+			{
+				selectedPath = System.getProperty("user.dir");
+			}
+		}
+
 		Vector<RopeFileFilter> filters = new Vector<RopeFileFilter>();
 		filters.add(new RopeFileFilter(new String[] {".a", ".asm", ".aut", ".s"}, "Assembly files (*.a *.asm *.aut *.s)"));
 		filters.add(new RopeFileFilter(new String[] {".m", ".mac"}, "Macro files (*.m *.mac)"));
-        RopeFileChooser chooser = new RopeFileChooser(DataOptions.directoryPath, null, filters);
+		
+        RopeFileChooser chooser = new RopeFileChooser(selectedPath, null, filters);
 		chooser.setDialogTitle("Source document selection");
 		chooser.setFileFilter(filters.firstElement());
 		chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
@@ -337,6 +360,8 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
         File file = chooser.choose(fileText, this);
         if (file != null) 
 		{
+			selectedPath = file.getParent();
+			
             BufferedReader sourceFile = null;
 
             String directoryPath = file.getParent();
@@ -512,7 +537,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 																						AssemblerOptions.assemblerPath);
 			System.out.println(message);	
 			
-			JOptionPane.showMessageDialog(this, message);
+			JOptionPane.showMessageDialog(this, message, "ROPE", JOptionPane.ERROR_MESSAGE);
 		}
     }
 
