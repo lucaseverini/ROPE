@@ -1,15 +1,28 @@
+/**
+ * <p>Title: </p>
+ * <p>Description: </p>
+ * <p>Copyright: Copyright (c) 2005</p>
+ * <p>Company: NASA Ames Research Center</p>
+ * @author Ronald Mak
+ * @version 2.0
+ */
+
 package rope1401;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.border.*;
 
-public class ConsoleFrame
-    extends JInternalFrame
-    implements ActionListener, ChangeListener, CommandWindow
+public class ConsoleFrame extends ChildFrame implements ActionListener, ChangeListener, CommandWindow
 {
+	private static final long serialVersionUID = 1L;
+	
     Border border1;
     Border border2;
     Border border3;
@@ -64,36 +77,35 @@ public class ConsoleFrame
     JCheckBox fCheckBox = new JCheckBox();
     JCheckBox gCheckBox = new JCheckBox();
 
-    private RopeFrame parent;
     private boolean enabled = true;
-
     private static int A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6;
 
-    public ConsoleFrame()
+    ConsoleFrame(final RopeFrame parent)
     {
-        try {
+        super(parent);
+		
+	    // Implement a smarter way to set the initial frame position and size
+		setLocation(1440, 710);
+		setSize(340, 330);
+ 
+		try 
+		{
             jbInit();
         }
-        catch (Exception ex) {
+        catch (Exception ex) 
+		{
             ex.printStackTrace();
         }
-    }
 
-    ConsoleFrame(RopeFrame myParent)
-    {
-        this();
-        this.parent = myParent;
-		
-		this.setSize(340, 330);	// Mac OS
-        // this.setSize(280, 330); // Windows
-
-        this.addInternalFrameListener(new InternalFrameAdapter()
+	  this.addInternalFrameListener(new InternalFrameAdapter()
         {
+			@Override
             public void internalFrameClosed(InternalFrameEvent event)
             {
-                parent.removeCommandWindow(ConsoleFrame.this);
-                parent.consoleFrameClosed();
-            }
+ 				savePreferences();
+				
+				mainFrame.removeConsoleFrame();
+           }
         });
 
         Color titleColor = new Color(204, 204, 255);
@@ -113,18 +125,24 @@ public class ConsoleFrame
 
         update();
 
-        if (parent.senseSwitchesEnabled()) {
+        if (parent.senseSwitchesEnabled()) 
+		{
             enableSenseSwitches();
         }
-        else {
+        else 
+		{
             disableSenseSwitches();
         }
     }
 
-    void jbInit()
-        throws Exception
+    void jbInit() throws Exception
     {
-        border1 = BorderFactory.createBevelBorder(BevelBorder.LOWERED,
+        this.setClosable(true);
+        this.setIconifiable(true);
+        this.setMaximizable(false);
+        this.setTitle("CONSOLE");
+
+		border1 = BorderFactory.createBevelBorder(BevelBorder.LOWERED,
                                                   Color.white, Color.white,
                                                   new Color(99, 99, 99),
                                                   new Color(142, 142, 142));
@@ -148,24 +166,15 @@ public class ConsoleFrame
                                                   Color.white, Color.white,
                                                   new Color(99, 99, 99),
                                                   new Color(142, 142, 142));
-        titledBorder1 = new TitledBorder(BorderFactory.createLineBorder(
-            new Color(204, 204, 255), 1), "Registers");
-        titledBorder2 = new TitledBorder(BorderFactory.createLineBorder(
-            new Color(204, 204, 255), 1), "Error");
-        titledBorder3 = new TitledBorder(BorderFactory.createLineBorder(
-            new Color(204, 204, 255), 1), "Logic");
-        titledBorder4 = new TitledBorder(BorderFactory.createLineBorder(
-            new Color(204, 204, 255), 1), "Check");
-        this.setClosable(true);
-        this.setIconifiable(true);
-        this.setMaximizable(false);
-        this.setNormalBounds(new Rectangle(10, 10, 280, 350));
-        this.setTitle("CONSOLE");
-        this.setOpaque(true);
-        this.setRequestFocusEnabled(true);
-        this.getContentPane().setLayout(new BorderLayout());
+		
+        titledBorder1 = new TitledBorder(BorderFactory.createLineBorder(new Color(204, 204, 255), 1), "Registers");
+        titledBorder2 = new TitledBorder(BorderFactory.createLineBorder(new Color(204, 204, 255), 1), "Error");
+        titledBorder3 = new TitledBorder(BorderFactory.createLineBorder(new Color(204, 204, 255), 1), "Logic");
+        titledBorder4 = new TitledBorder(BorderFactory.createLineBorder(new Color(204, 204, 255), 1), "Check");
+		        
         this.buttonPanel.setLayout(gridBagLayout0);
         this.displayPanel.setLayout(gridBagLayout1);
+		
         buttonPanel.setBorder(border6);
         autoCheckBox.setSelected(true);
         autoCheckBox.setText("Auto update");
@@ -262,6 +271,7 @@ public class ConsoleFrame
         bAddressText.setHorizontalAlignment(SwingConstants.TRAILING);
         bAddressText.setText("00000");
         switchPanel.setBorder(border8);
+		
         this.getContentPane().add(buttonPanel, BorderLayout.NORTH);
         buttonPanel.add(updateButton,
                         new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
@@ -357,6 +367,7 @@ public class ConsoleFrame
                                               GridBagConstraints.EAST,
                                               GridBagConstraints.NONE,
                                               new Insets(0, 15, 5, 5), 0, 0));
+		
         this.getContentPane().add(switchPanel, BorderLayout.SOUTH);
         switchPanel.add(aCheckBox,
                         new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
@@ -410,28 +421,34 @@ public class ConsoleFrame
                                                  new Insets(5, 5, 5, 5), 0, 0));
     }
 
+	@Override
     public void execute()
     {
-        if (autoCheckBox.isSelected()) {
+        if (autoCheckBox.isSelected()) 
+		{
             update();
         }
-        else {
+        else 
+		{
             iAddressText.setEnabled(false);
             aAddressText.setEnabled(false);
             bAddressText.setEnabled(false);
-         }
+        }
     }
 
+	@Override
     public void lock()
     {
         updateButton.setEnabled(false);
     }
 
+	@Override
     public void unlock()
     {
         updateButton.setEnabled(true);
     }
 
+	@Override
     public void actionPerformed(ActionEvent event)
     {
         update();
@@ -439,18 +456,16 @@ public class ConsoleFrame
 
     private String formatAddress(String text)
     {
-        StringBuffer buffer = new StringBuffer("00000");
+        StringBuilder buffer = new StringBuilder("00000");
         buffer.replace(5-text.length(), 5, text);
         return buffer.toString();
     }
 
     private void update()
     {
-        synchronized(Simulator.class) {
-            Simulator.execute("e is,as,bs,aserr,bserr,prchk,iochk," +
-                              "ovf,equ,uneq,high,low," +
-                              "ssa,ssb,ssc,ssd,sse,ssf,ssg");
-
+        synchronized(Simulator.class) 
+		{
+            Simulator.execute("e is,as,bs,aserr,bserr,prchk,iochk," + "ovf,equ,uneq,high,low," + "ssa,ssb,ssc,ssd,sse,ssf,ssg");
             int i;
             String text;
 
@@ -557,7 +572,8 @@ public class ConsoleFrame
 
     void enableSenseSwitches()
     {
-        if (!enabled) {
+        if (!enabled) 
+		{
             aCheckBox.setEnabled(true);
             bCheckBox.setEnabled(true);
             cCheckBox.setEnabled(true);
@@ -572,7 +588,8 @@ public class ConsoleFrame
 
     void disableSenseSwitches()
     {
-        if (enabled) {
+        if (enabled) 
+		{
             aCheckBox.setEnabled(false);
             bCheckBox.setEnabled(false);
             cCheckBox.setEnabled(false);
@@ -585,14 +602,34 @@ public class ConsoleFrame
         }
     }
 
+	@Override
     public void stateChanged(ChangeEvent event)
     {
         JCheckBox ss = (JCheckBox) event.getSource();
         String state = ss.isSelected() ? " 1" : " 0";
 
-        synchronized(Simulator.class) {
+        synchronized(Simulator.class) 
+		{
             String command = "d ss" + ss.getActionCommand() + state;
             Simulator.execute(command);
         }
     }
+
+	void savePreferences()
+	{
+		try
+		{
+			Preferences userPrefs = Preferences.userRoot();
+
+			userPrefs.put("consoleFrameLocation", this.getLocation().toString());
+			userPrefs.put("consoleFrameSize", this.getSize().toString());
+
+			userPrefs.sync();
+			userPrefs.flush();
+		}
+		catch(BackingStoreException ex) 
+		{
+			Logger.getLogger(RopeFrame.class.getName()).log(Level.SEVERE, null, ex);
+		}
+	}
 }

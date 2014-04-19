@@ -41,7 +41,9 @@ public class MemoryFrame extends ChildFrame implements ActionListener, ChangeLis
     {
 		super(parent);
 		
-		setSize(450, 500);
+		// Implement a smarter way to set the initial frame position and size
+		setLocation(954, 710);
+		setSize(460, 390);
 		
         try 
 		{
@@ -90,6 +92,7 @@ public class MemoryFrame extends ChildFrame implements ActionListener, ChangeLis
         this.setIconifiable(true);
         this.setResizable(true);
         this.setTitle("MEMORY");
+		
         this.getContentPane().setLayout(borderLayout1);
         this.getContentPane().add(controlPanel, BorderLayout.NORTH);
         this.getContentPane().add(scrollPane, BorderLayout.CENTER);
@@ -250,31 +253,39 @@ public class MemoryFrame extends ChildFrame implements ActionListener, ChangeLis
 			synchronized(Simulator.class) 
 			{
 				Simulator.execute("e -d " + from + "-" + to);
-				for (; ; ) {
+				for (; ; ) 
+				{
 					String text = Simulator.output();
 
-					if ((text != null) && (text.length() > 0)) {
+					if ((text != null) && (text.length() > 0)) 
+					{
 						buffer.append(text).append('\n');
 					}
 
 					int i = text.indexOf(":");
-					if ((i != -1) && (i <= 5)) {
-						try {
+					if ((i != -1) && (i <= 5)) 
+					{
+						try 
+						{
 							int address = Integer.parseInt(text.substring(0, i));
-							if (address == last) {
+							if (address == last) 
+							{
 								break;
 							}
 						}
-						catch (Exception ex) {
+						catch (Exception ex) 
+						{
 							ex.printStackTrace();
 						}
 					}
 				}
 
-				do {
+				do 
+				{
 					String text = Simulator.output();
 
-					if ((text != null) && (text.length() > 0)) {
+					if ((text != null) && (text.length() > 0)) 
+					{
 						buffer.append(text).append('\n');
 					}
 				}
@@ -303,5 +314,4 @@ public class MemoryFrame extends ChildFrame implements ActionListener, ChangeLis
 			Logger.getLogger(RopeFrame.class.getName()).log(Level.SEVERE, null, ex);
 		}
 	}
-
 }

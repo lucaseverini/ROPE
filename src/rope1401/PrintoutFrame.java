@@ -1,3 +1,12 @@
+/**
+ * <p>Title: </p>
+ * <p>Description: </p>
+ * <p>Copyright: Copyright (c) 2005</p>
+ * <p>Company: NASA Ames Research Center</p>
+ * @author Ronald Mak
+ * @version 2.0
+ */
+
 package rope1401;
 
 import java.io.*;
@@ -30,7 +39,9 @@ public class PrintoutFrame extends ChildFrame implements ActionListener, ChangeL
     {
 		super(parent);
 		
-        setSize(940, 400);
+		// Implement a smarter way to set the initial frame position and size
+        setLocation(0, 690);
+        setSize(940, 410);
    
 		try 
 		{

@@ -1,18 +1,28 @@
+/**
+ * <p>Title: </p>
+ * <p>Description: </p>
+ * <p>Copyright: Copyright (c) 2005</p>
+ * <p>Company: NASA Ames Research Center</p>
+ * @author Ronald Mak
+ * @version 2.0
+ */
+
 package rope1401;
 
 import java.text.DecimalFormat;
-import java.util.Date;
-import java.sql.Time;
-
 import java.awt.*;
 import java.awt.event.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 import javax.swing.*;
 import javax.swing.event.*;
 
-public class TimerFrame
-    extends JInternalFrame
-    implements ActionListener, CommandWindow
+public class TimerFrame extends ChildFrame implements ActionListener, CommandWindow
 {
+	private static final long serialVersionUID = 1L;
+	
     BorderLayout borderLayout1 = new BorderLayout();
     GridBagLayout gridBagLayout1 = new GridBagLayout();
     GridBagLayout gridBagLayout2 = new GridBagLayout();
@@ -36,38 +46,41 @@ public class TimerFrame
 
     private static final float SPEED_1401 = 0.000087f;      /* GHz */
     private static final float SIMULATOR_FUDGE = 10.0f;
-    private static final float SIMULATOR_FACTOR = 1.0f/(SPEED_1401*SIMULATOR_FUDGE);
-
+    private static final float SIMULATOR_FACTOR = 1.0f / (SPEED_1401 * SIMULATOR_FUDGE);
     private static final float DEFAULT_HOST_SPEED = 2.40f;  /* GHz */
 
-    private RopeFrame parent;
+	private RopeFrame parent;
     private float hostSpeed;
     private float speedFactor;
     private boolean settingSpeed;
 
-    public TimerFrame()
+    public TimerFrame(RopeFrame myParent)
     {
-        try {
+        super(myParent);
+
+		parent = myParent;
+
+        // Implement a smarter way to set the initial frame position and size
+		this.setLocation(1430, 890);
+        this.setSize(480, 210);
+	
+		try 
+		{
             jbInit();
         }
-        catch (Exception exception) {
+        catch (Exception exception) 
+		{
             exception.printStackTrace();
         }
-    }
-
-    TimerFrame(RopeFrame myParent)
-    {
-        this();
-        this.parent = myParent;
-
-        this.setSize(450, 200);
-
+ 
         this.addInternalFrameListener(new InternalFrameAdapter()
         {
+			@Override
             public void internalFrameClosed(InternalFrameEvent event)
             {
-                parent.removeCommandWindow(TimerFrame.this);
-                parent.timerFrameClosed();
+ 				savePreferences();
+				
+				mainFrame.removeTimerFrame();
             }
         });
 
@@ -80,11 +93,11 @@ public class TimerFrame
         resetButton.addActionListener(this);
 
         parent.resetTimers();
+		
         execute();
     }
 
-    private void jbInit()
-        throws Exception
+    private void jbInit() throws Exception
     {
         this.setClosable(true);
         this.setIconifiable(true);
@@ -210,6 +223,7 @@ public class TimerFrame
         return buffer.toString();
     }
 
+	@Override
     public void execute()
     {
         wallTimeText.setText(formatTime(Simulator.elapsedWallTime()));
@@ -219,10 +233,12 @@ public class TimerFrame
         estimatedTimeText.setText(formatTime((long) (speedFactor*elapsedSimulatorTime)));
     }
 
+	@Override
     public void lock()
     {
     }
 
+	@Override
     public void unlock()
     {
     }
@@ -231,39 +247,66 @@ public class TimerFrame
     {
         boolean success = true;
 
-        do {
-            try {
+        do 
+		{
+            try 
+			{
                 hostSpeed = Float.parseFloat(speedText.getText());
                 speedFactor = hostSpeed*SIMULATOR_FACTOR;
                 speedMessage.setText(" ");
                 success = true;
             }
-            catch (NumberFormatException ex) {
+            catch (NumberFormatException ex) 
+			{
                 speedMessage.setText("Invalid speed format. Use: nn.nn");
             }
-        } while (!success);
+        } 
+		while (!success);
     }
 
+	@Override
     public void actionPerformed(ActionEvent event)
     {
         Object button = event.getSource();
 
-        if (button == speedButton) {
-            if (settingSpeed) {
+        if (button == speedButton) 
+		{
+            if (settingSpeed) 
+			{
                 setSpeed();
                 speedText.setEditable(false);
                 speedButton.setText("Set speed");
                 settingSpeed = false;
             }
-            else {
+            else 
+			{
                 speedText.setEditable(true);
                 speedButton.setText("OK");
                 settingSpeed = true;
             }
         }
-        else if (button == resetButton) {
+        else if (button == resetButton) 
+		{
             parent.resetTimers();
             execute();
         }
     }
+
+	void savePreferences()
+	{
+		try
+		{
+			Preferences userPrefs = Preferences.userRoot();
+
+			userPrefs.put("timerFrameLocation", this.getLocation().toString());
+			userPrefs.put("timerFrameLocation", this.getSize().toString());
+
+			userPrefs.sync();
+			userPrefs.flush();
+		}
+		catch(BackingStoreException ex) 
+		{
+			Logger.getLogger(RopeFrame.class.getName()).log(Level.SEVERE, null, ex);
+		}
+	}
 }

@@ -85,7 +85,9 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
     {
 		super(parent);
 	
-		setSize(950, 650);
+		// Implement a smarter way to set the initial frame position and size
+		setLocation(960, 0);
+		setSize(960, 710);
 
         try 
 		{

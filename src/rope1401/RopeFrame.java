@@ -97,50 +97,49 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 		setupMenus();
 				
 		Dimension ropeFrameSize = getSize();
-		// Dimension ropeFrameSize = contentPanel.getSize();
 
 		editFrame = new EditFrame(this);
-	    Point frameLocation = new Point(0, 0);
-		frameSize = editFrame.getSize();
+	    Point editLocation = new Point(0, 0);
+		Dimension editSize = new Dimension(editFrame.getSize());
 		
-		frameLocation = RopeHelper.parsePoint(userPrefs.get("editFrameLocation", editFrame.getLocation().toString()));	
-		frameSize = RopeHelper.parseDimension(userPrefs.get("editFrameSize", editFrame.getSize().toString()));
+		editLocation = RopeHelper.parsePoint(userPrefs.get("editFrameLocation", editLocation.toString()));	
+		editSize = RopeHelper.parseDimension(userPrefs.get("editFrameSize", editSize.toString()));
 
-		verifyFrameLocation(frameLocation);
-		verifyFrameSize(frameSize);
+		verifyFrameLocation(editLocation);
+		verifyFrameSize(editSize);
 
-        editFrame.setLocation(frameLocation);
-		editFrame.setSize(frameSize);
+        editFrame.setLocation(editLocation);
+		editFrame.setSize(editSize);
 		editFrame.setVisible(true);
         desktop.add(editFrame);
         
         execFrame = new ExecFrame(this);
-	    frameLocation.setLocation(ropeFrameSize.width / 2, 0);
-		frameSize = execFrame.getSize();
+	    Point execLocation = new Point(ropeFrameSize.width / 2, 0);
+		Dimension execSize = new Dimension(execFrame.getSize());
 	 	
-		frameLocation = RopeHelper.parsePoint(userPrefs.get("execFrameLocation", execFrame.getLocation().toString()));	
-		frameSize = RopeHelper.parseDimension(userPrefs.get("execFrameSize", execFrame.getSize().toString()));
+		execLocation = RopeHelper.parsePoint(userPrefs.get("execFrameLocation", execLocation.toString()));	
+		execSize = RopeHelper.parseDimension(userPrefs.get("execFrameSize", execSize.toString()));
 		
-		verifyFrameLocation(frameLocation);
-		verifyFrameSize(frameSize);
+		verifyFrameLocation(execLocation);
+		verifyFrameSize(execSize);
 	
-        execFrame.setLocation(frameLocation);
-		execFrame.setSize(frameSize);
+        execFrame.setLocation(execLocation);
+		execFrame.setSize(execSize);
 		execFrame.setVisible(false);
 		desktop.add(execFrame);
 		
         printoutFrame = new PrintoutFrame(this);
-        frameLocation.setLocation(ropeFrameSize.width / 2, ropeFrameSize.height / 2);
-	 	frameSize = printoutFrame.getSize();
+        Point printoutLocation = new Point(printoutFrame.getLocation());
+	 	Dimension printoutSize = new Dimension(printoutFrame.getSize());
 		
-		frameLocation = RopeHelper.parsePoint(userPrefs.get("printoutFrameLocation", frameLocation.toString()));	
-		frameSize = RopeHelper.parseDimension(userPrefs.get("printoutFrameSize", frameSize.toString()));	
+		printoutLocation = RopeHelper.parsePoint(userPrefs.get("printoutFrameLocation", printoutLocation.toString()));	
+		printoutSize = RopeHelper.parseDimension(userPrefs.get("printoutFrameSize", printoutSize.toString()));	
 		
-		verifyFrameLocation(frameLocation);		
-		verifyFrameSize(frameSize);
+		verifyFrameLocation(printoutLocation);		
+		verifyFrameSize(printoutSize);
 		
-        printoutFrame.setLocation(frameLocation);
-		printoutFrame.setSize(frameSize);
+        printoutFrame.setLocation(printoutLocation);
+		printoutFrame.setSize(printoutSize);
 	    printoutFrame.setVisible(false);
         desktop.add(printoutFrame);
 		
@@ -228,12 +227,10 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
     {
 		if (memoryFrame == null) 
 		{
-			Dimension ropeFrameSize = this.getContentPane().getSize();
-
 			memoryFrame = new MemoryFrame(this);
+
 			Dimension frameSize = memoryFrame.getSize();
-			Point frameLocation = new Point((int)(ropeFrameSize.getWidth() - frameSize.getWidth()) / 2, 
-											(int)(ropeFrameSize.getHeight() - frameSize.getHeight()) / 2);
+			Point frameLocation = memoryFrame.getLocation();
 
 			frameLocation = RopeHelper.parsePoint(userPrefs.get("memoryFrameLocation", frameLocation.toString()));	
 			frameSize = RopeHelper.parseDimension(userPrefs.get("memoryFrameSize", frameSize.toString()));	
@@ -244,6 +241,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 			memoryFrame.setLocation(frameLocation);
 			memoryFrame.setSize(frameSize);
 			memoryFrame.setVisible(true);
+			
 			desktop.add(memoryFrame);
 
 			commandWindows.addElement(memoryFrame);
@@ -257,8 +255,9 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 		else
 		{
 			desktop.getDesktopManager().deiconifyFrame(memoryFrame);
-            desktop.getDesktopManager().activateFrame(memoryFrame);
- 		}
+  		}
+		
+		desktop.getDesktopManager().activateFrame(memoryFrame);
 	}
 	
 	void removeMemoryFrame()
@@ -273,54 +272,76 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
         if (consoleFrame == null) 
 		{
             consoleFrame = new ConsoleFrame(this);
-            Dimension ropeSize = this.getContentPane().getSize();
-            Dimension consoleSize = consoleFrame.getSize();
+			
+			Dimension frameSize = consoleFrame.getSize();
+			Point frameLocation = consoleFrame.getLocation();
 
-            consoleFrame.setLocation(((int)(ropeSize.getWidth() - consoleSize.getWidth())),
-                                     ((int)(ropeSize.getHeight() - consoleSize.getHeight())));
-            desktop.add(consoleFrame);
-            consoleFrame.setVisible(true);
+			frameLocation = RopeHelper.parsePoint(userPrefs.get("consoleFrameLocation", frameLocation.toString()));	
+			frameSize = RopeHelper.parseDimension(userPrefs.get("consoleFrameSize", frameSize.toString()));	
+
+			verifyFrameLocation(frameLocation);
+			verifyFrameSize(frameSize);
+		
+			consoleFrame.setLocation(frameLocation);
+			consoleFrame.setSize(frameSize);
+			consoleFrame.setVisible(true);
+					
+			desktop.add(consoleFrame);
 
             commandWindows.addElement(consoleFrame);
         }
         else 
 		{
             desktop.getDesktopManager().deiconifyFrame(consoleFrame);
-            desktop.getDesktopManager().activateFrame(consoleFrame);
         }
+		
+		desktop.getDesktopManager().activateFrame(consoleFrame);
     }
 
-    void consoleFrameClosed()
-    {
-        consoleFrame = null;
-    }
+ 	void removeConsoleFrame()
+	{
+		commandWindows.remove(consoleFrame);
+		
+		consoleFrame = null;
+	}
 
     void createTimerFrame()
     {
         if (timerFrame == null) 
 		{
             timerFrame = new TimerFrame(this);
-            Dimension ropeSize = this.getContentPane().getSize();
-            Dimension frameSize = timerFrame.getSize();
+ 
+			Dimension frameSize = timerFrame.getSize();
+			Point frameLocation = timerFrame.getLocation();
 
-            timerFrame.setLocation(((int) (ropeSize.getWidth() - frameSize.getWidth() - 100)),
-                                     ((int) (ropeSize.getHeight() - frameSize.getHeight())) - 100);
-            desktop.add(timerFrame);
-            timerFrame.setVisible(true);
+			frameLocation = RopeHelper.parsePoint(userPrefs.get("timerFrameLocation", frameLocation.toString()));	
+			frameSize = RopeHelper.parseDimension(userPrefs.get("timerFrameSize", frameSize.toString()));	
+
+			verifyFrameLocation(frameLocation);
+			verifyFrameSize(frameSize);
+		
+			timerFrame.setLocation(frameLocation);
+			timerFrame.setSize(frameSize);
+			timerFrame.setVisible(true);
+			
+			desktop.add(timerFrame);
 
             commandWindows.addElement(timerFrame);
-        }
+		}
         else 
 		{
             desktop.getDesktopManager().deiconifyFrame(timerFrame);
-            desktop.getDesktopManager().activateFrame(timerFrame);
         }
+		
+		desktop.getDesktopManager().activateFrame(timerFrame);
     }
 
-    void timerFrameClosed()
-    {
-        timerFrame = null;
-    }
+ 	void removeTimerFrame()
+	{
+		commandWindows.remove(timerFrame);
+		
+		timerFrame = null;
+	}
 
     void resetTimers()
     {
@@ -593,7 +614,19 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 				userPrefs.put("memoryFrameLocation", memoryFrame.getLocation().toString());
 				userPrefs.put("memoryFrameSize", memoryFrame.getSize().toString());
 			}
-			
+
+			if(consoleFrame != null && consoleFrame.isVisible())
+			{
+				userPrefs.put("consoleFrameLocation", consoleFrame.getLocation().toString());
+				userPrefs.put("consoleFrameSize", consoleFrame.getSize().toString());
+			}
+
+			if(timerFrame != null && timerFrame.isVisible())
+			{
+				userPrefs.put("timerFrameLocation", timerFrame.getLocation().toString());
+				userPrefs.put("timerFrameSize", timerFrame.getSize().toString());
+			}
+
 			userPrefs.sync();
 			userPrefs.flush();
 		}

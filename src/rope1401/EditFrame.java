@@ -68,7 +68,9 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
     {
 		super(parent);
 		
-        setSize(640, 700);
+		// Implement a smarter way to set the initial frame position and size
+        setLocation(0, 0);
+        setSize(640, 710);
 		
         try 
 		{
@@ -357,6 +359,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 		Vector<RopeFileFilter> filters = new Vector<RopeFileFilter>();
 		filters.add(new RopeFileFilter(new String[] {".a", ".asm", ".aut", ".s"}, "Assembly files (*.a *.asm *.aut *.s)"));
 		filters.add(new RopeFileFilter(new String[] {".m", ".mac"}, "Macro files (*.m *.mac)"));
+		filters.add(new RopeFileFilter(new String[] {".lst"}, "List files (*.lst)"));
 		
         RopeFileChooser chooser = new RopeFileChooser(selectedPath, null, filters);
 		chooser.setDialogTitle("Source document selection");
