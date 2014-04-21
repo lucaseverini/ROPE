@@ -1,0 +1,6 @@
+ToDo list
+
+1) Print for active window.
+2) Add a Print button on Printout window.
+3) Save breakpoints.
+4) Save/Restore status between Rope sessions (Windows position, open files, breakpoints, current execution point).
