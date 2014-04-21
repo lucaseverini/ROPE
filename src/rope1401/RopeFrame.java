@@ -466,17 +466,17 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 		if(RopeHelper.isWindows)
 		{
 			assemblerPref = userPrefs.get("assemblerPath", "tools/windows/autocoder.exe");
-			simulatorPref = userPrefs.get("simulatorPath", "tools/windows/i1401.exe");
+			simulatorPref = userPrefs.get("simulatorPath", "tools/windows/ibm1401.exe");
 		}
 		else if(RopeHelper.isMac)
 		{
 			assemblerPref = userPrefs.get("assemblerPath", "tools/mac/autocoder");
-			simulatorPref = userPrefs.get("simulatorPath", "tools/mac/i1401");			
+			simulatorPref = userPrefs.get("simulatorPath", "tools/mac/ibm1401");			
 		}
 		else if(RopeHelper.isUnix)
 		{
 			assemblerPref = userPrefs.get("assemblerPath", "tools/linux/autocoder");
-			simulatorPref = userPrefs.get("simulatorPath", "tools/linux/i1401");			
+			simulatorPref = userPrefs.get("simulatorPath", "tools/linux/ibm1401");			
 		}
 		
 		AssemblerOptions.saveBeforeAssembly = userPrefs.getBoolean("saveBeforeAssembly", false);

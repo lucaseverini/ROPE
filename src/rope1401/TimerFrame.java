@@ -299,7 +299,7 @@ public class TimerFrame extends ChildFrame implements ActionListener, CommandWin
 			Preferences userPrefs = Preferences.userRoot();
 
 			userPrefs.put("timerFrameLocation", this.getLocation().toString());
-			userPrefs.put("timerFrameLocation", this.getSize().toString());
+			userPrefs.put("timerFrameSize", this.getSize().toString());
 
 			userPrefs.sync();
 			userPrefs.flush();

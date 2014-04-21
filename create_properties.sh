@@ -2,10 +2,12 @@
 #
 # This bash script creates the property file containing the properties used 
 # in the java program ROPE.
+# On Windows, it requires MinGW (http://www.mingw.org) or compatible 
+# unix shell environment.
 #
 # By Luca Severini (lucaseverini@mac.com)
 #
-# Version date: April 14 2014
+# Version date: April 21 2014
 #
 
 PROPERTIES_FILE_PATH=./src/rope1401/Resources/BuildTimeStrings.properties

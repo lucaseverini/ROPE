@@ -82,7 +82,7 @@
 			<arg line="create_properties.sh"/>
 		</exec>
 		
-		<!-- For windows it's necessary to have MingW installed -->
+		<!-- For windows it's necessary to have MinGW or compatible environment installed -->
 		<exec dir="." executable="C:\Programmi\Git\bin\sh.exe" os="Windows XP 5.1">
 			<arg line="--login -i create_properties.sh"/>
 		</exec>
