@@ -1,6 +1,8 @@
 ToDo list
 
-1) Print for active window.
-2) Add a Print button on Printout window.
-3) Save breakpoints.
-4) Save/Restore status between Rope sessions (Windows position, open files, breakpoints, current execution point).
+1) Implement environment variable ROPE_MACROS_PATH as requested by Stan.
+2) Print for active window.
+3) Add a Print button on Printout window.
+4) Save breakpoints.
+5) Save/Restore status between Rope sessions (Windows position, open files, breakpoints, execution status).
+6) Application Icon (the rope icon sent by Stan).

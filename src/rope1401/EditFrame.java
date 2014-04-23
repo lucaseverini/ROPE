@@ -387,8 +387,25 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
             AssemblerOptions.sourcePath = sourcePath;
             AssemblerOptions.listingPath = basePath + ".lst";
             AssemblerOptions.objectPath = basePath + ".cd";
-			AssemblerOptions.macroPath = directoryPath;
 			
+			String var = System.getenv("ROPE_MACROS_DIR");
+			if(var != null && !var.isEmpty())
+			{
+				File dir = new File(var);
+				if(dir.exists() && dir.isDirectory()) 
+				{
+					AssemblerOptions.macroPath = var;
+				}
+				else
+				{
+					AssemblerOptions.macroPath = directoryPath;
+				}
+			}
+			else
+			{
+				AssemblerOptions.macroPath = directoryPath;
+			}
+						
  			DataOptions.inputPath = AssemblerOptions.objectPath;
             DataOptions.outputPath = basePath + ".out";
             DataOptions.readerPath = null;
