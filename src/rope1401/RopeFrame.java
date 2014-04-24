@@ -691,7 +691,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 		if(editFrame.sourcePath != null && editFrame.sourceChanged)
 		{
 			int result = JOptionPane.showConfirmDialog(null, "Do you want to save the changes to the edited file?", "ROPE",
-															JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION);
+															JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
 			if (result == JOptionPane.CANCEL_OPTION)
 			{
 				return false;
@@ -705,7 +705,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 		if(askConfirmationToQuit)
 		{
 			int result = JOptionPane.showConfirmDialog(null, "Do you want to quit Rope?", "ROPE", 
-															JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_OPTION);
+															JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 			if (result == JOptionPane.NO_OPTION)
 			{
 				return false;

@@ -1009,7 +1009,7 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
 		if(!file.exists() || file.isDirectory())
 		{
 			String message = String.format("Assembler path is not available: %s.\n Continue?", assemblerText.getText());
-			if (JOptionPane.showConfirmDialog(null, message , "ROPE", JOptionPane.WARNING_MESSAGE, JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION)
+			if (JOptionPane.showConfirmDialog(null, message , "ROPE", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.NO_OPTION)
 			{
 				return;
 			}
@@ -1019,7 +1019,7 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
 		if(!file.exists() || file.isDirectory())
 		{
 			String message = String.format("Listing path is not available: %s.\n Continue?", listingText.getText());
-			if (JOptionPane.showConfirmDialog(null, message , "ROPE", JOptionPane.WARNING_MESSAGE, JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION)
+			if (JOptionPane.showConfirmDialog(null, message , "ROPE", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.NO_OPTION)
 			{
 				return;
 			}
@@ -1029,7 +1029,7 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
 		if(!file.exists() || file.isDirectory())
 		{
 			String message = String.format("Object path is not available: %s.\n Continue?", objectText.getText());
-			if (JOptionPane.showConfirmDialog(null, message , "ROPE", JOptionPane.WARNING_MESSAGE, JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION)
+			if (JOptionPane.showConfirmDialog(null, message , "ROPE", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.NO_OPTION)
 			{
 				return;
 			}
@@ -1042,7 +1042,7 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
 			if(!file.exists() || file.isDirectory())
 			{
 				String message = String.format("Macro path is not available: %s.\n Continue?", path);
-				if (JOptionPane.showConfirmDialog(null, message , "ROPE", JOptionPane.WARNING_MESSAGE, JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION)
+				if (JOptionPane.showConfirmDialog(null, message , "ROPE", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.NO_OPTION)
 				{
 					return;
 				}
@@ -1053,7 +1053,7 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
 		if(!file.exists() || file.isDirectory())
 		{
 			String message = String.format("Tape path is not available: %s.\n Continue?", tapeText.getText());
-			if (JOptionPane.showConfirmDialog(null, message , "ROPE", JOptionPane.WARNING_MESSAGE, JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION)
+			if (JOptionPane.showConfirmDialog(null, message , "ROPE", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.NO_OPTION)
 			{
 				return;
 			}
@@ -1063,7 +1063,7 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
 		if(!file.exists() || file.isDirectory())
 		{
 			String message = String.format("Diagnostic path is not available: %s.\n Continue?", diagnosticText.getText());
-			if (JOptionPane.showConfirmDialog(null, message , "ROPE", JOptionPane.WARNING_MESSAGE, JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION)
+			if (JOptionPane.showConfirmDialog(null, message , "ROPE", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.NO_OPTION)
 			{
 				return;
 			}

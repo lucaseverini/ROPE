@@ -177,7 +177,7 @@ public class PreferencesDialog extends JDialog implements ActionListener
 		if(!file.exists() || file.isDirectory())
 		{
 			String message = String.format("The path to Assembler program is not available: %s.\n Continue?", assemblerPath.getText());
-			if (JOptionPane.showConfirmDialog(null, message , "ROPE", JOptionPane.ERROR_MESSAGE, JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION)
+			if (JOptionPane.showConfirmDialog(null, message , "ROPE", JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE) == JOptionPane.NO_OPTION)
 			{
 				return;
 			}
@@ -187,7 +187,7 @@ public class PreferencesDialog extends JDialog implements ActionListener
 		if(!file.exists() || file.isDirectory())
 		{
 			String message = String.format("The path to Simulator program is not available: %s.\n Continue?", simulatorPath.getText());
-			if (JOptionPane.showConfirmDialog(null, message , "ROPE", JOptionPane.ERROR_MESSAGE, JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION)
+			if (JOptionPane.showConfirmDialog(null, message , "ROPE", JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE) == JOptionPane.NO_OPTION)
 			{
 				return;
 			}
@@ -240,7 +240,7 @@ public class PreferencesDialog extends JDialog implements ActionListener
 		try
 		{
 			String message = "Do you want to reset all Rope preferences to default value and quit immediately?";
-			int result = JOptionPane.showConfirmDialog(null, message, "ROPE", JOptionPane.WARNING_MESSAGE, JOptionPane.OK_CANCEL_OPTION);
+			int result = JOptionPane.showConfirmDialog(null, message, "ROPE", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
 			if (result == JOptionPane.OK_OPTION)
 			{
 				Preferences userPrefs = Preferences.userRoot();
