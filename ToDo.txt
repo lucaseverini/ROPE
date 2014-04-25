@@ -6,3 +6,5 @@ ToDo list
 4) Save breakpoints.
 5) Save/Restore status between Rope sessions (Windows position, open files, breakpoints, execution status).
 6) Application Icon (the rope icon sent by Stan).
+7) Unnoticed exception in ClipboardListener.java line 41 "regainOwnership(sysClip.getContents(this));"
+

@@ -25,6 +25,8 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
@@ -41,11 +43,8 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
     JScrollPane listingScrollPane = new JScrollPane();
     MyJList listing = new MyJList();
     JPanel controlPanel = new JPanel();
-    JPanel messagePanel = new JPanel();
+    JScrollPane messageScrollPane = new JScrollPane();
     JTextArea messageArea = new JTextArea();
-    JPanel buttonPanel = new JPanel();
-    JPanel filler1Panel = new JPanel();
-    JPanel filler2Panel = new JPanel();
     JCheckBox showAllCheckBox = new JCheckBox();
     JButton simulatorButton = new JButton();
     JButton optionsButton = new JButton();
@@ -59,36 +58,37 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
     JButton showMemoryButton = new JButton();
     JButton showConsoleButton = new JButton();
     JButton showTimerButton = new JButton();
+	JSplitPane splitPane = new JSplitPane();
 
     private DataDialog dialog = null;
     private Hashtable lineTable;
-
     private static int INIT_AUTO_STEP_WAIT_TIME = 200;
-
     private Thread autoStepper;
     private int autoStepWaitTime;
-
     private boolean simulatorRunning = false;
     private boolean programRunning = false;
     private boolean settingBreakpoint = false;
     private boolean autoStepping = false;
-
     private String baseName;
     private String currentMessage = null;
-
     private Font listingFont = null;
     private ImageIcon nobreakIcon = null;
     private ImageIcon breakableIcon = null;
     private ImageIcon breakPointIcon = null;
+	private String listingPath = null;
+	private String listingDir = null;
+
+	
+	public BreakpointSet activeBreakpoints = null;
 
     public ExecFrame(RopeFrame parent)
     {
 		super(parent);
 	
 		// Implement a smarter way to set the initial frame position and size
-		setLocation(940, 0);
+		setLocation(930, 0);
 		setSize(980, 710);
-
+		
         try 
 		{
             jbInit();
@@ -198,25 +198,24 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
     {
         titledBorder1 = new TitledBorder(BorderFactory.createLineBorder(new Color(153, 153, 153), 2), "Simulator messages");
         this.getContentPane().setLayout(borderLayout1);
+		
         this.setIconifiable(true);
         this.setMaximizable(true);
         this.setResizable(true);
+		
         this.setTitle("EXEC");
 		
-        listing.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
+        splitPane.setDividerLocation(470);
+	    listing.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         controlPanel.setLayout(gridBagLayout1);
-        messagePanel.setLayout(borderLayout2);
-        messagePanel.setBorder(titledBorder1);
-        messagePanel.setMinimumSize(new Dimension(12, 50));
-        messagePanel.setPreferredSize(new Dimension(12, 50));
-        messageArea.setBackground(new Color(205, 205, 205));
+		controlPanel.setBorder(BorderFactory.createLoweredBevelBorder());
+        messageScrollPane.setBorder(titledBorder1);
+        messageScrollPane.setMinimumSize(new Dimension(33, 60));
+        messageScrollPane.setPreferredSize(new Dimension(60, 90));
         messageArea.setFont(new java.awt.Font("Dialog", 1, 12));
         messageArea.setForeground(Color.blue);
         messageArea.setText("");
-        buttonPanel.setLayout(gridBagLayout2);
-        buttonPanel.setBorder(BorderFactory.createLoweredBevelBorder());
-        filler1Panel.setLayout(null);
-        filler2Panel.setLayout(null);
         simulatorButton.setEnabled(true);
         simulatorButton.setText("Kill simulator");
         optionsButton.setEnabled(false);
@@ -242,98 +241,95 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
         showConsoleButton.setEnabled(false);
         showConsoleButton.setText("Console ...");
         showTimerButton.setText("Timers ...");
+		messageScrollPane.getViewport().add(messageArea, null);
+        this.getContentPane().add(splitPane, BorderLayout.CENTER);
+        splitPane.add(listingScrollPane, JSplitPane.TOP);
+        splitPane.add(controlPanel, JSplitPane.BOTTOM);
         listingScrollPane.getViewport().add(listing, null);
-        controlPanel.add(messagePanel,
-                         new GridBagConstraints(0, 0, 4, 1, 1.0, 0.0,
-                                                GridBagConstraints.CENTER,
-                                                GridBagConstraints.HORIZONTAL,
-                                                new Insets(5, 5, 0, 5), 0, 0));
-        messagePanel.add(messageArea, BorderLayout.CENTER);
-        controlPanel.add(buttonPanel,
-                         new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
-                                                GridBagConstraints.CENTER,
-                                                GridBagConstraints.HORIZONTAL,
-                                                new Insets(5, 5, 5, 5), 0, 0));
-        buttonPanel.add(simulatorButton,
-                        new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+			
+        controlPanel.add(simulatorButton,
+                        new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
                                                GridBagConstraints.CENTER,
                                                GridBagConstraints.HORIZONTAL,
                                                new Insets(5, 5, 0, 0), 0, 0));
-        buttonPanel.add(optionsButton,
-                        new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+        controlPanel.add(optionsButton,
+                        new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
                                                GridBagConstraints.CENTER,
                                                GridBagConstraints.HORIZONTAL,
                                                new Insets(5, 5, 5, 0), 0, 0));
-        buttonPanel.add(dataButton,
-                        new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+        controlPanel.add(dataButton,
+                        new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0,
                                                GridBagConstraints.CENTER,
                                                GridBagConstraints.HORIZONTAL,
-                                               new Insets(5, 20, 0, 15), 0, 0));
-        buttonPanel.add(showAllCheckBox,
-                        new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
+                                               new Insets(5, 5, 0, 5), 0, 0));
+        controlPanel.add(showAllCheckBox,
+                        new GridBagConstraints(1, 1, 1, 1, 1.0, 0.0,
                                                GridBagConstraints.CENTER,
-                                               GridBagConstraints.NONE,
+                                               GridBagConstraints.HORIZONTAL,
                                                new Insets(5, 5, 5, 0), 0, 0));
-        buttonPanel.add(startButton,
-                        new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+        controlPanel.add(startButton,
+                        new GridBagConstraints(2, 0, 1, 1, 1.0, 0.0,
                                                GridBagConstraints.CENTER,
                                                GridBagConstraints.HORIZONTAL,
                                                new Insets(5, 5, 0, 0), 0, 0));
-        buttonPanel.add(quitButton,
-                        new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0,
+        controlPanel.add(quitButton,
+                        new GridBagConstraints(2, 1, 1, 1, 1.0, 0.0,
                                                GridBagConstraints.CENTER,
                                                GridBagConstraints.HORIZONTAL,
                                                new Insets(5, 5, 5, 0), 0, 0));
-        buttonPanel.add(singleStepButton,
-                        new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
+        controlPanel.add(singleStepButton,
+                        new GridBagConstraints(3, 0, 1, 1, 1.0, 0.0,
                                                GridBagConstraints.CENTER,
                                                GridBagConstraints.HORIZONTAL,
                                                new Insets(5, 5, 0, 0), 0, 0));
-        buttonPanel.add(autoStepButton,
-                        new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0,
+        controlPanel.add(autoStepButton,
+                        new GridBagConstraints(3, 1, 1, 1, 1.0, 0.0,
                                                GridBagConstraints.CENTER,
                                                GridBagConstraints.HORIZONTAL,
                                                new Insets(5, 5, 5, 0), 0, 0));
-        buttonPanel.add(fasterButton,
-                        new GridBagConstraints(4, 1, 1, 1, 0.0, 0.0,
+        controlPanel.add(fasterButton,
+                        new GridBagConstraints(4, 1, 1, 1, 1.0, 0.0,
                                                GridBagConstraints.CENTER,
                                                GridBagConstraints.HORIZONTAL,
                                                new Insets(5, 5, 5, 0), 0, 0));
-        buttonPanel.add(slowerButton,
-                        new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
+        controlPanel.add(slowerButton,
+                        new GridBagConstraints(4, 0, 1, 1, 1.0, 0.0,
                                                GridBagConstraints.CENTER,
                                                GridBagConstraints.HORIZONTAL,
                                                new Insets(5, 5, 0, 0), 0, 0));
-        buttonPanel.add(showTimerButton,
-                        new GridBagConstraints(5, 1, 1, 1, 0.0, 0.0,
+        controlPanel.add(showTimerButton,
+                        new GridBagConstraints(5, 1, 1, 1, 1.0, 0.0,
                                                GridBagConstraints.CENTER,
                                                GridBagConstraints.HORIZONTAL,
                                                new Insets(5, 5, 5, 5), 0, 0));
-        buttonPanel.add(showMemoryButton,
-                        new GridBagConstraints(6, 0, 1, 1, 0.0, 0.0,
-                                               GridBagConstraints.SOUTH,
-                                               GridBagConstraints.HORIZONTAL,
+        controlPanel.add(showMemoryButton,
+                        new GridBagConstraints(6, 0, 1, 1, 1.0, 0.0,
+                                               GridBagConstraints.CENTER,
+                                               GridBagConstraints.NONE,
                                                new Insets(5, 0, 0, 5), 0, 0));
-        buttonPanel.add(showConsoleButton,
-                        new GridBagConstraints(6, 1, 1, 1, 0.0, 0.0,
+        controlPanel.add(showConsoleButton,
+                        new GridBagConstraints(6, 1, 1, 1, 1.0, 0.0,
                                                GridBagConstraints.CENTER,
                                                GridBagConstraints.HORIZONTAL,
                                                new Insets(5, 0, 5, 5), 0, 0));
-
-        this.getContentPane().add(listingScrollPane, BorderLayout.CENTER);
-        this.getContentPane().add(controlPanel, BorderLayout.SOUTH);
-        buttonPanel.add(filler2Panel,
-                        new GridBagConstraints(5, 0, 1, 1, 0.0, 0.0
-                                               , GridBagConstraints.CENTER,
-                                               GridBagConstraints.BOTH,
-                                               new Insets(0, 0, 0, 0), 0, 0));
+        controlPanel.add(messageScrollPane,
+                         new GridBagConstraints(0, 2, 7, 1, 1.0, 1.0,
+                                                GridBagConstraints.CENTER,
+                                                GridBagConstraints.BOTH,
+                                                new Insets(5, 5, 5, 5), 0, 0));
     }
 
     public static final Color DARK_RED = new Color(150, 0, 0);
 
-    void initialize(String baseName, String outPath)
+    void initialize(String listingFilePath, String outPath)
     {
-        this.baseName = baseName;
+		listingPath = listingFilePath;
+		
+		File file = new File(listingPath);
+ 		listingDir = file.getParent();
+		String sourceName = file.getName();
+		int idx = sourceName.lastIndexOf(".");
+		baseName = idx == -1 ? sourceName.substring(0) : sourceName.substring(0, idx);
 
         programRunning = false;
         startButton.setText("Start program");
@@ -353,7 +349,7 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
 
         autoStepWaitTime = INIT_AUTO_STEP_WAIT_TIME;
         currentMessage = null;
-
+		
         loadListing();
 
         if (mainFrame.haveAssemblyErrors()) 
@@ -361,7 +357,7 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
             writeMessage(DARK_RED, "*** Correct assembly errors before continuing.");
             mainFrame.lockCommandWindows();
         }
-        else if ((AssemblerOptions.listingPath == null) || (outPath == null)) 
+        else if (listingPath == null || outPath == null) 
 		{
             writeMessage(DARK_RED, "*** Missing or empty listing or object deck files.");
             mainFrame.lockCommandWindows();
@@ -381,13 +377,16 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
 			}
  			else
 			{
-				String message = String.format("SimH failed!\nVerify the correctness of SimH path\n%s", 
+				String message = String.format("SimH failed!\nVerify the path is correct.\n%s", 
 																			SimulatorOptions.simulatorPath);
 				System.out.println(message);
 				JOptionPane.showMessageDialog(this, message, "ROPE", JOptionPane.ERROR_MESSAGE);
 			}
        }
-    }
+
+		loadBreakpoints();
+		restoreBreakpoints(activeBreakpoints);
+	}
 
     void reset()
     {
@@ -413,7 +412,6 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
     private void loadListing()
     {
         Vector v = filterListing();
-
         if (v != null) 
 		{
             listing.clearSelection();
@@ -429,7 +427,7 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
             }
 
 			checkListContent();
-		}
+		}	
     }
 
     private Vector filterListing()
@@ -445,7 +443,7 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
 
         try 
 		{
-            listFile = new BufferedReader(new FileReader(AssemblerOptions.listingPath));
+            listFile = new BufferedReader(new FileReader(listingPath));
 
             while ((line = listFile.readLine()) != null) 
 			{
@@ -476,6 +474,8 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
                         if (breakable) 
 						{
                             lineTable.put(listingLine.getAddress(), new Integer(index));
+							
+							System.out.println(line);
                         }
 
                         ++index;
@@ -531,7 +531,7 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
 
             synchronized(Simulator.class) 
 			{
-                if (line.isBreakpoint()) 
+                if (line.hasBreakpoint()) 
 				{
                     Simulator.execute("br " + line.getAddress());
                 }
@@ -540,14 +540,70 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
                     Simulator.execute("nobr " + line.getAddress());
                 }
             }
+			
+			activeBreakpoints = saveActiveBreakpoints();
         }
     }
+	
+	private void restoreBreakpoints(BreakpointSet breakpoints)
+    {
+		if(breakpoints == null || !breakpoints.listingFile.equals(listingPath))
+		{
+			return;
+		}
+		
+		Vector<ListingLine> breaks = new Vector<ListingLine>(breakpoints.breakpoints);
+		int count = breaks.size();
+
+		ListModel model = listing.getModel();
+        int size = model.getSize();
+        for (int idx = 0; idx < size; ++idx) 
+		{
+            ListingLine line = (ListingLine) model.getElementAt(idx);
+            if(line.isBreakable())
+			{
+				for(int idx2 = 0; idx2 < count; idx2++)
+				{
+					ListingLine line2 = breaks.get(idx2);
+					if(!line.hasBreakpoint() && line.getText().equals(line2.getText()))
+					{
+						flipBreakpoint(idx);
+						break;
+					}
+				}
+			}
+        }
+	}
+
+	private BreakpointSet saveActiveBreakpoints()
+	{
+		Vector<ListingLine> breakpoints = new Vector<ListingLine>();
+
+		ListModel model = listing.getModel();
+        int size = model.getSize();
+        for (int idx = 0; idx < size; ++idx) 
+		{
+            ListingLine line = (ListingLine) model.getElementAt(idx);
+            if(line.breakpoint)
+			{
+				try 
+				{
+					breakpoints.add(line.clone());
+				}
+				catch(CloneNotSupportedException ex) 
+				{
+					Logger.getLogger(ExecFrame.class.getName()).log(Level.SEVERE, null, ex);
+				}
+			}
+        }
+
+		return new BreakpointSet(listingPath, breakpoints);
+	}
 
     private void clearBreakpoints()
     {
         ListModel model = listing.getModel();
         int size = model.getSize();
-
         for (int idx = 0; idx < size; ++idx) 
 		{
             ListingLine line = (ListingLine) model.getElementAt(idx);
@@ -558,27 +614,41 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
 
 		listing.removeAll(); // Cleanup the listing in Exec window (LS 8-12-2013)
     }
-
-    private class ListingLine
+		
+    private class ListingLine implements Cloneable
     {
         private String text;
-        private boolean breakable = true;
+       private boolean breakable = true;
         private boolean breakpoint = false;
         private Integer address = null;
-
+		
         ListingLine(String text, boolean breakable)
         {
             this.breakable = breakable;
             this.text = text;
-
+			
             if (breakable) 
 			{
-                int i = (text.charAt(86) == ' ') ? 87 : 86;
-                address = new Integer(text.substring(i, 91));
+               int idx = (text.charAt(86) == ' ') ? 87 : 86;
+                address = new Integer(text.substring(idx, 91));
             }
         }
 
- 		@Override
+		@Override
+		public ListingLine clone() throws CloneNotSupportedException 
+		{
+			try 
+			{
+				return (ListingLine)super.clone();
+			} 
+			catch (CloneNotSupportedException ex) 
+			{        
+				ex.printStackTrace();
+				throw new RuntimeException();
+			}
+		}
+
+		@Override
 		public String toString()
 		{
 			return text;
@@ -588,7 +658,7 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
         {
             return text;
         }
-		
+
         Integer getAddress()
         {
             return address;
@@ -599,7 +669,7 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
             return breakable;
         }
 
-        boolean isBreakpoint()
+        boolean hasBreakpoint()
         {
             return breakpoint;
         }
@@ -608,7 +678,12 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
         {
             this.breakpoint = !this.breakpoint;
         }
-    }
+  
+	    void setBreakpoint(boolean value)
+        {
+            this.breakpoint = value;
+        }
+	}
 
     private class ListingLineRenderer extends JLabel implements ListCellRenderer
     {
@@ -624,12 +699,12 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
         {
             ListingLine line = (ListingLine)value;
 
-            setIcon(!line.isBreakable() || !simulatorRunning ? nobreakIcon : line.isBreakpoint() ? breakPointIcon : breakableIcon);
+            setIcon(!line.isBreakable() || !simulatorRunning ? nobreakIcon : line.hasBreakpoint() ? breakPointIcon : breakableIcon);
 
             setFont(listingFont);
             setText(line.getText());
 
-            setForeground(line.isBreakpoint() ? Color.RED : Color.BLACK);
+            setForeground(line.hasBreakpoint() ? Color.RED : Color.BLACK);
 			
             setBackground(isSelected && !settingBreakpoint ? Color.LIGHT_GRAY : Color.WHITE);
 
@@ -734,7 +809,7 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
         showConsoleButton.setEnabled(true);
         showTimerButton.setEnabled(true);
 
-        clearBreakpoints();
+ 		restoreBreakpoints(activeBreakpoints);
 		
         mainFrame.unlockCommandWindows();
         mainFrame.showPrintoutWindow(baseName);
@@ -767,7 +842,7 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
         showConsoleButton.setEnabled(false);
 		
 		listing.clearSelection();
-
+				
 		clearBreakpoints();
 		
         mainFrame.lockCommandWindows();
@@ -851,8 +926,9 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
         autoStepButton.setEnabled(false);
         showMemoryButton.setEnabled(false);
         showConsoleButton.setEnabled(false);
-
+		
         clearBreakpoints();
+		
         mainFrame.lockCommandWindows();
         mainFrame.disableSenseSwitches();
 
@@ -1042,7 +1118,9 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
             clearBreakpoints();
 			
             loadListing();
-        }
+ 
+			restoreBreakpoints(activeBreakpoints);
+		}
     }
 	
 	@Override
@@ -1051,6 +1129,12 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
 		super.internalFrameActivated(e);
 
 		// checkListContent();
+	}
+	
+	@Override
+	public void internalFrameDeactivated(InternalFrameEvent e)
+	{
+		super.internalFrameDeactivated(e);
 	}
 	
 	@Override
@@ -1123,6 +1207,68 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 				clipboard.setContents(selection, null);			
 			}
+		}
+	}
+	
+	private class BreakpointSet
+	{
+		private static final long serialVersionUID = 1L;
+		
+		String listingFile;					// The path to the listing file the breakpoints refer to
+		Vector<ListingLine> breakpoints;	// The lines with active breakpoint
+		
+		BreakpointSet(String file, Vector<ListingLine> breakpoints)
+		{
+			this.listingFile = file;
+			this.breakpoints = breakpoints;
+		}
+	}
+	
+	public void saveBreakpoints()
+	{		
+		String filename = baseName + ".brk";
+		String filePath = new File(listingDir, filename).getPath();
+		
+		try
+		{
+			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filePath)));
+			
+			for(ListingLine line : activeBreakpoints.breakpoints)
+			{
+				writer.write(line.getText());
+				writer.newLine();
+			}
+			
+			writer.close();
+		}
+		catch (IOException ex)
+		{
+			ex.printStackTrace();
+		}
+	}
+	
+	public void loadBreakpoints()
+	{
+		String filename = baseName + ".brk";
+		String filePath = new File(listingDir, filename).getPath();
+		
+		try
+		{
+			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath)));
+			
+			Vector<ListingLine> breakpoints = new Vector<ListingLine>();
+		
+			while(reader.ready())
+			{
+				breakpoints.add(new ListingLine(reader.readLine(), true));
+			}
+			
+			reader.close();
+
+			activeBreakpoints = new BreakpointSet(listingPath, breakpoints);
+		}
+		catch (IOException ex)
+		{
 		}
 	}
 }

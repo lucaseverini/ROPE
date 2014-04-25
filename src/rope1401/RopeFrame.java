@@ -40,6 +40,9 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 	private boolean closed;
 	private EditFrame editFrame;	
 	
+	public boolean savePreferencesOnExit = true;
+	public boolean reopenLastSource = false;
+	
 	public ClipboardListener clipboardListener;
 	public ChildFrame currentChildFrame;
 	public JMenuBar menuBar;
@@ -101,30 +104,38 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 		editFrame = new EditFrame(this);
 	    Point editLocation = new Point(0, 0);
 		Dimension editSize = new Dimension(editFrame.getSize());
+		Integer editSplitter = editFrame.splitPane.getDividerLocation();
 		
 		editLocation = RopeHelper.parsePoint(userPrefs.get("editFrameLocation", editLocation.toString()));	
 		editSize = RopeHelper.parseDimension(userPrefs.get("editFrameSize", editSize.toString()));
+		editSplitter = userPrefs.getInt("editFrameSplitter", editSplitter);
 
 		verifyFrameLocation(editLocation);
-		verifyFrameSize(editSize);
-
+		verifyFrameSize(editSize, editSplitter);
+	
         editFrame.setLocation(editLocation);
 		editFrame.setSize(editSize);
+		editFrame.setMinimumSize(new Dimension(480, 240));
+		editFrame.splitPane.setDividerLocation(editSplitter);
 		editFrame.setVisible(true);
         desktop.add(editFrame);
-        
+       
         execFrame = new ExecFrame(this);
 	    Point execLocation = new Point(ropeFrameSize.width / 2, 0);
 		Dimension execSize = new Dimension(execFrame.getSize());
-	 	
+	 	Integer execSplitter = execFrame.splitPane.getDividerLocation();
+		
 		execLocation = RopeHelper.parsePoint(userPrefs.get("execFrameLocation", execLocation.toString()));	
 		execSize = RopeHelper.parseDimension(userPrefs.get("execFrameSize", execSize.toString()));
-		
+		execSplitter = userPrefs.getInt("execFrameSplitter", execSplitter);
+	
 		verifyFrameLocation(execLocation);
-		verifyFrameSize(execSize);
+		verifyFrameSize(execSize, execSplitter);
 	
         execFrame.setLocation(execLocation);
 		execFrame.setSize(execSize);
+		execFrame.setMinimumSize(new Dimension(480, 240));
+		execFrame.splitPane.setDividerLocation(execSplitter);
 		execFrame.setVisible(false);
 		desktop.add(execFrame);
 		
@@ -136,7 +147,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 		printoutSize = RopeHelper.parseDimension(userPrefs.get("printoutFrameSize", printoutSize.toString()));	
 		
 		verifyFrameLocation(printoutLocation);		
-		verifyFrameSize(printoutSize);
+		verifyFrameSize(printoutSize, null);
 		
         printoutFrame.setLocation(printoutLocation);
 		printoutFrame.setSize(printoutSize);
@@ -164,17 +175,36 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 		}
 	}
 	
-	void verifyFrameSize(Dimension frameSize)
+	void verifyFrameSize(Dimension frameSize, Integer splitterLocation)
 	{
 		Dimension ropeFrameSize = getSize();
 
-		if(frameSize.getWidth() < 20 || frameSize.getHeight() < 20)
+		if(frameSize.width < 100)
 		{
-			frameSize.setSize(20, 20);
+			frameSize.width = 100;
 		}
-		else if(frameSize.getWidth() > ropeFrameSize.getWidth() || frameSize.getHeight() > ropeFrameSize.getHeight())
+
+		if(frameSize.height < 240)
 		{
-			frameSize.setSize(ropeFrameSize.getWidth(), ropeFrameSize.getHeight());
+			frameSize.height = 240;
+		}
+
+		if(frameSize.width > ropeFrameSize.width)
+		{
+			frameSize.width = ropeFrameSize.width;
+		}
+
+		if(frameSize.height > ropeFrameSize.height)
+		{
+			frameSize.height = ropeFrameSize.height;
+		}
+
+		if(splitterLocation != null)
+		{
+			if(splitterLocation > frameSize.height - 200)
+			{
+				splitterLocation = frameSize.height - 200;
+			}
 		}
 	}
 	
@@ -188,7 +218,8 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
         desktop.getDesktopManager().deiconifyFrame(execFrame);
         execFrame.setTitle("EXEC: " + baseName);
         execFrame.setVisible(true);
-        execFrame.initialize(baseName, DataOptions.outputPath);
+        execFrame.initialize(AssemblerOptions.listingPath, DataOptions.outputPath);
+			
 		execFrame.toFront();
     }
 
@@ -236,7 +267,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 			frameSize = RopeHelper.parseDimension(userPrefs.get("memoryFrameSize", frameSize.toString()));	
 
 			verifyFrameLocation(frameLocation);
-			verifyFrameSize(frameSize);
+			verifyFrameSize(frameSize, null);
 		
 			memoryFrame.setLocation(frameLocation);
 			memoryFrame.setSize(frameSize);
@@ -280,7 +311,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 			frameSize = RopeHelper.parseDimension(userPrefs.get("consoleFrameSize", frameSize.toString()));	
 
 			verifyFrameLocation(frameLocation);
-			verifyFrameSize(frameSize);
+			verifyFrameSize(frameSize, null);
 		
 			consoleFrame.setLocation(frameLocation);
 			consoleFrame.setSize(frameSize);
@@ -318,7 +349,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 			frameSize = RopeHelper.parseDimension(userPrefs.get("timerFrameSize", frameSize.toString()));	
 
 			verifyFrameLocation(frameLocation);
-			verifyFrameSize(frameSize);
+			verifyFrameSize(frameSize, null);
 		
 			timerFrame.setLocation(frameLocation);
 			timerFrame.setSize(frameSize);
@@ -430,6 +461,20 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 	public void windowOpened(WindowEvent e)
 	{
 		loadPreferences();
+					
+		if(reopenLastSource)
+		{
+			File file = new File(userPrefs.get("lastSourceFile", null));
+
+			if(editFrame.loadSourceFile(file))
+			{
+				String sourceName = file.getName();
+				int idx = sourceName.lastIndexOf(".");
+				String baseName = idx == -1 ? sourceName.substring(0) : sourceName.substring(0, idx);
+ 
+				showExecWindow(baseName);
+			}
+		}
 	}
 
 	@Override
@@ -465,20 +510,21 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 		
 		if(RopeHelper.isWindows)
 		{
-			assemblerPref = userPrefs.get("assemblerPath", "tools/windows/autocoder.exe");
-			simulatorPref = userPrefs.get("simulatorPath", "tools/windows/ibm1401.exe");
+			assemblerPref = userPrefs.get("assemblerPath", RopeResources.getString("AutocoderWindowsPath"));
+			simulatorPref = userPrefs.get("simulatorPath", RopeResources.getString("SimhWindowsPath"));
 		}
 		else if(RopeHelper.isMac)
 		{
-			assemblerPref = userPrefs.get("assemblerPath", "tools/mac/autocoder");
-			simulatorPref = userPrefs.get("simulatorPath", "tools/mac/ibm1401");			
+			assemblerPref = userPrefs.get("assemblerPath", RopeResources.getString("AutocoderMacPath"));
+			simulatorPref = userPrefs.get("simulatorPath", RopeResources.getString("SimhMacPath"));			
 		}
 		else if(RopeHelper.isUnix)
 		{
-			assemblerPref = userPrefs.get("assemblerPath", "tools/linux/autocoder");
-			simulatorPref = userPrefs.get("simulatorPath", "tools/linux/ibm1401");			
+			assemblerPref = userPrefs.get("assemblerPath", RopeResources.getString("AutocoderLinuxPath"));
+			simulatorPref = userPrefs.get("simulatorPath", RopeResources.getString("SimhLinuxPath"));			
 		}
 		
+		reopenLastSource = userPrefs.getBoolean("reopenLastSource", true);
 		AssemblerOptions.saveBeforeAssembly = userPrefs.getBoolean("saveBeforeAssembly", false);
 		SimulatorOptions.useOldConversion = userPrefs.getBoolean("useOldConversion", true);
 		
@@ -589,18 +635,26 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 	
 	void savePreferences()
 	{
+		if(!savePreferencesOnExit)
+		{
+			return;
+		}
+		
 		try 
 		{
 			if(editFrame != null && editFrame.isVisible())
 			{
 				userPrefs.put("editFrameLocation", editFrame.getLocation().toString());
 				userPrefs.put("editFrameSize", editFrame.getSize().toString());
+				userPrefs.putInt("editFrameSplitter", editFrame.splitPane.getDividerLocation());
+				userPrefs.put("lastSourceFile", editFrame.sourcePath);
 			}
 			
 			if(execFrame != null && execFrame.isVisible())
 			{
 				userPrefs.put("execFrameLocation", execFrame.getLocation().toString());
 				userPrefs.put("execFrameSize", execFrame.getSize().toString());
+				userPrefs.putInt("execFrameSplitter", execFrame.splitPane.getDividerLocation());
 			}
 			
 			if(printoutFrame != null && printoutFrame.isVisible())
@@ -710,6 +764,11 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 			{
 				return false;
 			}
+		}
+		
+		if(execFrame.activeBreakpoints != null)
+		{
+			execFrame.saveBreakpoints();
 		}
 		
 		savePreferences();

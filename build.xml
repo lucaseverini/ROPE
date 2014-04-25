@@ -71,8 +71,10 @@
 
     -->
 <!--
-	Last changes by Luca Severini (lucaseverini@mac.com) on April 14 2014.
+	Last changes by Luca Severini (lucaseverini@mac.com) on April 24 2014.
 -->
+
+	<property name="app.icon.icns" value="rope1401.icns"/>
 	
 <!--
 	Execute the script that creates the property file containing some properties used as strings

@@ -17,7 +17,7 @@ import javax.swing.JOptionPane;
 
 public class Rope
 {
-	private RopeFrame mainFrame;
+	public static RopeFrame mainFrame;
 	
     public Rope()
     {
@@ -50,59 +50,4 @@ public class Rope
     {
         Rope rope = new Rope();
     }
-	
-	public static void savePreferences()
-	{
-/*
-		try
-		{
-			// Retrieve the user preference node
-			Preferences userPrefs = Preferences.userRoot();
-
-			userPrefs.sync();
-			userPrefs.flush();
-		}
-		catch(BackingStoreException ex)
-		{
-			Logger.getLogger(RopeFrame.class.getName()).log(Level.SEVERE, null, ex);
-		}
-*/
-	}
-/*	
-	public static void loadPreferences()
-	{
-		Preferences userPrefs = Preferences.userRoot();
-
-		if(RopeHelper.isWindows)
-		{
-			AssemblerOptions.assemblerPath = userPrefs.get("assemblerPath", "tools/windows/autocoder.exe");
-			SimulatorOptions.simulatorPath = userPrefs.get("simulatorPath", "tools/windows/i1401.exe");
-		}
-		else if(RopeHelper.isMac)
-		{
-			AssemblerOptions.assemblerPath = userPrefs.get("assemblerPath", "tools/mac/autocoder");
-			SimulatorOptions.simulatorPath = userPrefs.get("simulatorPath", "tools/mac/i1401");			
-		}
-		else if(RopeHelper.isUnix)
-		{
-			AssemblerOptions.assemblerPath = userPrefs.get("assemblerPath", "tools/linux/autocoder");
-			SimulatorOptions.simulatorPath = userPrefs.get("simulatorPath", "tools/linux/i1401");			
-		}
-		
-		AssemblerOptions.saveBeforeAssembly = userPrefs.getBoolean("saveBeforeAssembly", false);
-		SimulatorOptions.useOldConversion = userPrefs.getBoolean("useOldConversion", true);
-		
-		String var = System.getenv("ROPE_ASSEMBLER");
-		if(var != null && !var.isEmpty())
-		{
-			AssemblerOptions.assemblerPath = var;
-		}
-		
-		var = System.getenv("ROPE_SIMULATOR");
-		if(var != null && !var.isEmpty())
-		{
-			SimulatorOptions.simulatorPath = var;
-		}
-	}
-*/
 }

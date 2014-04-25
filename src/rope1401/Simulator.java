@@ -249,14 +249,4 @@ class Simulator
     {
         cleanup();
     }
-
-/*
-    public static void main(String[] args)
-    {
-        String line;
-
-        start("C:\\IBM1401\\programs\\Pi\\test.cd",
-              "C:\\IBM1401\\programs\\Pi\\test.out");
-    }
-*/
 }

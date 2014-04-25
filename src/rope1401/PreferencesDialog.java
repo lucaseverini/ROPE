@@ -24,6 +24,7 @@ public class PreferencesDialog extends JDialog implements ActionListener
 
     JTextField assemblerPath;
     JTextField simulatorPath;	
+	JCheckBox reopenLastSourceChk;
     JCheckBox saveBeforeAssemblyChk;
 	JCheckBox useOldConversionChk;
     JButton assemblerBrowseBtn;
@@ -62,22 +63,23 @@ public class PreferencesDialog extends JDialog implements ActionListener
 		
 		if(RopeHelper.isWindows)
 		{
-			path1 = userPrefs.get("assemblerPath", "tools/windows/autocoder.exe");
-			path2 = userPrefs.get("simulatorPath", "tools/windows/i1401.exe");
+			path1 = userPrefs.get("assemblerPath", RopeResources.getString("AutocoderWindowsPath"));
+			path2 = userPrefs.get("simulatorPath", RopeResources.getString("SimhWindowsPath"));
 		}
 		else if(RopeHelper.isMac)
 		{
-			path1 = userPrefs.get("assemblerPath", "tools/mac/autocoder");
-			path2 = userPrefs.get("simulatorPath", "tools/mac/i1401");			
+			path1 = userPrefs.get("assemblerPath", RopeResources.getString("AutocoderMacPath"));
+			path2 = userPrefs.get("simulatorPath", RopeResources.getString("SimhMacPath"));			
 		}
 		else if(RopeHelper.isUnix)
 		{
-			path1 = userPrefs.get("assemblerPath", "tools/linux/autocoder");
-			path2 = userPrefs.get("simulatorPath", "tools/linux/i1401");			
+			path1 = userPrefs.get("assemblerPath", RopeResources.getString("AutocoderLinuxPath"));
+			path2 = userPrefs.get("simulatorPath", RopeResources.getString("SimhLinuxPath"));			
 		}
 	
 		assemblerPath.setText(path1);
         simulatorPath.setText(path2);
+		reopenLastSourceChk.setSelected(userPrefs.getBoolean("reopenLastSource", true));
 		saveBeforeAssemblyChk.setSelected(userPrefs.getBoolean("saveBeforeAssembly", false));
 		useOldConversionChk.setSelected(userPrefs.getBoolean("useOldConversion", true));
      }
@@ -87,7 +89,8 @@ public class PreferencesDialog extends JDialog implements ActionListener
 		assemblerPath = new JTextField();
 		simulatorPath = new JTextField();	
 	
-		saveBeforeAssemblyChk = new JCheckBox("Save documents before assembling");
+		reopenLastSourceChk = new JCheckBox("Reopen last source file");
+		saveBeforeAssemblyChk = new JCheckBox("Save source file before assembling");
 		useOldConversionChk = new JCheckBox("Use Old Conversion option with SimH");
 	
 		assemblerBrowseBtn = new JButton("Select...");
@@ -123,10 +126,13 @@ public class PreferencesDialog extends JDialog implements ActionListener
                                                   new Insets(0, 5, 5, 5), 0, 0));
 
 		checkPanel.setLayout(new GridBagLayout());
-        checkPanel.add(saveBeforeAssemblyChk, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
+        checkPanel.add(reopenLastSourceChk, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
                                                GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
                                                new Insets(5, 5, 5, 5), 0, 0));
-        checkPanel.add(useOldConversionChk, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
+        checkPanel.add(saveBeforeAssemblyChk, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
+                                               GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+                                               new Insets(0, 5, 5, 5), 0, 0));
+        checkPanel.add(useOldConversionChk, new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0,
                                                GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
                                                new Insets(0, 5, 5, 5), 0, 0));
 
@@ -199,6 +205,7 @@ public class PreferencesDialog extends JDialog implements ActionListener
 			
 			userPrefs.put("assemblerPath", assemblerPath.getText());
 			userPrefs.put("simulatorPath", simulatorPath.getText());
+			userPrefs.putBoolean("reopenLastSource", reopenLastSourceChk.isSelected());
 			userPrefs.putBoolean("saveBeforeAssembly", saveBeforeAssemblyChk.isSelected());
 			userPrefs.putBoolean("useOldConversion", useOldConversionChk.isSelected());
 			
@@ -210,6 +217,7 @@ public class PreferencesDialog extends JDialog implements ActionListener
 			Logger.getLogger(RopeFrame.class.getName()).log(Level.SEVERE, null, ex);
 		}
 	
+		Rope.mainFrame.reopenLastSource = reopenLastSourceChk.isSelected();
 		AssemblerOptions.saveBeforeAssembly = saveBeforeAssemblyChk.isSelected();
 		SimulatorOptions.useOldConversion = useOldConversionChk.isSelected();
 		AssemblerOptions.assemblerPath = assemblerPath.getText();
@@ -251,6 +259,8 @@ public class PreferencesDialog extends JDialog implements ActionListener
 				Assembler.kill();
 				Simulator.kill();
 			
+				Rope.mainFrame.savePreferencesOnExit = false;
+				
 				System.exit(0);
 			}
 		}

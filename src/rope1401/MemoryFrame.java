@@ -133,12 +133,12 @@ public class MemoryFrame extends ChildFrame implements ActionListener, ChangeLis
         controlPanel.setLayout(gridBagLayout1);
         controlPanel.setBorder(BorderFactory.createLoweredBevelBorder());
         fromLabel.setText("From");
-        fromText.setMinimumSize(new Dimension(45, 20));
-        fromText.setPreferredSize(new Dimension(45, 20));
+        fromText.setMinimumSize(new Dimension(56, 20));
+        fromText.setPreferredSize(new Dimension(56, 20));
         fromText.setText("0");
         toLabel.setText("to");
-        toText.setMinimumSize(new Dimension(45, 20));
-        toText.setPreferredSize(new Dimension(45, 20));
+        toText.setMinimumSize(new Dimension(56, 20));
+        toText.setPreferredSize(new Dimension(56, 20));
         toText.setText("512");
         showButton.setText("Show");
         autoCheckBox.setSelected(true);

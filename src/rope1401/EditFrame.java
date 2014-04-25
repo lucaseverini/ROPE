@@ -105,19 +105,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 		undoMgr.updateRedoAction = new UpdateRedoAction();
 	
 		document = sourceArea.getDocument();
-/*
-		doc.addUndoableEditListener(new UndoableEditListener() 
-		{
-			@Override
-			public void undoableEditHappened(UndoableEditEvent e) 
-			{
-				if(undoMgr.addEdit(e.getEdit()))
-				{
-					setEditMenuItems();
-				}
-			}
-		});
-*/
+
 		// Remove automatic key bindings because we want them controlled by menu items
 		InputMap im = sourceArea.getInputMap(JComponent.WHEN_FOCUSED);
 		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, RopeHelper.modifierMaks), "none");
@@ -152,7 +140,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 	
     void jbInit() throws Exception
     {
-        titledBorder1 = new TitledBorder(BorderFactory.createLineBorder( new Color(153, 153, 153), 2), "Assembly messages");
+        titledBorder1 = new TitledBorder(BorderFactory.createLineBorder( new Color(153, 153, 153), 2), "Assembler messages");
         this.getContentPane().setLayout(borderLayout1);
 		
         this.setIconifiable(true);
@@ -180,12 +168,12 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
         lineText.setPreferredSize(new Dimension(50, 20));
         lineText.setEditable(false);
         columnLabel.setText("Column:");
-        columnText.setMinimumSize(new Dimension(32, 20));
-        columnText.setPreferredSize(new Dimension(32, 20));
+        columnText.setMinimumSize(new Dimension(41, 20));
+        columnText.setPreferredSize(new Dimension(41, 20));
         columnText.setEditable(false);
         columnText.setText("");
         messageScrollPane.setBorder(titledBorder1);
-        messageScrollPane.setMinimumSize(new Dimension(33, 90));
+        messageScrollPane.setMinimumSize(new Dimension(33, 61));
         messageScrollPane.setPreferredSize(new Dimension(60, 90));
         optionsButton.setEnabled(false);
         optionsButton.setText("Assembler options ...");
@@ -195,6 +183,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
         splitPane.add(textScrollPane, JSplitPane.TOP);
         splitPane.add(controlPanel, JSplitPane.BOTTOM);
         textScrollPane.getViewport().add(sourceArea, null);
+		
         controlPanel.add(fileLabel,
                          new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
                                                 GridBagConstraints.WEST,
@@ -369,108 +358,119 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
         File file = chooser.choose(fileText, this);
         if (file != null) 
 		{
-			selectedPath = file.getParent();
-			
-            BufferedReader sourceFile = null;
+			loadSourceFile(file);
+	    }
+    }
+	
+	public boolean loadSourceFile(File file)
+	{
+		boolean result =false;
+		
+		selectedPath = file.getParent();
 
-            String directoryPath = file.getParent();
-            String sourceName = file.getName();
+		BufferedReader sourceFile = null;
 
-            int i = sourceName.lastIndexOf(".");
-            baseName = i == -1 ? sourceName.substring(0) : sourceName.substring(0, i);
-            String basePath = directoryPath + File.separator + baseName;
+		String directoryPath = file.getParent();
+		String sourceName = file.getName();
 
-            DataOptions.directoryPath = directoryPath;
+		int i = sourceName.lastIndexOf(".");
+		baseName = i == -1 ? sourceName.substring(0) : sourceName.substring(0, i);
+		String basePath = directoryPath + File.separator + baseName;
 
-			sourcePath = file.getPath();
-			
-            AssemblerOptions.sourcePath = sourcePath;
-            AssemblerOptions.listingPath = basePath + ".lst";
-            AssemblerOptions.objectPath = basePath + ".cd";
-			
-			String var = System.getenv("ROPE_MACROS_DIR");
-			if(var != null && !var.isEmpty())
+		DataOptions.directoryPath = directoryPath;
+
+		sourcePath = file.getPath();
+
+		AssemblerOptions.sourcePath = sourcePath;
+		AssemblerOptions.listingPath = basePath + ".lst";
+		AssemblerOptions.objectPath = basePath + ".cd";
+
+		String var = System.getenv("ROPE_MACROS_DIR");
+		if(var != null && !var.isEmpty())
+		{
+			File dir = new File(var);
+			if(dir.exists() && dir.isDirectory()) 
 			{
-				File dir = new File(var);
-				if(dir.exists() && dir.isDirectory()) 
-				{
-					AssemblerOptions.macroPath = var;
-				}
-				else
-				{
-					AssemblerOptions.macroPath = directoryPath;
-				}
+				AssemblerOptions.macroPath = var;
 			}
 			else
 			{
 				AssemblerOptions.macroPath = directoryPath;
 			}
-						
- 			DataOptions.inputPath = AssemblerOptions.objectPath;
-            DataOptions.outputPath = basePath + ".out";
-            DataOptions.readerPath = null;
-            DataOptions.punchPath = basePath + ".pch";
-            DataOptions.tape1Path = basePath + ".mt1";
-            DataOptions.tape2Path = basePath + ".mt2";
-            DataOptions.tape3Path = basePath + ".mt3";
-            DataOptions.tape4Path = basePath + ".mt4";
-            DataOptions.tape5Path = basePath + ".mt5";
-            DataOptions.tape6Path = basePath + ".mt6";
+		}
+		else
+		{
+			AssemblerOptions.macroPath = directoryPath;
+		}
 
-            this.setTitle("EDIT: " + sourceName);
-            fileText.setText(sourcePath);
+		DataOptions.inputPath = AssemblerOptions.objectPath;
+		DataOptions.outputPath = basePath + ".out";
+		DataOptions.readerPath = null;
+		DataOptions.punchPath = basePath + ".pch";
+		DataOptions.tape1Path = basePath + ".mt1";
+		DataOptions.tape2Path = basePath + ".mt2";
+		DataOptions.tape3Path = basePath + ".mt3";
+		DataOptions.tape4Path = basePath + ".mt4";
+		DataOptions.tape5Path = basePath + ".mt5";
+		DataOptions.tape6Path = basePath + ".mt6";
 
-            if (dialog == null) 
+		this.setTitle("EDIT: " + sourceName);
+		fileText.setText(sourcePath);
+
+		if (dialog == null) 
+		{
+			dialog = new AssemblerDialog(mainFrame, "Assembler options");
+
+			Dimension screenSize = Toolkit.getDefaultToolkit(). getScreenSize();
+			Dimension dialogSize = dialog.getSize();
+			dialog.setLocation((screenSize.width - dialogSize.width) / 2, (screenSize.height - dialogSize.height) / 2);
+		}
+
+		dialog.initialize();
+
+		AssemblerOptions.command = dialog.buildCommand();
+
+		sourceArea.setText(null);
+
+		try 
+		{
+			sourceFile = new BufferedReader(new FileReader(file));
+			String line;
+
+			while ((line = sourceFile.readLine()) != null) 
 			{
-                dialog = new AssemblerDialog(mainFrame, "Assembler options");
+				sourceArea.append(line + "\n");
+			}
 
-                Dimension screenSize = Toolkit.getDefaultToolkit(). getScreenSize();
-                Dimension dialogSize = dialog.getSize();
-                dialog.setLocation((screenSize.width - dialogSize.width) / 2, (screenSize.height - dialogSize.height) / 2);
-            }
+			sourceArea.setCaretPosition(0);
+			optionsButton.setEnabled(true);
+			assembleButton.setEnabled(true);
+			saveButton.setEnabled(true);
 
-            dialog.initialize();
+			sourceChanged = false;
+			undoMgr.discardAllEdits();
 			
-            AssemblerOptions.command = dialog.buildCommand();
-
-            sourceArea.setText(null);
-
-            try 
+			result = true;
+		}
+		catch (IOException ex) 
+		{
+			ex.printStackTrace();
+		}
+		finally 
+		{
+			try 
 			{
-                sourceFile = new BufferedReader(new FileReader(file));
-                String line;
-
-                while ((line = sourceFile.readLine()) != null) 
+				if(sourceFile != null)
 				{
-                    sourceArea.append(line + "\n");
-                }
-
-                sourceArea.setCaretPosition(0);
-                optionsButton.setEnabled(true);
-                assembleButton.setEnabled(true);
-                saveButton.setEnabled(true);
-				
-				sourceChanged = false;
-				undoMgr.discardAllEdits();
-            }
-            catch (IOException ex) 
-			{
-                ex.printStackTrace();
-            }
-            finally 
-			{
-                try 
-				{
-					if(sourceFile != null)
-					{
-						sourceFile.close();
-					}
-                }	
-                catch (IOException ignore) {}
-            }
-        }
-    }
-
+					sourceFile.close();
+				}
+			}	
+			catch (IOException ignore) {}
+		}
+		
+		return result;
+	}	
+	
     public void saveAction()
     {
 		BufferedWriter sourceFile = null;
@@ -516,6 +516,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
         mainFrame.resetExecWindow();
 
         saveAction();
+		
 		assembleFailed = false;
         haveAssemblyErrors = false;
 
