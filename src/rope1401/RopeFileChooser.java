@@ -17,6 +17,9 @@ import java.util.logging.Logger;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 
+// TO BE DONE:
+// Use java.awt.FileDialog on Mac OS
+
 class RopeFileChooser extends JFileChooser
 {
 	private static final long serialVersionUID = 1L;

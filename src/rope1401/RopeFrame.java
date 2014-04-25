@@ -75,7 +75,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 		addWindowListener(this);
 		addFocusListener(this);
 
-        // Validate frames that have preset sizes
+		// Validate frames that have preset sizes
         // Pack frames that have useful preferred size info, e.g. from their layout
         if (packFrame) 
 		{
@@ -153,9 +153,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 		printoutFrame.setSize(printoutSize);
 	    printoutFrame.setVisible(false);
         desktop.add(printoutFrame);
-		
-		currentChildFrame = editFrame;
-		
+				
 		setVisible(true);
 
 		clipboardListener = new ClipboardListener(this);
@@ -164,14 +162,25 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 	void verifyFrameLocation(Point frameLocation)
 	{
 		Dimension ropeFrameSize = getSize();
-		
-		if(frameLocation.getX() < 0 || frameLocation.getY() < 0)
+/*		
+		if(frameLocation.x < 0)
 		{
-			frameLocation.setLocation(0, 0);
+			frameLocation.x = 0;
 		}
-		else if(frameLocation.getX() > ropeFrameSize.getWidth()- 20 || frameLocation.getY() > ropeFrameSize.getHeight()- 20)
+*/		
+		if(frameLocation.y < -4)
 		{
-			frameLocation.setLocation(ropeFrameSize.getWidth() - 20, ropeFrameSize.getHeight() - 20);
+			frameLocation.y = -4;
+		}
+		
+		if(frameLocation.x > ropeFrameSize.width - 20)
+		{
+			frameLocation.x = ropeFrameSize.width - 20;
+		}
+
+		if(frameLocation.y > ropeFrameSize.height - 20)
+		{
+			frameLocation.y = ropeFrameSize.height - 20;
 		}
 	}
 	
@@ -475,6 +484,9 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 				showExecWindow(baseName);
 			}
 		}
+
+		currentChildFrame = editFrame;
+		desktop.getDesktopManager().activateFrame(editFrame);
 	}
 
 	@Override
@@ -792,7 +804,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
             @Override
             public void actionPerformed(ActionEvent e) 
 			{
-				System.out.println("New...");
+				callChildFrameMethod("newMenuAction", e);
             }
         });
 		fileMenu.add(newItem);
@@ -803,7 +815,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
             @Override
             public void actionPerformed(ActionEvent e) 
 			{
-				System.out.println("Open...");
+				callChildFrameMethod("openMenuAction", e);
             }
         });
 		fileMenu.add(openItem);
@@ -816,7 +828,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
             @Override
             public void actionPerformed(ActionEvent e) 
 			{
-				System.out.println("Revert...");
+				callChildFrameMethod("revertMenuAction", e);
             }
         });
 		fileMenu.add(revertItem);
@@ -829,7 +841,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
             @Override
             public void actionPerformed(ActionEvent e) 
 			{
-				System.out.println("Save");
+				callChildFrameMethod("saveMenuAction", e);
             }
         });
 		fileMenu.add(saveItem);
@@ -840,7 +852,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
             @Override
             public void actionPerformed(ActionEvent e) 
 			{
-				System.out.println("Save as...");
+				callChildFrameMethod("saveasMenuAction", e);
             }
         });
 		fileMenu.add(saveAsItem);
@@ -853,7 +865,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
             @Override
             public void actionPerformed(ActionEvent e) 
 			{
-				System.out.println("Close");
+				callChildFrameMethod("closeMenuAction", e);
             }
         });
 		fileMenu.add(closeItem);
@@ -866,7 +878,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
             @Override
             public void actionPerformed(ActionEvent e) 
 			{
-				System.out.println("Print");
+				callChildFrameMethod("printMenuAction", e);
             }
         });
 		fileMenu.add(printItem);

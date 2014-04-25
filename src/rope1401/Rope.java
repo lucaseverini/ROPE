@@ -9,23 +9,30 @@
 
 package rope1401;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.prefs.BackingStoreException;
-import java.util.prefs.Preferences;
-import javax.swing.JOptionPane;
+import javax.swing.UIManager;
+import com.apple.eawt.QuitStrategy;
 
-public class Rope
+public class Rope extends com.apple.eawt.Application
 {
 	public static RopeFrame mainFrame;
 	
     public Rope()
-    {
+    {	
 		if(RopeHelper.isMac)
 		{
+			System.setProperty("apple.awt.graphics.EnableQ2DX", "true");
 			System.setProperty("apple.laf.useScreenMenuBar", "true");
+			System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Rope");
+			
+			setQuitStrategy(QuitStrategy.SYSTEM_EXIT_0);
 		}
 
+		try
+		{
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		}
+		catch (Exception ex) {}
+	   
 		Runtime.getRuntime().addShutdownHook(new Thread()
 		{
 			@Override

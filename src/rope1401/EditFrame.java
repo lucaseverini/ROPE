@@ -798,7 +798,13 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 	{
 		return mainFrame.clipboardListener != null && mainFrame.clipboardListener.hasValidContent;
 	}
-	
+
+	@Override
+	public boolean canPrint()
+	{
+		return true;
+	}
+
 	@Override
 	public void internalFrameActivated(InternalFrameEvent e)
 	{

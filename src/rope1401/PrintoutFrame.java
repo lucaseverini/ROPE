@@ -302,6 +302,12 @@ public class PrintoutFrame extends ChildFrame implements ActionListener, ChangeL
 		return (printoutArea.getText().length() > 0);
 	}
 	
+	@Override
+	public boolean canPrint()
+	{
+		return true;
+	}
+
 	public void copyMenuAction(ActionEvent event)
 	{
 		if(printoutArea != null)

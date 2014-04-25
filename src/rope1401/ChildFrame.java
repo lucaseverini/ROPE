@@ -6,12 +6,16 @@
 
 package rope1401;
 
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import javax.swing.JInternalFrame;
 import javax.swing.JMenuItem;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
 
-public class ChildFrame extends JInternalFrame implements InternalFrameListener
+public class ChildFrame extends JInternalFrame implements InternalFrameListener, ComponentListener
 {
 	private static final long serialVersionUID = 1L;
 
@@ -22,6 +26,7 @@ public class ChildFrame extends JInternalFrame implements InternalFrameListener
 		mainFrame = ropeFrame;
 		
 		addInternalFrameListener(this);
+	    addComponentListener(this);		
 	}
 
 	@Override
@@ -96,6 +101,14 @@ public class ChildFrame extends JInternalFrame implements InternalFrameListener
 	
 	public void setupMenus()
 	{
+		mainFrame.newItem.setEnabled(canNew());
+		mainFrame.openItem.setEnabled(canOpen());
+		mainFrame.saveItem.setEnabled(canSave());
+		mainFrame.saveAsItem.setEnabled(canSaveAs());
+		mainFrame.revertItem.setEnabled(canRevert());
+		mainFrame.closeItem.setEnabled(canClose());
+		mainFrame.printItem.setEnabled(canPrint());
+			
 		mainFrame.undoItem.setEnabled(canUndo());
 		mainFrame.redoItem.setEnabled(canRedo());
 		mainFrame.cutItem.setEnabled(canCut());
@@ -104,6 +117,17 @@ public class ChildFrame extends JInternalFrame implements InternalFrameListener
 		mainFrame.deleteItem.setEnabled(canDelete());
 		mainFrame.selectAllItem.setEnabled(canSelectAll());
 		mainFrame.selectLineItem.setEnabled(canSelectLine());
+		
+		if(RopeHelper.isMac)
+		{
+			// On Mac OS those three menus arer managed in a different way...
+		}
+		else
+		{
+			mainFrame.prefsItem.setEnabled(canPrefs());
+			mainFrame.quitItem.setEnabled(canQuit());
+			mainFrame.aboutItem.setEnabled(canAbout());
+		}
 	}
 
 	public boolean canUndo()
@@ -145,4 +169,114 @@ public class ChildFrame extends JInternalFrame implements InternalFrameListener
 	{
 		return false;
 	}
+	
+	public boolean canNew()
+	{
+		return true;
+	}
+
+	public boolean canOpen()
+	{
+		return true;
+	}
+
+	public boolean canPrefs()
+	{
+		return true;
+	}
+
+	public boolean canQuit()
+	{
+		return true;
+	}
+
+	public boolean canAbout()
+	{
+		return true;
+	}
+
+	public boolean canSave()
+	{
+		return false;
+	}
+
+	public boolean canSaveAs()
+	{
+		return false;
+	}
+
+	public boolean canRevert()
+	{
+		return false;
+	}
+
+	public boolean canClose()
+	{
+		return false;
+	}
+	
+	public boolean canPrint()
+	{
+		return false;
+	}
+
+	@Override
+	public void componentResized(ComponentEvent e)
+	{
+		Point p = getLocation();
+		Dimension s = getSize();
+		
+		if(p.y < -5)
+		{
+			p.y = -5;
+			setLocation(p);
+		}
+		
+		if(p.x + s.width < 40)
+		{
+			p.x = -(s.width - 40);
+			setLocation(p);
+		}
+		else if(p.x > mainFrame.getWidth() - 40)
+		{
+			p.x = mainFrame.getWidth() - 40;
+			setLocation(p);
+		}
+	}
+
+	@Override
+	public void componentMoved(ComponentEvent e)
+	{
+		Point p = getLocation();
+		Dimension s = getSize();
+
+		if(p.y < -5)
+		{
+			p.y = -5;
+			setLocation(p);
+		}
+
+		if(p.x + s.width < 40)
+		{
+			p.x = -(s.width - 40);
+			setLocation(p);
+		}
+		else if(p.x > mainFrame.getWidth() - 40)
+		{
+			p.x = mainFrame.getWidth() - 40;
+			setLocation(p);
+		}
+	}
+
+	@Override
+	public void componentShown(ComponentEvent e)
+	{
+	}
+
+	@Override
+	public void componentHidden(ComponentEvent e)
+	{
+	}
 }
+
+
