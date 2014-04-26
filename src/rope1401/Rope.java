@@ -10,9 +10,9 @@
 package rope1401;
 
 import javax.swing.UIManager;
-import com.apple.eawt.QuitStrategy;
+// import com.apple.eawt.QuitStrategy;
 
-public class Rope extends com.apple.eawt.Application
+public class Rope /* extends com.apple.eawt.Application */
 {
 	public static RopeFrame mainFrame;
 	
@@ -24,7 +24,7 @@ public class Rope extends com.apple.eawt.Application
 			System.setProperty("apple.laf.useScreenMenuBar", "true");
 			System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Rope");
 			
-			setQuitStrategy(QuitStrategy.SYSTEM_EXIT_0);
+			// setQuitStrategy(QuitStrategy.SYSTEM_EXIT_0);
 		}
 
 		try

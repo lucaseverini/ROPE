@@ -473,15 +473,19 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 					
 		if(reopenLastSource)
 		{
-			File file = new File(userPrefs.get("lastSourceFile", null));
-
-			if(editFrame.loadSourceFile(file))
+			String filePath = userPrefs.get("lastSourceFile", null);
+			if(filePath != null)
 			{
-				String sourceName = file.getName();
-				int idx = sourceName.lastIndexOf(".");
-				String baseName = idx == -1 ? sourceName.substring(0) : sourceName.substring(0, idx);
- 
-				showExecWindow(baseName);
+				File file = new File(filePath);
+
+				if(file.exists() && editFrame.loadSourceFile(file))
+				{
+					String sourceName = file.getName();
+					int idx = sourceName.lastIndexOf(".");
+					String baseName = idx == -1 ? sourceName.substring(0) : sourceName.substring(0, idx);
+
+					showExecWindow(baseName);
+				}
 			}
 		}
 
