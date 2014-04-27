@@ -224,12 +224,36 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 
     void showExecWindow(String baseName)
     {
-        desktop.getDesktopManager().deiconifyFrame(execFrame);
-        execFrame.setTitle("EXEC: " + baseName);
-        execFrame.setVisible(true);
-        execFrame.initialize(AssemblerOptions.listingPath, DataOptions.outputPath);
-			
-		execFrame.toFront();
+		File file = new File(AssemblerOptions.listingPath);
+		if(file.exists())
+		{
+			execFrame.setTitle("EXEC: " + baseName);
+			execFrame.initialize(AssemblerOptions.listingPath, DataOptions.outputPath);
+
+			if(!execFrame.isVisible())
+			{
+				execFrame.setVisible(true);
+				execFrame.toFront();
+			}
+		}
+		else
+		{
+			if(execFrame.isVisible())
+			{
+				execFrame.clearMessage();
+				execFrame.clearListing();
+				execFrame.clearBreakpoints();
+				
+				execFrame.setTitle("EXEC:");
+				execFrame.setVisible(false);
+			}
+
+			if(printoutFrame.isVisible())
+			{
+				printoutFrame.setTitle("PRINTOUT:");
+				printoutFrame.setVisible(false);
+			}
+		}
     }
 
     void resetExecWindow()
@@ -663,7 +687,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 				userPrefs.put("editFrameLocation", editFrame.getLocation().toString());
 				userPrefs.put("editFrameSize", editFrame.getSize().toString());
 				userPrefs.putInt("editFrameSplitter", editFrame.splitPane.getDividerLocation());
-				userPrefs.put("lastSourceFile", editFrame.sourcePath);
+				userPrefs.put("lastSourceFile", editFrame.sourcePath != null ? editFrame.sourcePath : "");
 			}
 			
 			if(execFrame != null && execFrame.isVisible())

@@ -349,7 +349,10 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 		filters.add(new RopeFileFilter(new String[] {".a", ".asm", ".aut", ".s"}, "Assembly files (*.a *.asm *.aut *.s)"));
 		filters.add(new RopeFileFilter(new String[] {".m", ".mac"}, "Macro files (*.m *.mac)"));
 		filters.add(new RopeFileFilter(new String[] {".lst"}, "List files (*.lst)"));
-		
+/*		
+		RopeFileChooser chooser = new RopeFileChooser(mainFrame);
+		File file = chooser.chooseFile(selectedPath, fileText, filters, false);
+*/
         RopeFileChooser chooser = new RopeFileChooser(selectedPath, null, filters);
 		chooser.setDialogTitle("Source document selection");
 		chooser.setFileFilter(filters.firstElement());
@@ -358,7 +361,10 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
         File file = chooser.choose(fileText, this);
         if (file != null) 
 		{
-			loadSourceFile(file);
+			if(loadSourceFile(file))
+			{
+				mainFrame.showExecWindow(baseName);
+			}
 	    }
     }
 	

@@ -12,17 +12,16 @@ package rope1401;
 import java.awt.*;
 import java.io.*;
 import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
 
 // TO BE DONE:
-// Use java.awt.FileDialog on Mac OS
+// More OS-like dialogs
 
 class RopeFileChooser extends JFileChooser
 {
 	private static final long serialVersionUID = 1L;
+	
+	private Component parent;
 	
     RopeFileChooser(String directoryPath, String filePath, Vector<RopeFileFilter> filters, boolean directories, boolean multiple)
     {
@@ -103,66 +102,76 @@ class RopeFileChooser extends JFileChooser
             return null;
         }
     }
-}
-
-class RopeFileFilter extends FileFilter
-{
-    private final String extensions[];
-    private final String description;
-
-    public RopeFileFilter(String extensions[], String description)
-    {
-        this.extensions = new String[extensions.length];
-        this.description = description;
-
-        for (int i = 0; i < extensions.length; ++i) 
-		{
-            this.extensions[i] = extensions[i].toLowerCase();
-        }
+/*
+	RopeFileChooser(Component parent)
+    {     
+		this.parent = parent;
     }
 
-	@Override
-    public boolean accept(File file)
-    {
-        if (file.isDirectory()) 
-		{
-            return true;
-        }
-		else if (isLink(file)) 
-		{
-            return true;
-        }
-
-        String name = file.getName().toLowerCase();
-        for (int i = 0; i < extensions.length; ++i) 
-		{
-            if (name.endsWith(extensions[i])) 
-			{
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-	@Override
-    public String getDescription()
-    {
-        return description;
-    }
-	
-	private boolean isLink(File file) 
+	File chooseFile(String startDirPath, JTextField textField, Vector<RopeFileFilter> filter, boolean multiple)
 	{		
-        try {
-			if (file.getAbsolutePath().equals(file.getCanonicalPath())) 
-			{
-                return false;
-            }
-        } catch (IOException ex) 
+		FileDialog fd = new FileDialog((Frame)parent, "Choose a source file", FileDialog.LOAD);
+		fd.setDirectory(startDirPath);
+		
+		MyFileFilter fileFilter = new MyFileFilter(filter);
+		fd.setFilenameFilter(fileFilter);
+		fd.setVisible(true);
+		
+		String filename = fd.getFile();
+		if (filename == null)
 		{
-            Logger.getLogger(RopeFrame.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return true;
-    }
-
+			System.out.println("You cancelled the choice");
+		}
+		else
+		{
+			System.out.println("You chose " + filename);
+		}
+		
+		return null;
+	}
+	
+	File chooseDirectory(String startDirPath, JTextField textField, boolean multiple)
+	{
+		return null;
+	}
+	
+	class MyFileFilter implements FilenameFilter
+	{
+		Vector<RopeFileFilter> filters;
+	
+		public MyFileFilter(Vector<RopeFileFilter> filters)
+		{
+			this.filters = filters;
+		}
+		
+		@Override
+		public boolean accept(File dir, String name)
+		{
+			if(filters == null || filters.isEmpty())
+			{
+				return true;
+			}
+			
+			int idx = name.lastIndexOf('.');
+			if (idx >= 0) 
+			{
+				String fileExt = name.substring(idx);
+				
+				for(RopeFileFilter filter : filters)
+				{
+					for(String filterExt : filter.getExtensions())
+					{
+						if(fileExt.equals(filterExt))
+						{
+							return true;
+						}
+					}
+				}
+			}	
+			
+			return false;
+		}
+	}
+*/
 }
+

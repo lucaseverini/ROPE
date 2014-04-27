@@ -408,13 +408,20 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
     {
         messageArea.setText(null);
     }
+	
+	void clearListing()
+	{
+        listing.clearSelection();
+		listing.removeAll();
+	}
 
     private void loadListing()
     {
+		clearListing();
+		
         Vector v = filterListing();
         if (v != null) 
 		{
-            listing.clearSelection();
             listing.setListData(v);
 
             if (currentMessage == null) 
@@ -600,7 +607,7 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
 		return new BreakpointSet(listingPath, breakpoints);
 	}
 
-    private void clearBreakpoints()
+    public void clearBreakpoints()
     {
         ListModel model = listing.getModel();
         int size = model.getSize();
