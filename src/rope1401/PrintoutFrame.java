@@ -41,7 +41,7 @@ public class PrintoutFrame extends ChildFrame implements ActionListener, ChangeL
 		
 		// Implement a smarter way to set the initial frame position and size
         setLocation(0, 690);
-        setSize(940, 410);
+        setSize(940, 395);
    
 		try 
 		{
@@ -179,7 +179,7 @@ public class PrintoutFrame extends ChildFrame implements ActionListener, ChangeL
                          new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
                                                 GridBagConstraints.CENTER,
                                                 GridBagConstraints.NONE,
-                                                new Insets(0, 0, 0, 0), 0, 0));
+                                                new Insets(0, 5, 0, 5), 0, 0));
     }
 
     void initialize()

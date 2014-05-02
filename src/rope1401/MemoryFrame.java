@@ -125,7 +125,7 @@ public class MemoryFrame extends ChildFrame implements ActionListener, ChangeLis
                 }
             }
         };
-        memoryArea.setFont(new java.awt.Font("Courier", 0, 12));
+        memoryArea.setFont(new java.awt.Font("Courier", 0, 14));
         memoryArea.setDoubleBuffered(true);
         memoryArea.setEditable(false);		
         scrollPane.getViewport().add(memoryArea, null);

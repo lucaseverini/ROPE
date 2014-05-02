@@ -70,7 +70,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 		
 		// Implement a smarter way to set the initial frame position and size
         setLocation(0, 0);
-        setSize(640, 710);
+        setSize(650, 705);
 		
         try 
 		{
