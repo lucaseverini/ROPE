@@ -1151,7 +1151,7 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
 	@Override
 	public boolean canPrint()
 	{
-		return false;
+		return true;
 	}
 	
 	public void checkListContent()

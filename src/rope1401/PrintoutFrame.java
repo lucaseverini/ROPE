@@ -385,6 +385,14 @@ public class PrintoutFrame extends ChildFrame implements Printable, ActionListen
 		}
 	}
 
+	public void printMenuAction(ActionEvent event)
+	{
+		if(printoutArea != null)
+		{
+			print();
+		}
+	}
+
 	@Override
 	public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException
 	{
