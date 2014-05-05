@@ -11,6 +11,8 @@ package rope1401;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.print.PageFormat;
+import java.awt.print.PrinterJob;
 import java.beans.PropertyVetoException;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
@@ -65,6 +67,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 	public JMenuItem saveAsItem;	
 	public JMenuItem revertItem;	
 	public JMenuItem closeItem;	
+	public JMenuItem pageSetupItem;
 	public JMenuItem printItem;	
 	public JMenuItem prefsItem;	
 	public JMenuItem quitItem;	
@@ -898,7 +901,48 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 		
 		fileMenu.addSeparator();
 
-		printItem = new JMenuItem("Print");
+		pageSetupItem = new JMenuItem("Page Setup...");
+        pageSetupItem.addActionListener(new ActionListener()
+		{
+            @Override
+            public void actionPerformed(ActionEvent e) 
+			{
+				PrinterJob printJob = PrinterJob.getPrinterJob();		
+				PageFormat printFormat = printJob.defaultPage();
+
+				Preferences userPrefs = Preferences.userRoot();
+				printFormat.setOrientation(userPrefs.getInt("printFormatOrientation", printFormat.getOrientation()));
+				double width = userPrefs.getDouble("printFormatWidth", printFormat.getWidth());
+				double height = userPrefs.getDouble("printFormatHeight", printFormat.getHeight());
+				double imgX = userPrefs.getDouble("printFormatImageableX", printFormat.getImageableX());
+				double imgY = userPrefs.getDouble("printFormatImageableY", printFormat.getImageableY());
+				double imgWidth = userPrefs.getDouble("printFormatImageableWidth", printFormat.getImageableWidth());
+				double imgHeight = userPrefs.getDouble("printFormatImageableHeight", printFormat.getImageableHeight());
+				printFormat.getPaper().setSize(width, height);
+				printFormat.getPaper().setImageableArea(imgX, imgY, imgWidth, imgHeight);
+
+				printFormat = printJob.pageDialog(printFormat);	
+				
+				try 
+				{			
+					userPrefs.putInt("printFormatOrientation", printFormat.getOrientation());
+					userPrefs.putDouble("printFormatWidth", printFormat.getWidth());
+					userPrefs.putDouble("printFormatHeight", printFormat.getHeight());
+					userPrefs.putDouble("printFormatImageableX", printFormat.getImageableX());
+					userPrefs.putDouble("printFormatImageableY", printFormat.getImageableY());
+					userPrefs.putDouble("printFormatImageableWidth", printFormat.getImageableWidth());
+					userPrefs.putDouble("printFormatImageableHeight", printFormat.getImageableHeight());
+					userPrefs.sync();
+				}
+				catch(BackingStoreException ex) 
+				{
+					ex.printStackTrace();
+				}
+            }
+        });
+		fileMenu.add(pageSetupItem);
+
+		printItem = new JMenuItem("Print...");
         printItem.addActionListener(new ActionListener()
 		{
             @Override

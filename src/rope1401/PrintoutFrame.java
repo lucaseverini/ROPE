@@ -9,15 +9,25 @@
 
 package rope1401;
 
-import java.io.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.print.Book;
+import java.awt.print.PageFormat;
+import java.awt.print.Paper;
+import java.awt.print.Printable;
+import java.awt.print.PrinterException;
+import java.awt.print.PrinterJob;
+import java.io.*;
 import static java.lang.Math.abs;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.text.BadLocationException;
 
-public class PrintoutFrame extends ChildFrame implements ActionListener, ChangeListener, CaretListener, CommandWindow
+public class PrintoutFrame extends ChildFrame implements Printable, ActionListener, ChangeListener, CaretListener, CommandWindow
 {
 	private static final long serialVersionUID = 1L;
 	
@@ -25,6 +35,7 @@ public class PrintoutFrame extends ChildFrame implements ActionListener, ChangeL
     GridBagLayout gridBagLayout1 = new GridBagLayout();
     JPanel controlPanel = new JPanel();
     JButton updateButton = new JButton();
+    JButton printButton = new JButton();
     JCheckBox autoCheckBox = new JCheckBox();
     JCheckBox stripesCheckBox = new JCheckBox();
     JCheckBox barsCheckBox = new JCheckBox();
@@ -34,6 +45,8 @@ public class PrintoutFrame extends ChildFrame implements ActionListener, ChangeL
     private BufferedReader printout;
     private Color barColor = new Color(100, 0, 100);
     private Color stripeColor = new Color(25, 0, 25);
+	private Font printFont;
+	private FontMetrics printMetrics;
 
     public PrintoutFrame(RopeFrame parent)
     {
@@ -54,6 +67,7 @@ public class PrintoutFrame extends ChildFrame implements ActionListener, ChangeL
 
 		printoutArea.addCaretListener(this);
 	    updateButton.addActionListener(this);
+	    printButton.addActionListener(this);
         stripesCheckBox.addChangeListener(this);
         barsCheckBox.addChangeListener(this);
 
@@ -146,13 +160,15 @@ public class PrintoutFrame extends ChildFrame implements ActionListener, ChangeL
                 }
             }
         };
-        printoutArea.setFont(new java.awt.Font("Monospaced", 0, 12));
+		
+        printoutArea.setFont(new java.awt.Font("Monospaced", Font.PLAIN, 12));
         printoutArea.setDoubleBuffered(true);
         printoutArea.setEditable(false);
         scrollPane.getViewport().add(printoutArea, null);
 		
         controlPanel.setLayout(gridBagLayout1);
         updateButton.setText("Update");
+        printButton.setText("Print");
         autoCheckBox.setText("Auto update");
         autoCheckBox.setSelected(true);
         stripesCheckBox.setText("Stripes");
@@ -170,13 +186,18 @@ public class PrintoutFrame extends ChildFrame implements ActionListener, ChangeL
                                                 GridBagConstraints.CENTER,
                                                 GridBagConstraints.NONE,
                                                 new Insets(5, 5, 5, 0), 0, 0));
+        controlPanel.add(printButton,
+                         new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+                                                GridBagConstraints.CENTER,
+                                                GridBagConstraints.NONE,
+                                                new Insets(5, 5, 5, 0), 0, 0));
         controlPanel.add(stripesCheckBox,
-                         new GridBagConstraints(3, 0, 1, 1, 1.0, 0.0,
+                         new GridBagConstraints(4, 0, 1, 1, 1.0, 0.0,
                                                 GridBagConstraints.EAST,
                                                 GridBagConstraints.NONE,
                                                 new Insets(5, 0, 5, 0), 0, 0));
         controlPanel.add(barsCheckBox,
-                         new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
+                         new GridBagConstraints(5, 0, 1, 1, 0.0, 0.0,
                                                 GridBagConstraints.CENTER,
                                                 GridBagConstraints.NONE,
                                                 new Insets(0, 5, 0, 5), 0, 0));
@@ -240,9 +261,17 @@ public class PrintoutFrame extends ChildFrame implements ActionListener, ChangeL
 	@Override
     public void actionPerformed(ActionEvent event)
     {
-        update();
+		Object button = event.getSource();
 		
-        printoutArea.repaint();
+		if(button == updateButton)
+		{
+			update();		
+			printoutArea.repaint();
+		}
+		else if(button == printButton)
+		{
+			print();
+		}
     }
 
     private void update()
@@ -268,6 +297,38 @@ public class PrintoutFrame extends ChildFrame implements ActionListener, ChangeL
         }
     }
 	
+	private void print()
+    {
+		PrinterJob printJob = PrinterJob.getPrinterJob();		
+		PageFormat printFormat = printJob.defaultPage();
+		
+		Preferences userPrefs = Preferences.userRoot();
+		printFormat.setOrientation(userPrefs.getInt("printFormatOrientation", printFormat.getOrientation()));
+		double width = userPrefs.getDouble("printFormatWidth", printFormat.getWidth());
+		double height = userPrefs.getDouble("printFormatHeight", printFormat.getHeight());
+		double imgX = userPrefs.getDouble("printFormatImageableX", printFormat.getImageableX());
+		double imgY = userPrefs.getDouble("printFormatImageableY", printFormat.getImageableY());
+		double imgWidth = userPrefs.getDouble("printFormatImageableWidth", printFormat.getImageableWidth());
+		double imgHeight = userPrefs.getDouble("printFormatImageableHeight", printFormat.getImageableHeight());
+		printFormat.getPaper().setSize(width, height);
+		printFormat.getPaper().setImageableArea(imgX, imgY, imgWidth, imgHeight);
+			
+		printFormat = printJob.validatePage(printFormat);
+		
+		if (printJob.printDialog()) 
+		{
+			try
+			{
+				printJob.setPrintable(this, printFormat);			
+				printJob.print();
+			}
+			catch (PrinterException ex)
+			{
+				ex.printStackTrace();
+			}
+		}
+	}
+	   
 	@Override
     public void caretUpdate(CaretEvent event)
     {
@@ -322,5 +383,53 @@ public class PrintoutFrame extends ChildFrame implements ActionListener, ChangeL
 		{
 			printoutArea.selectAll();
 		}
+	}
+
+	@Override
+	public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException
+	{
+		if(printFont == null)
+		{
+			printFont = new Font(Font.MONOSPACED, Font.PLAIN, 10);
+			graphics.setFont(printFont);
+			printMetrics = graphics.getFontMetrics(printFont);
+		}
+
+		graphics.setFont(printFont);
+
+		int lineHeight = printMetrics.getHeight();
+		double pageHeight = pageFormat.getImageableHeight();
+		int linesPerPage = (int)(pageHeight / lineHeight);	
+		int totLines = printoutArea.getLineCount();
+		
+		int firstLineIdx = pageIndex > 0 ? linesPerPage * pageIndex : 0;
+		if(firstLineIdx >= totLines)
+		{
+			return NO_SUCH_PAGE;
+		}
+				
+		int pageTop = (int)pageFormat.getImageableY();
+		int pageLeft = (int)pageFormat.getImageableX();
+		
+		int LastLineIdx = firstLineIdx + linesPerPage > totLines ? totLines - 1 : (firstLineIdx + linesPerPage) - 1;
+		
+		int yPos = pageTop;
+		for (int lineIdx = firstLineIdx; lineIdx <= LastLineIdx; lineIdx++) 
+		{
+			try 
+			{
+				int lineStart = printoutArea.getLineStartOffset(lineIdx);
+				int lineLen = printoutArea.getLineEndOffset(lineIdx) - lineStart;
+				
+				yPos += lineHeight;
+				graphics.drawString(printoutArea.getText(lineStart, lineLen), pageLeft, yPos);
+			}
+			catch(BadLocationException ex) 
+			{
+				ex.printStackTrace();
+			}
+        }
+		
+		return PAGE_EXISTS;
 	}
 }

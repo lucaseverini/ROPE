@@ -481,8 +481,6 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
                         if (breakable) 
 						{
                             lineTable.put(listingLine.getAddress(), new Integer(index));
-							
-							System.out.println(line);
                         }
 
                         ++index;
@@ -1148,6 +1146,12 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
 	public boolean canCopy()
 	{
 		return (listing.getModel().getSize() > 0);
+	}
+
+	@Override
+	public boolean canPrint()
+	{
+		return false;
 	}
 	
 	public void checkListContent()

@@ -9,6 +9,8 @@ package rope1401;
 
 import java.awt.*;  
 import java.awt.datatransfer.*;  
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ClipboardListener extends Thread implements ClipboardOwner 
 {  
@@ -42,7 +44,11 @@ public class ClipboardListener extends Thread implements ClipboardOwner
 		
 		while(true) 
 		{
-			yield();
+			try 
+			{
+				sleep(100);
+			}
+			catch(InterruptedException ex) {}
 		}  
 	}  
 

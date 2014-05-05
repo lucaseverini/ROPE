@@ -107,6 +107,7 @@ public class ChildFrame extends JInternalFrame implements InternalFrameListener,
 		mainFrame.saveAsItem.setEnabled(canSaveAs());
 		mainFrame.revertItem.setEnabled(canRevert());
 		mainFrame.closeItem.setEnabled(canClose());
+		mainFrame.pageSetupItem.setEnabled(canPageSetup());
 		mainFrame.printItem.setEnabled(canPrint());
 			
 		mainFrame.undoItem.setEnabled(canUndo());
@@ -215,6 +216,11 @@ public class ChildFrame extends JInternalFrame implements InternalFrameListener,
 		return false;
 	}
 	
+	public boolean canPageSetup()
+	{
+		return true;
+	}
+
 	public boolean canPrint()
 	{
 		return false;
