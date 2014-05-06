@@ -371,7 +371,7 @@ public class DataDialog extends JDialog implements ActionListener
     private String browseAction(String filePath, JTextField textField, Vector<RopeFileFilter> filters)
     {
         RopeFileChooser chooser = new RopeFileChooser(DataOptions.directoryPath, filePath, filters);
-        File choice = chooser.choose(textField, this);
+        File choice = chooser.open(this, textField);
 
         if (textField == readerTextField) 
 		{

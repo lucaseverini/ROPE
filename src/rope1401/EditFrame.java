@@ -53,15 +53,15 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 	public CompoundUndoManager undoMgr;
     private AssemblerDialog dialog = null;
     private String baseName;
+	private String fileExt;
 	private boolean assembleFailed;
     private boolean haveAssemblyErrors;
     private Vector messages;
-	public boolean sourceChanged;
+	private boolean sourceChanged;
 	public String sourcePath;
 	private Document document;
 	private Action undoAction;
 	private Action redoAction;
-	
 	private String selectedPath;
 
     EditFrame(RopeFrame parent)
@@ -121,19 +121,19 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 			@Override
 			public void insertUpdate(DocumentEvent e)
 			{
-			  sourceChanged = true;
+				setSourceChanged(true);
 			}
 			
 			@Override
 			public void removeUpdate(DocumentEvent e)
 			{
-			  sourceChanged = true;
+				setSourceChanged(true);
 			}
 			
 			@Override
 			public void changedUpdate(DocumentEvent e)
 			{
-			  sourceChanged = true;
+				setSourceChanged(true);
 			}
 		});
 	}
@@ -305,7 +305,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
         }
         else if (button == saveButton) 
 		{
-            saveAction();
+            save();
         }
         else if (button == optionsButton) 
 		{
@@ -349,16 +349,14 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 		filters.add(new RopeFileFilter(new String[] {".a", ".asm", ".aut", ".s"}, "Assembly files (*.a *.asm *.aut *.s)"));
 		filters.add(new RopeFileFilter(new String[] {".m", ".mac"}, "Macro files (*.m *.mac)"));
 		filters.add(new RopeFileFilter(new String[] {".lst"}, "List files (*.lst)"));
-/*		
-		RopeFileChooser chooser = new RopeFileChooser(mainFrame);
-		File file = chooser.chooseFile(selectedPath, fileText, filters, false);
-*/
-        RopeFileChooser chooser = new RopeFileChooser(selectedPath, null, filters);
+		filters.add(new RopeFileFilter(new String[] {".txt"}, "Text files (*.txt)"));
+
+		RopeFileChooser chooser = new RopeFileChooser(selectedPath, null, filters);
 		chooser.setDialogTitle("Source document selection");
 		chooser.setFileFilter(filters.firstElement());
 		chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 		
-        File file = chooser.choose(fileText, this);
+        File file = chooser.open(this, fileText);
         if (file != null) 
 		{
 			if(loadSourceFile(file))
@@ -379,8 +377,9 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 		String directoryPath = file.getParent();
 		String sourceName = file.getName();
 
-		int i = sourceName.lastIndexOf(".");
-		baseName = i == -1 ? sourceName.substring(0) : sourceName.substring(0, i);
+		int idx = sourceName.lastIndexOf(".");
+		fileExt = idx == -1 ? "" : sourceName.substring(idx + 1);
+		baseName = idx == -1 ? sourceName.substring(0) : sourceName.substring(0, idx);
 		String basePath = directoryPath + File.separator + baseName;
 
 		DataOptions.directoryPath = directoryPath;
@@ -453,7 +452,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 			assembleButton.setEnabled(true);
 			saveButton.setEnabled(true);
 
-			sourceChanged = false;
+			setSourceChanged(false);
 			undoMgr.discardAllEdits();
 			
 			result = true;
@@ -477,7 +476,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 		return result;
 	}	
 	
-    public void saveAction()
+    public void save()
     {
 		BufferedWriter sourceFile = null;
 
@@ -486,7 +485,9 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
             sourceFile = new BufferedWriter(new FileWriter(sourcePath, false));
             sourceFile.write(sourceArea.getText());
 			
-			sourceChanged = false;
+			setSourceChanged(false);
+			
+			setupMenus();
         }
         catch (IOException ex) 
 		{
@@ -504,6 +505,75 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
             }
         }
     }
+	
+	public boolean getSourceChanged()
+	{
+		return sourceChanged;
+	}
+	
+	public void setSourceChanged(boolean changed)
+	{
+		if(sourceChanged != changed)
+		{
+			sourceChanged = changed;
+			setupMenus();
+		}
+	}
+	
+	public void saveAs()
+	{
+		Vector<RopeFileFilter> filters = new Vector<RopeFileFilter>();
+		
+		if(fileExt.equals("m") || fileExt.equals("mac"))
+		{
+			filters.add(new RopeFileFilter(new String[] {".m", ".mac"}, "Macro files (*.m *.mac)"));
+			filters.add(new RopeFileFilter(new String[] {".a", ".asm", ".aut", ".s"}, "Assembly files (*.a *.asm *.aut *.s)"));
+		}
+		else
+		{
+			filters.add(new RopeFileFilter(new String[] {".a", ".asm", ".aut", ".s"}, "Assembly files (*.a *.asm *.aut *.s)"));
+			filters.add(new RopeFileFilter(new String[] {".m", ".mac"}, "Macro files (*.m *.mac)"));
+		}
+		filters.add(new RopeFileFilter(new String[] {".txt"}, "Text files (*.txt)"));
+
+		RopeFileChooser chooser = new RopeFileChooser(selectedPath, null, filters);
+		chooser.setDialogTitle("Save Source File");
+		String fileName = String.format("%s.%s", baseName, fileExt);
+		chooser.setSelectedFile(new File(selectedPath, fileName));
+		JTextField field = chooser.getTextField();
+		field.setSelectionStart(0);
+		field.setSelectionEnd(baseName.length());
+		File file = chooser.save(Rope.mainFrame);
+		if(file != null)
+		{
+			selectedPath = file.getParent();
+			
+			BufferedWriter writer = null;
+			try
+			{
+				writer = new BufferedWriter(new FileWriter(file));
+				writer.write(sourceArea.getText());
+			}
+			catch (IOException ex)
+			{
+				ex.printStackTrace();
+			}
+			finally
+			{
+				try
+				{
+					if( writer != null)
+					{
+						writer.close();
+					}
+				}
+				catch (IOException ex)
+				{
+					ex.printStackTrace();
+				}
+			}		
+		}
+	}
 
     private void optionsAction()
     {
@@ -521,7 +591,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 
         mainFrame.resetExecWindow();
 
-        saveAction();
+        save();
 		
 		assembleFailed = false;
         haveAssemblyErrors = false;
@@ -574,7 +644,23 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 		}
     }
 
-    private void highlightError(int index)
+	public void saveMenuAction(ActionEvent event)
+	{
+		if(sourceArea != null)
+		{
+			save();
+		}
+	}
+
+	public void saveAsMenuAction(ActionEvent event)
+	{
+		if(sourceArea != null)
+		{
+			saveAs();
+		}
+	}
+
+	private void highlightError(int index)
     {
         String message = (String) messages.elementAt(index);
         int i = message.indexOf(":");
@@ -803,6 +889,18 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 	public boolean canPaste()
 	{
 		return mainFrame.clipboardListener != null && mainFrame.clipboardListener.hasValidContent;
+	}
+
+	@Override
+	public boolean canSave()
+	{
+		return sourceChanged;
+	}
+
+	@Override
+	public boolean canSaveAs()
+	{
+		return true;
 	}
 
 	@Override

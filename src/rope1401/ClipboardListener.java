@@ -37,8 +37,12 @@ public class ClipboardListener extends Thread implements ClipboardOwner
 	@Override
 	public void run() 
 	{  
-		regainOwnership(sysClip.getContents(this));  
-		
+		try 
+		{
+			regainOwnership(sysClip.getContents(this));  
+		}
+		catch(Exception ex) {}
+	
 		while(true) 
 		{
 			try 

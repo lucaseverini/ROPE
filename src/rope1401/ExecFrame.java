@@ -77,8 +77,8 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
     private ImageIcon breakPointIcon = null;
 	private String listingPath = null;
 	private String listingDir = null;
+	private String selectedPath;
 
-	
 	public BreakpointSet activeBreakpoints = null;
 
     public ExecFrame(RopeFrame parent)
@@ -1153,7 +1153,13 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
 	{
 		return true;
 	}
-	
+
+	@Override
+	public boolean canSaveAs()
+	{
+		return true;
+	}
+
 	public void checkListContent()
 	{
 		mainFrame.copyItem.setEnabled(canCopy());
@@ -1280,6 +1286,69 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
 		}
 		catch (IOException ex)
 		{
+		}
+	}
+
+	public void saveAsMenuAction(ActionEvent event)
+	{
+		if(listing != null)
+		{
+			saveAs();
+		}
+	}
+
+	private void saveAs()
+    {
+		Vector<RopeFileFilter> filters = new Vector<RopeFileFilter>();
+		filters.add(new RopeFileFilter(new String[] {".lst"}, "List files (*.lst)"));
+		filters.add(new RopeFileFilter(new String[] {".txt"}, "Text files (*.txt)"));
+
+		RopeFileChooser chooser = new RopeFileChooser(selectedPath, null, filters);
+		chooser.setDialogTitle("Save Listing File");
+		String fileName = String.format("%s.lst", baseName);
+		chooser.setSelectedFile(new File(selectedPath, fileName));
+		JTextField field = chooser.getTextField();
+		field.setSelectionStart(0);
+		field.setSelectionEnd(baseName.length());
+		File file = chooser.save(Rope.mainFrame);
+		if(file != null)
+		{
+			selectedPath = file.getParent();
+			
+			BufferedWriter writer = null;
+			try
+			{
+				writer = new BufferedWriter(new FileWriter(file));
+
+				String text = "";
+				String separator = System.getProperty("line.separator");
+			
+				ListModel model = listing.getModel();
+				for (int idx = 0; idx < model.getSize(); idx++) 
+				{
+					text = text.concat(model.getElementAt(idx).toString() + separator);
+				}
+
+				writer.write(text);
+			}
+			catch (IOException ex)
+			{
+				ex.printStackTrace();
+			}
+			finally
+			{
+				try
+				{
+					if( writer != null)
+					{
+						writer.close();
+					}
+				}
+				catch (IOException ex)
+				{
+					ex.printStackTrace();
+				}
+			}		
 		}
 	}
 }

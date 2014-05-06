@@ -265,7 +265,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
     void showPrintoutWindow(String baseName)
     {
 		desktop.getDesktopManager().deiconifyFrame(printoutFrame);
-		printoutFrame.setTitle("PRINTOUT: " + baseName);
+		printoutFrame.setTitle(baseName);
 		printoutFrame.setVisible(true);
 		printoutFrame.initialize();
 		printoutFrame.toFront();
@@ -783,7 +783,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 	
 	public boolean quitRope()
 	{
-		if(editFrame.sourcePath != null && editFrame.sourceChanged)
+		if(editFrame.sourcePath != null && editFrame.getSourceChanged())
 		{
 			int result = JOptionPane.showConfirmDialog(null, "Do you want to save the changes to the edited file?", "ROPE",
 															JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
@@ -793,7 +793,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 			}
 			else if (result == JOptionPane.YES_OPTION)
 			{
-				editFrame.saveAction();
+				editFrame.save();
 			}
 		}
 	
@@ -881,7 +881,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
             @Override
             public void actionPerformed(ActionEvent e) 
 			{
-				callChildFrameMethod("saveasMenuAction", e);
+				callChildFrameMethod("saveAsMenuAction", e);
             }
         });
 		fileMenu.add(saveAsItem);

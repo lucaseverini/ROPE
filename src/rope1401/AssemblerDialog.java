@@ -996,7 +996,7 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
 		
         RopeFileChooser chooser = new RopeFileChooser(selectedPath, filePath, filters, directories, multiple);
 		chooser.setDialogTitle(title);
-        File file = chooser.choose(textField, this, multiple);
+        File file = chooser.open(this, textField, multiple);
         if (file != null) 
 		{
             selectedPath = file.getParent();

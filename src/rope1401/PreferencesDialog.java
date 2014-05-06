@@ -174,7 +174,7 @@ public class PreferencesDialog extends JDialog implements ActionListener
 			chooser.setFileFilter(filters.firstElement()); 
 		}
 		
-        chooser.choose(textField, this, multiple);
+        chooser.open(this, textField, multiple);
     }
 
     private void confirmAction()
