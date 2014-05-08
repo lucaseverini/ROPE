@@ -75,7 +75,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 
     public RopeFrame()
     {			
-		this.setIconImage(new ImageIcon(getClass().getResource("Images/appIcon.gif")).getImage());
+		this.setIconImage(new ImageIcon(getClass().getResource("Images/appIcon330.gif")).getImage());
 		
 		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 			
