@@ -217,7 +217,7 @@ public class PreferencesDialog extends JDialog implements ActionListener
 			Logger.getLogger(RopeFrame.class.getName()).log(Level.SEVERE, null, ex);
 		}
 	
-		Rope.mainFrame.reopenLastSource = reopenLastSourceChk.isSelected();
+		ROPE.mainFrame.reopenLastSource = reopenLastSourceChk.isSelected();
 		AssemblerOptions.saveBeforeAssembly = saveBeforeAssemblyChk.isSelected();
 		SimulatorOptions.useOldConversion = useOldConversionChk.isSelected();
 		AssemblerOptions.assemblerPath = assemblerPath.getText();
@@ -259,7 +259,7 @@ public class PreferencesDialog extends JDialog implements ActionListener
 				Assembler.kill();
 				Simulator.kill();
 			
-				Rope.mainFrame.savePreferencesOnExit = false;
+				ROPE.mainFrame.savePreferencesOnExit = false;
 				
 				System.exit(0);
 			}

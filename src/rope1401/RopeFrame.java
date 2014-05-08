@@ -75,6 +75,8 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 
     public RopeFrame()
     {			
+		this.setIconImage(new ImageIcon(getClass().getResource("Images/appIcon.gif")).getImage());
+		
 		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 			
 		addWindowListener(this);
@@ -775,8 +777,8 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 			message = message.concat("\n" + s3);
 		if(!s4.isEmpty())
 			message = message.concat("\n" + s4);
-	
-		JOptionPane.showMessageDialog(this, message, "ROPE", JOptionPane.INFORMATION_MESSAGE);
+			
+		JOptionPane.showMessageDialog(this, message, "ROPE", JOptionPane.INFORMATION_MESSAGE, ROPE.appIcon64);
 		
 		return true;	
     }
@@ -786,7 +788,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 		if(editFrame.sourcePath != null && editFrame.getSourceChanged())
 		{
 			int result = JOptionPane.showConfirmDialog(null, "Do you want to save the changes to the edited file?", "ROPE",
-															JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+													JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, ROPE.appIcon64);
 			if (result == JOptionPane.CANCEL_OPTION)
 			{
 				return false;
@@ -800,7 +802,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 		if(askConfirmationToQuit)
 		{
 			int result = JOptionPane.showConfirmDialog(null, "Do you want to quit Rope?", "ROPE", 
-															JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+														JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, ROPE.appIcon64);
 			if (result == JOptionPane.NO_OPTION)
 			{
 				return false;

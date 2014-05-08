@@ -543,7 +543,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 		JTextField field = chooser.getTextField();
 		field.setSelectionStart(0);
 		field.setSelectionEnd(baseName.length());
-		File file = chooser.save(Rope.mainFrame);
+		File file = chooser.save(ROPE.mainFrame);
 		if(file != null)
 		{
 			selectedPath = file.getParent();
