@@ -42,8 +42,8 @@ public class MemoryFrame extends ChildFrame implements ActionListener, ChangeLis
 		super(parent);
 		
 		// Implement a smarter way to set the initial frame position and size
-		setLocation(954, 710);
-		setSize(460, 390);
+		setLocation(930, 690);
+		setSize(510, 395);
 		
         try 
 		{
@@ -140,11 +140,13 @@ public class MemoryFrame extends ChildFrame implements ActionListener, ChangeLis
         toText.setMinimumSize(new Dimension(56, 20));
         toText.setPreferredSize(new Dimension(56, 20));
         toText.setText("512");
-        showButton.setText("Show");
-        autoCheckBox.setSelected(true);
+        showButton.setText("Update");
         autoCheckBox.setText("Auto update");
         barsCheckBox.setText("Bars");
+		
+        autoCheckBox.setSelected(true);		
         barsCheckBox.setSelected(true);
+		
         controlPanel.add(fromLabel,
                          new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
                                                 GridBagConstraints.EAST,
@@ -169,15 +171,17 @@ public class MemoryFrame extends ChildFrame implements ActionListener, ChangeLis
                          new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
                                                 GridBagConstraints.CENTER,
                                                 GridBagConstraints.NONE,
-                                                new Insets(5, 10, 5, 0), 0, 0));
+                                                new Insets(5, 15, 5, 0), 0, 0));
         controlPanel.add(barsCheckBox,
-                          new GridBagConstraints(7, 0, 1, 1, 1.0, 0.0
-            ,GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5, 0, 5, 5), 0, 0));
+                          new GridBagConstraints(7, 0, 1, 1, 1.0, 0.0,
+												GridBagConstraints.EAST, 
+												GridBagConstraints.NONE, 
+												new Insets(5, 15, 5, 5), 0, 0));
         controlPanel.add(autoCheckBox,
                          new GridBagConstraints(5, 0, 1, 1, 0.0, 0.0,
                                                 GridBagConstraints.CENTER,
                                                 GridBagConstraints.NONE,
-                                                new Insets(5, 5, 5, 0), 0, 0));
+                                                new Insets(5, 10, 5, 0), 0, 0));
     }
 
     public void execute()

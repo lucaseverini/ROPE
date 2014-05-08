@@ -27,6 +27,8 @@ import java.io.*;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
@@ -86,8 +88,8 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
 		super(parent);
 	
 		// Implement a smarter way to set the initial frame position and size
-		setLocation(930, 0);
-		setSize(980, 710);
+		setLocation(920, 0);
+		setSize(990, 705);
 		
         try 
 		{
@@ -346,6 +348,9 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
         showMemoryButton.setEnabled(false);
         showConsoleButton.setEnabled(false);
         showTimerButton.setEnabled(false);
+		
+		Preferences userPrefs = Preferences.userRoot();
+		showAllCheckBox.setSelected(userPrefs.getBoolean("execShowAll", false));
 
         autoStepWaitTime = INIT_AUTO_STEP_WAIT_TIME;
         currentMessage = null;
@@ -1125,6 +1130,14 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
             loadListing();
  
 			restoreBreakpoints(activeBreakpoints);
+			
+			try 
+			{
+				Preferences userPrefs = Preferences.userRoot();
+				userPrefs.putBoolean("execShowAll", showAllCheckBox.isSelected());
+				userPrefs.sync();
+			}
+			catch(BackingStoreException ex) {}
 		}
     }
 	

@@ -70,7 +70,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 		
 		// Implement a smarter way to set the initial frame position and size
         setLocation(0, 0);
-        setSize(650, 705);
+        setSize(670, 705);
 		
         try 
 		{
@@ -693,70 +693,6 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
   		doCaretUpdate(event.getDot(), event.getMark());
     }
 	
-	void doCaretUpdate(int dot, int mark)
-	{	
-        if (dot == mark) 
-		{
-            mainFrame.cutItem.setEnabled(false);  
-            mainFrame.copyItem.setEnabled(false);
-            mainFrame.deleteItem.setEnabled(false);
-		}   
-		else
-		{
-            mainFrame.cutItem.setEnabled(true);
-            mainFrame.copyItem.setEnabled(true);
-            mainFrame.deleteItem.setEnabled(true);
-        }
-		
-		int length = sourceArea.getText().length();
-		if(length == 0 || abs(mark - dot) == length)
-		{
-			mainFrame.selectAllItem.setEnabled(false);
-		}
-		else
-		{
-			mainFrame.selectAllItem.setEnabled(true);
-		}
-
-		try 
-		{
-			if(length == 0)
-			{
-				mainFrame.selectLineItem.setEnabled(false);
-			}
-			else
-			{
-				int lineNum = sourceArea.getLineOfOffset(dot);
-				int startLine = sourceArea.getLineStartOffset(lineNum);
-				int endLine = sourceArea.getLineEndOffset(lineNum);
-				if(endLine - startLine <= 1)
-				{
-					mainFrame.selectLineItem.setEnabled(false);
-				}
-				else
-				{
-					mainFrame.selectLineItem.setEnabled(true);
-				}
-			}
-		}
-		catch (BadLocationException ex) 
-		{
-			ex.printStackTrace();
-		}
-		
-        try 
-		{
-            int line = sourceArea.getLineOfOffset(dot);
-            lineText.setText(Integer.toString(line + 1));
-            int column = dot - sourceArea.getLineStartOffset(line);
-            columnText.setText(Integer.toString(column + 1));
-        }
-        catch(BadLocationException ex) 
-		{
-            ex.printStackTrace();
-        }
-	}
-	
 	public void undoAction()
 	{
 		try 
@@ -985,5 +921,69 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 		{
 			selectLine();
 		}
+	}
+
+	void doCaretUpdate(int dot, int mark)
+	{	
+        if (dot == mark) 
+		{
+            mainFrame.cutItem.setEnabled(false);  
+            mainFrame.copyItem.setEnabled(false);
+            mainFrame.deleteItem.setEnabled(false);
+		}   
+		else
+		{
+            mainFrame.cutItem.setEnabled(true);
+            mainFrame.copyItem.setEnabled(true);
+            mainFrame.deleteItem.setEnabled(true);
+        }
+		
+		int length = sourceArea.getText().length();
+		if(length == 0 || abs(mark - dot) == length)
+		{
+			mainFrame.selectAllItem.setEnabled(false);
+		}
+		else
+		{
+			mainFrame.selectAllItem.setEnabled(true);
+		}
+
+		try 
+		{
+			if(length == 0)
+			{
+				mainFrame.selectLineItem.setEnabled(false);
+			}
+			else
+			{
+				int lineNum = sourceArea.getLineOfOffset(dot);
+				int startLine = sourceArea.getLineStartOffset(lineNum);
+				int endLine = sourceArea.getLineEndOffset(lineNum);
+				if(endLine - startLine <= 1)
+				{
+					mainFrame.selectLineItem.setEnabled(false);
+				}
+				else
+				{
+					mainFrame.selectLineItem.setEnabled(true);
+				}
+			}
+		}
+		catch (BadLocationException ex) 
+		{
+			ex.printStackTrace();
+		}
+		
+        try 
+		{
+            int line = sourceArea.getLineOfOffset(dot);
+            lineText.setText(Integer.toString(line + 1));
+            int column = dot - sourceArea.getLineStartOffset(line);
+            columnText.setText(Integer.toString(column + 1));
+        }
+        catch(BadLocationException ex) 
+		{
+            ex.printStackTrace();
+        }
 	}
 }

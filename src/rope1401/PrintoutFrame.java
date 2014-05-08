@@ -18,6 +18,7 @@ import java.awt.print.PrinterJob;
 import java.io.*;
 import static java.lang.Math.abs;
 import java.util.Vector;
+import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.swing.*;
 import javax.swing.event.*;
@@ -33,7 +34,7 @@ public class PrintoutFrame extends ChildFrame implements Printable, ActionListen
     JButton updateButton = new JButton();
     JButton saveAsButton = new JButton();
     JButton printButton = new JButton();
-    JCheckBox autoCheckBox = new JCheckBox();
+    JCheckBox autoUpdateCheckBox = new JCheckBox();
     JCheckBox stripesCheckBox = new JCheckBox();
     JCheckBox barsCheckBox = new JCheckBox();
     JScrollPane scrollPane = new JScrollPane();
@@ -53,7 +54,7 @@ public class PrintoutFrame extends ChildFrame implements Printable, ActionListen
 		
 		// Implement a smarter way to set the initial frame position and size
         setLocation(0, 690);
-        setSize(940, 395);
+        setSize(930, 395);
    
 		try 
 		{
@@ -70,6 +71,7 @@ public class PrintoutFrame extends ChildFrame implements Printable, ActionListen
 	    printButton.addActionListener(this);
         stripesCheckBox.addChangeListener(this);
         barsCheckBox.addChangeListener(this);
+        autoUpdateCheckBox.addChangeListener(this);
 
 		// Remove automatic key bindings because we want them controlled by menu items
 		InputMap im = printoutArea.getInputMap(JComponent.WHEN_FOCUSED);
@@ -170,19 +172,21 @@ public class PrintoutFrame extends ChildFrame implements Printable, ActionListen
         updateButton.setText("Update");
         saveAsButton.setText("Save As...");
         printButton.setText("Print");
-        autoCheckBox.setText("Auto update");
-        autoCheckBox.setSelected(true);
+        autoUpdateCheckBox.setText("Auto update");
         stripesCheckBox.setText("Stripes");
-        stripesCheckBox.setSelected(true);
         barsCheckBox.setText("Bars");
-        barsCheckBox.setSelected(false);
  
+		Preferences userPrefs = Preferences.userRoot();
+		autoUpdateCheckBox.setSelected(userPrefs.getBoolean("printAutoUpdate", true));
+		stripesCheckBox.setSelected(userPrefs.getBoolean("printStripes", true));
+		barsCheckBox.setSelected(userPrefs.getBoolean("printBars", false));
+
 		controlPanel.add(updateButton,
                          new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
                                                 GridBagConstraints.WEST,
                                                 GridBagConstraints.NONE,
                                                 new Insets(5, 5, 5, 0), 0, 0));
-        controlPanel.add(autoCheckBox,
+        controlPanel.add(autoUpdateCheckBox,
                          new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
                                                 GridBagConstraints.CENTER,
                                                 GridBagConstraints.NONE,
@@ -238,7 +242,7 @@ public class PrintoutFrame extends ChildFrame implements Printable, ActionListen
 	@Override
     public void execute()
     {
-        if (autoCheckBox.isSelected()) 
+        if (autoUpdateCheckBox.isSelected()) 
 		{
             update();
         }
@@ -265,11 +269,35 @@ public class PrintoutFrame extends ChildFrame implements Printable, ActionListen
     {
         Object source = event.getSource();
 
-        if ((source == stripesCheckBox) || (source == barsCheckBox)) 
+        if (source == stripesCheckBox || source == barsCheckBox)
 		{
             printoutArea.repaint();
-        }
-    }
+ 
+			try 
+			{
+				Preferences userPrefs = Preferences.userRoot();
+				userPrefs.putBoolean("printStripes", stripesCheckBox.isSelected());
+				userPrefs.putBoolean("printBars", barsCheckBox.isSelected());
+				userPrefs.sync();
+			}
+			catch(BackingStoreException ex) {}
+		}
+		else if(source == autoUpdateCheckBox)
+		{
+			if (autoUpdateCheckBox.isSelected()) 
+			{
+				update();
+			}
+			
+			try 
+			{
+				Preferences userPrefs = Preferences.userRoot();
+				userPrefs.putBoolean("printAutoUpdate", autoUpdateCheckBox.isSelected());
+				userPrefs.sync();
+			}
+			catch(BackingStoreException ex) {}
+		}
+	}
 
 	@Override
     public void actionPerformed(ActionEvent event)
@@ -278,7 +306,8 @@ public class PrintoutFrame extends ChildFrame implements Printable, ActionListen
 		
 		if(button == updateButton)
 		{
-			update();		
+			update();	
+			
 			printoutArea.repaint();
 		}
 		else if(button == saveAsButton)
