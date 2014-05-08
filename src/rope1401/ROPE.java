@@ -9,20 +9,31 @@
 
 package rope1401;
 
+import com.apple.eawt.Application;
+import javax.swing.ImageIcon;
 import javax.swing.UIManager;
 // import com.apple.eawt.QuitStrategy;
 
-public class Rope /* extends com.apple.eawt.Application */
+public class ROPE /* extends com.apple.eawt.Application */
 {
 	public static RopeFrame mainFrame;
+	public static ImageIcon appIcon128;
+	public static ImageIcon appIcon64;
+	public static ImageIcon appIcon32;
 	
-    public Rope()
+    public ROPE()
     {	
+		appIcon128 = new ImageIcon(getClass().getResource("Images/appIcon128.gif"));
+		appIcon64 = new ImageIcon(getClass().getResource("Images/appIcon64.gif"));
+		appIcon32 = new ImageIcon(getClass().getResource("Images/appIcon32.gif"));
+		
 		if(RopeHelper.isMac)
 		{
+			Application.getApplication().setDockIconImage(new ImageIcon(getClass().getResource("Images/appIcon330.gif")).getImage());
+			
 			System.setProperty("apple.awt.graphics.EnableQ2DX", "true");
 			System.setProperty("apple.laf.useScreenMenuBar", "true");
-			System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Rope");
+			System.setProperty("com.apple.mrj.application.apple.menu.about.name", "ROPE");
 			
 			// setQuitStrategy(QuitStrategy.SYSTEM_EXIT_0);
 		}
@@ -55,6 +66,6 @@ public class Rope /* extends com.apple.eawt.Application */
 
     public static void main(String[] args)
     {
-        Rope rope = new Rope();
+        ROPE rope = new ROPE();
     }
 }
