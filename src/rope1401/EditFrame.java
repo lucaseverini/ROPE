@@ -106,8 +106,10 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 	
 		document = sourceArea.getDocument();
 
-		// Remove automatic key bindings because we want them controlled by menu items
+		ActionMap am = sourceArea.getActionMap();
 		InputMap im = sourceArea.getInputMap(JComponent.WHEN_FOCUSED);
+		
+		// Remove automatic key bindings because we want them controlled by menu items
 		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, RopeHelper.modifierMaks), "none");
 		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, RopeHelper.modifierMaks + InputEvent.SHIFT_MASK), "none");
 		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_X, RopeHelper.modifierMaks), "none");
@@ -115,7 +117,100 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_V, RopeHelper.modifierMaks), "none");
 		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_A, RopeHelper.modifierMaks), "none");
 		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_L, RopeHelper.modifierMaks), "none");
+
+		// Set custom binding action for tab key
+		String action = "tabKeyAction";
+		im.put(KeyStroke.getKeyStroke("TAB"), action);
+		am.put(action, new AbstractAction() 
+		{
+			private static final long serialVersionUID = 1L;
+			
+			@Override
+			public void actionPerformed(ActionEvent e) 
+			{
+ 				try 
+				{
+					int caretPos = sourceArea.getCaretPosition();
+					int lineNum = sourceArea.getLineOfOffset(caretPos);
+					int startLine = sourceArea.getLineStartOffset(lineNum);
+					int endLine = sourceArea.getLineEndOffset(lineNum);
+					int linePos = caretPos - startLine;
+							
+					if(linePos >= 39 && linePos < 79)
+					{
+						caretPos = startLine + linePos + 10 - ((linePos + 1) % 10);
+					}					
+					else if(linePos >= 20 && linePos <= 39)
+					{
+						caretPos = startLine + 39;
+					}
+					else if(linePos >= 15 && linePos <= 19)
+					{
+						caretPos = startLine + 20;
+					}
+					else if(linePos >= 5 && linePos <= 14)
+					{
+						caretPos = startLine + 15;
+					}
+					else
+					{
+						caretPos = startLine + 5;
+					}
+					
+					// If the line is shorter than the new position fo the caret add enough spaces...
+					if(caretPos > endLine)
+					{
+						StringBuilder str = new StringBuilder();
+						int size = caretPos - endLine;
+						while(size-- >= 0) 
+						{
+							str.append(' ');
+						}
+						document.insertString(endLine - 1, str.toString(), null);
+					}
+					
+					sourceArea.setCaretPosition(caretPos);
+				}
+				catch(BadLocationException ex) 
+				{
+					ex.printStackTrace();
+				}
+			}
+		});
 		
+		// Set custom binding action for return/enter key
+		action = "enterKeyAction";
+		im.put(KeyStroke.getKeyStroke("ENTER"), action);
+		am.put(action, new AbstractAction() 
+		{
+			private static final long serialVersionUID = 1L;
+			
+			@Override
+			public void actionPerformed(ActionEvent e) 
+			{		
+				try 
+				{
+					int caretPos = sourceArea.getCaretPosition();
+					int lineNum = sourceArea.getLineOfOffset(caretPos);
+					int startLine = sourceArea.getLineStartOffset(lineNum);
+					int linePos = caretPos - startLine;
+					
+					if(linePos >= 5)
+					{
+						document.insertString(caretPos, "\n     ", null);
+					}
+					else
+					{
+						document.insertString(caretPos, "\n", null);
+					}
+				}
+				catch(BadLocationException ex) 
+				{
+					ex.printStackTrace();
+				}
+			}
+		});
+	
 		document.addDocumentListener(new DocumentListener()
 		{
 			@Override
