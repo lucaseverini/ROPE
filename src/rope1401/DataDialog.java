@@ -115,17 +115,15 @@ public class DataDialog extends JDialog implements ActionListener
     }
 
     private static final String DEFAULT_MESSAGE =
-        "Enable an I/O unit by checking its checkbox.  " +
-        "The card input data deck will be loaded into " +
-        "the card reader after the object deck.";
-
+        "Enable an I/O unit by checking its checkbox.\n" +
+        "The card input data deck will be loaded into the card reader after the object deck.";
 
     private void jbInit() throws Exception
     {
         messageText.setBackground(UIManager.getColor("MenuBar.background"));
-        messageText.setFont(new java.awt.Font("Tahoma", Font.BOLD, 11));
-        messageText.setMinimumSize(new Dimension(637, 30));
-        messageText.setPreferredSize(new Dimension(637, 30));
+        messageText.setFont(new java.awt.Font("Tahoma", Font.BOLD, 14));
+        messageText.setMinimumSize(new Dimension(640, 40));
+        messageText.setPreferredSize(new Dimension(640, 40));
         messageText.setEditable(false);
         messageText.setForeground(Color.blue);
         messageText.setText(DEFAULT_MESSAGE);
@@ -155,7 +153,7 @@ public class DataDialog extends JDialog implements ActionListener
         getContentPane().add(optionsPanel);
 
         optionsPanel.setLayout(gridBagLayout1);
-        optionsPanel.setPreferredSize(new Dimension(500, 425));
+        optionsPanel.setPreferredSize(new Dimension(650, 450));
         optionsPanel.add(messagePanel,
                          new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
                                                 GridBagConstraints.CENTER,
@@ -296,12 +294,12 @@ public class DataDialog extends JDialog implements ActionListener
                         new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
                                                GridBagConstraints.EAST,
                                                GridBagConstraints.NONE,
-                                               new Insets(0, 0, 0, 10), 0, 0));
+                                               new Insets(0, 0, 10, 50), 0, 0));
         buttonPanel.add(cancelButton,
                         new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
                                                GridBagConstraints.CENTER,
                                                GridBagConstraints.NONE,
-                                               new Insets(0, 0, 0, 0), 0, 0));
+                                               new Insets(0, 0, 10, 0), 0, 0));
         tapePanel.add(tape6CheckBox,
                       new GridBagConstraints(0, 5, 1, 1, 0.0, 0.0,
                                              GridBagConstraints.WEST,
@@ -324,46 +322,49 @@ public class DataDialog extends JDialog implements ActionListener
     {
         Object source = event.getSource();
 
-        if (source == readerBrowseButton) {
-            DataOptions.readerPath =
-                browseAction(DataOptions.readerPath, readerTextField, null);
+        if (source == readerBrowseButton)
+		{
+            DataOptions.readerPath = browseAction(DataOptions.readerPath, readerTextField, null);
         }
-        else if (source == punchBrowseButton) {
-            DataOptions.punchPath =
-                browseAction(DataOptions.punchPath, punchTextField, null);
+        else if (source == punchBrowseButton) 
+		{
+            DataOptions.punchPath = browseAction(DataOptions.punchPath, punchTextField, null);
         }
-        else if (source == tape1BrowseButton) {
-            DataOptions.tape1Path =
-                browseAction(DataOptions.tape1Path, tape1TextField, null);
+        else if (source == tape1BrowseButton) 
+		{
+            DataOptions.tape1Path = browseAction(DataOptions.tape1Path, tape1TextField, null);
         }
-        else if (source == tape2BrowseButton) {
-            DataOptions.tape2Path =
-                browseAction(DataOptions.tape2Path, tape2TextField, null);
+        else if (source == tape2BrowseButton) 
+		{
+            DataOptions.tape2Path = browseAction(DataOptions.tape2Path, tape2TextField, null);
         }
-        else if (source == tape3BrowseButton) {
-            DataOptions.tape3Path =
-                browseAction(DataOptions.tape3Path, tape3TextField, null);
+        else if (source == tape3BrowseButton) 
+		{
+            DataOptions.tape3Path = browseAction(DataOptions.tape3Path, tape3TextField, null);
         }
-        else if (source == tape4BrowseButton) {
-            DataOptions.tape4Path =
-                browseAction(DataOptions.tape4Path, tape4TextField, null);
+        else if (source == tape4BrowseButton) 
+		{
+            DataOptions.tape4Path = browseAction(DataOptions.tape4Path, tape4TextField, null);
         }
-        else if (source == tape5BrowseButton) {
-            DataOptions.tape5Path =
-                browseAction(DataOptions.tape5Path, tape5TextField, null);
+        else if (source == tape5BrowseButton) 
+		{
+            DataOptions.tape5Path = browseAction(DataOptions.tape5Path, tape5TextField, null);
         }
-        else if (source == tape6BrowseButton) {
-            DataOptions.tape6Path =
-                browseAction(DataOptions.tape6Path, tape6TextField, null);
+        else if (source == tape6BrowseButton)
+		{
+            DataOptions.tape6Path = browseAction(DataOptions.tape6Path, tape6TextField, null);
         }
-        else if (source == okButton) {
-            if (OkAction()) {
+        else if (source == okButton)
+		{
+            if (OkAction()) 
+			{
                 this.setVisible(false);
                 messageText.setForeground(Color.blue);
                 messageText.setText(DEFAULT_MESSAGE);
             }
         }
-        else if (source == cancelButton) {
+        else if (source == cancelButton) 
+		{
             this.setVisible(false);
         }
     }
@@ -388,29 +389,35 @@ public class DataDialog extends JDialog implements ActionListener
 
     private boolean OkAction()
     {
-        DataOptions.inputPath = readerCheckBox.isSelected()
-                                ? loadCardData()
-                                : AssemblerOptions.objectPath;
-
+		if(readerCheckBox.isSelected() && DataOptions.readerPath == null)
+		{
+            messageText.setForeground(ExecFrame.DARK_RED);
+            messageText.setText("*** Unit cd is invalid : Uncheck the checkbox or enter a file path.");
+			return false;
+		}
+			
+        DataOptions.inputPath = readerCheckBox.isSelected() ? loadCardData() : AssemblerOptions.objectPath;
         DataOptions.unitCommands = new ArrayList();
 
-        return
-            handleUnit("cdp", punchCheckBox, punchTextField) &&
-            handleUnit("mt1", tape1CheckBox, tape1TextField) &&
-            handleUnit("mt2", tape2CheckBox, tape2TextField) &&
-            handleUnit("mt3", tape3CheckBox, tape3TextField) &&
-            handleUnit("mt4", tape4CheckBox, tape4TextField) &&
-            handleUnit("mt5", tape5CheckBox, tape5TextField) &&
-            handleUnit("mt6", tape6CheckBox, tape6TextField);
+        return (handleUnit("cdp", punchCheckBox, punchTextField) &&
+				handleUnit("mt1", tape1CheckBox, tape1TextField) &&
+				handleUnit("mt2", tape2CheckBox, tape2TextField) &&
+				handleUnit("mt3", tape3CheckBox, tape3TextField) &&
+				handleUnit("mt4", tape4CheckBox, tape4TextField) &&
+				handleUnit("mt5", tape5CheckBox, tape5TextField) &&
+				handleUnit("mt6", tape6CheckBox, tape6TextField));
     }
 
     private String loadCardData()
     {
-        if (cardDeckFile == null) {
-            if (DataOptions.readerPath.trim().length() > 0) {
+        if (cardDeckFile == null) 
+		{
+            if (DataOptions.readerPath.trim().length() > 0) 
+			{
                 cardDeckFile = new File(DataOptions.readerPath);
             }
-            else {
+            else
+			{
                 return AssemblerOptions.objectPath;
             }
         }
@@ -422,12 +429,14 @@ public class DataDialog extends JDialog implements ActionListener
         String name2 = new String(cardDeckName);
 
         int index = name1.lastIndexOf(".");
-        if (index != -1) {
+        if (index != -1)
+		{
             name1 = name1.substring(0, index);
         }
 
         index = name2.lastIndexOf(".");
-        if (index != -1) {
+        if (index != -1) 
+		{
             name2 = name2.substring(0, index);
         }
 
@@ -435,19 +444,20 @@ public class DataDialog extends JDialog implements ActionListener
         File inputFile = new File(DataOptions.directoryPath, inputName);
         String inputPath = inputFile.getPath();
 
-        try {
-            BufferedReader objectReader =
-                new BufferedReader(new FileReader(objectFile));
-            BufferedReader cardDeckReader =
-                new BufferedReader(new FileReader(cardDeckFile));
-            PrintWriter inputWriter =
-                new PrintWriter(new FileWriter(inputFile));
+        try 
+		{
+            BufferedReader objectReader = new BufferedReader(new FileReader(objectFile));
+            BufferedReader cardDeckReader = new BufferedReader(new FileReader(cardDeckFile));
+            PrintWriter inputWriter = new PrintWriter(new FileWriter(inputFile));
+			
             String line;
-
-            while ((line = objectReader.readLine()) != null) {
+            while ((line = objectReader.readLine()) != null) 
+			{
                 inputWriter.println(line);
             }
-            while ((line = cardDeckReader.readLine()) != null) {
+			
+            while ((line = cardDeckReader.readLine()) != null)
+			{
                 inputWriter.println(line);
             }
 
@@ -455,7 +465,7 @@ public class DataDialog extends JDialog implements ActionListener
             cardDeckReader.close();
             inputWriter.close();
         }
-        catch (Exception ex) 
+        catch (IOException ex) 
 		{
             parent.writeMessage(ExecFrame.DARK_RED, "*** " + ex.getMessage());
         }
@@ -463,6 +473,7 @@ public class DataDialog extends JDialog implements ActionListener
         return inputPath;
     }
 
+	@SuppressWarnings("unchecked")
     private boolean handleUnit(String unitName, JCheckBox checkBox, JTextField filePath)
     {
         if (checkBox.isSelected()) 
@@ -471,19 +482,23 @@ public class DataDialog extends JDialog implements ActionListener
             if (path.length() > 0) 
 			{
                 DataOptions.unitCommands.add("at " + unitName + " " + path);
-                return true;
+                
+				return true;
             }
             else 
 			{
                 messageText.setForeground(ExecFrame.DARK_RED);
-                messageText.setText("*** Unit " + unitName + ": Uncheck the checkbox or enter a file path.");
-                return false;
+                messageText.setText("*** Unit " + unitName + " is invalid : Uncheck the checkbox or enter a file path.");
+                
+				return false;
             }
         }
         else 
 		{
-            DataOptions.unitCommands.add("det " + unitName);
-            return true;
+			// There is no needs to detach any unit because the Simulator is restarted after any change to the input data.
+            // DataOptions.unitCommands.add("det " + unitName);
+            
+			return true;
         }
     }
 }

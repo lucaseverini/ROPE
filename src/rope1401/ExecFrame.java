@@ -1062,8 +1062,10 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
             int ch;
 
             try {
-                if (stderr != null) {
-                    while ((ch = stderr.read()) != -1) {
+                if (stderr != null) 
+				{
+                    while ((ch = stderr.read()) != -1)
+					{
                         System.out.print((char) ch);
                     }
                 }
@@ -1080,40 +1082,52 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
     {
         Object button = event.getSource();
 
-        if (button == simulatorButton) {
+        if (button == simulatorButton) 
+		{
             restartAction();
         }
-        else if (button == optionsButton) {
+        else if (button == optionsButton)
+		{
             optionsAction();
         }
-        else if (button == dataButton) {
+        else if (button == dataButton) 
+		{
             dataAction();
         }
-        else if (button == startButton) {
+        else if (button == startButton)
+		{
             startAction();
         }
-        else if (button == quitButton) {
+        else if (button == quitButton)
+		{
             quitAction();
         }
-        else if (button == singleStepButton) {
+        else if (button == singleStepButton)
+		{
             singleStepAction();
         }
-        else if (button == autoStepButton) {
+        else if (button == autoStepButton)
+		{
             autoStepAction();
         }
-        else if (button == slowerButton) {
+        else if (button == slowerButton) 
+		{
             slowerAction();
         }
-        else if (button == fasterButton) {
+        else if (button == fasterButton)
+		{
             fasterAction();
         }
-        else if (button == showMemoryButton) {
+        else if (button == showMemoryButton) 
+		{
             showMemoryAction();
         }
-        else if (button == showConsoleButton) {
+        else if (button == showConsoleButton)
+		{
             showConsoleAction();
         }
-        else if (button == showTimerButton) {
+        else if (button == showTimerButton) 
+		{
             showTimerAction();
         }
     }
