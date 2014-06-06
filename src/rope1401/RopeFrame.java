@@ -266,16 +266,16 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 
     void showPrintoutWindow(String baseName)
     {
-		desktop.getDesktopManager().deiconifyFrame(printoutFrame);
-		printoutFrame.setTitle(baseName);
-		printoutFrame.setVisible(true);
-		printoutFrame.initialize();
-		printoutFrame.toFront();
-
-		commandWindows.addElement(printoutFrame);
-
 		try 
 		{
+			printoutFrame.setIcon(false);
+			printoutFrame.setTitle(baseName);
+			printoutFrame.setVisible(true);
+			printoutFrame.initialize();
+			printoutFrame.toFront();
+		
+			commandWindows.addElement(printoutFrame);
+
 			execFrame.toFront();
 			execFrame.setSelected(true);
 		}
@@ -321,8 +321,12 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 		}
 		else
 		{
-			desktop.getDesktopManager().deiconifyFrame(memoryFrame);
-  		}
+			try
+			{
+				memoryFrame.setIcon(false);
+			}
+			catch(PropertyVetoException ignore) {}
+ 		}
 		
 		desktop.getDesktopManager().activateFrame(memoryFrame);
 	}
@@ -359,7 +363,11 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
         }
         else 
 		{
-            desktop.getDesktopManager().deiconifyFrame(consoleFrame);
+			try
+			{
+				consoleFrame.setIcon(false);
+			}
+			catch(PropertyVetoException ignore) {}
         }
 		
 		desktop.getDesktopManager().activateFrame(consoleFrame);
@@ -397,7 +405,11 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 		}
         else 
 		{
-            desktop.getDesktopManager().deiconifyFrame(timerFrame);
+			try
+			{
+				timerFrame.setIcon(false);
+			}
+			catch(PropertyVetoException ignore) {}
         }
 		
 		desktop.getDesktopManager().activateFrame(timerFrame);
@@ -753,9 +765,9 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 	public boolean aboutRope() 
 	{	
 		String ropeVersion = RopeResources.getString("RopeVersion");
-		String s1 = MessageFormat.format(RopeResources.getString("AboutText1"), ropeVersion);
+		String s1 = RopeResources.getString("AboutText1");
 
-		String s2 = RopeResources.getString("AboutText2");
+		String s2 = MessageFormat.format(RopeResources.getString("AboutText2"), ropeVersion);
 
 		String s3 = "";
 		String compilerJDK = RopeResources.getBuildString("CompilerJDK");
@@ -766,7 +778,8 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 		}
 
 		String s4 = MessageFormat.format(RopeResources.getString("AboutText4"), System.getProperty("java.version"),
-														System.getProperty("os.name") + " " + System.getProperty("os.version"));
+															System.getProperty("os.name") + " " + System.getProperty("os.version"));
+		String s5 = RopeResources.getString("AboutText5");
 
 		String message = "";
 		if(!s1.isEmpty())
@@ -777,6 +790,8 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 			message = message.concat("\n" + s3);
 		if(!s4.isEmpty())
 			message = message.concat("\n" + s4);
+		if(!s5.isEmpty())
+			message = message.concat("\n" + s5);
 			
 		JOptionPane.showMessageDialog(this, message, "ROPE", JOptionPane.INFORMATION_MESSAGE, ROPE.appIcon64);
 		
