@@ -663,31 +663,17 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
             }
         }
 
-        size1400RadioButton.setSelected(
-            AssemblerOptions.coreSize == AssemblerOptions.SIZE_1400);
-        size2000RadioButton.setSelected(
-            AssemblerOptions.coreSize == AssemblerOptions.SIZE_2000);
-        size4000RadioButton.setSelected(
-            AssemblerOptions.coreSize == AssemblerOptions.SIZE_4000);
-        size8000RadioButton.setSelected(
-            AssemblerOptions.coreSize == AssemblerOptions.SIZE_8000);
-        size12000RadioButton.setSelected(
-            AssemblerOptions.coreSize == AssemblerOptions.SIZE_12000);
-        size16000RadioButton.setSelected(
-            AssemblerOptions.coreSize == AssemblerOptions.SIZE_16000);
+        size1400RadioButton.setSelected(AssemblerOptions.coreSize == AssemblerOptions.SIZE_1400);
+        size2000RadioButton.setSelected(AssemblerOptions.coreSize == AssemblerOptions.SIZE_2000);
+        size4000RadioButton.setSelected(AssemblerOptions.coreSize == AssemblerOptions.SIZE_4000);
+        size8000RadioButton.setSelected(AssemblerOptions.coreSize == AssemblerOptions.SIZE_8000);
+        size12000RadioButton.setSelected(AssemblerOptions.coreSize == AssemblerOptions.SIZE_12000);
+        size16000RadioButton.setSelected(AssemblerOptions.coreSize == AssemblerOptions.SIZE_16000);
 
-        encodingSimhRadioButton.setSelected(
-            AssemblerOptions.encodingChoice.equals(
-                AssemblerOptions.ENCODING_SIMH));
-        encodingARadioButton.setSelected(
-            AssemblerOptions.encodingChoice.equals(
-                AssemblerOptions.ENCODING_SIMH));
-        encodingHRadioButton.setSelected(
-            AssemblerOptions.encodingChoice.equals(
-                AssemblerOptions.ENCODING_SIMH));
-        encodingPrintRadioButton.setSelected(
-            AssemblerOptions.encodingChoice.equals(
-                AssemblerOptions.ENCODING_SIMH));
+        encodingSimhRadioButton.setSelected(AssemblerOptions.encodingChoice.equals(AssemblerOptions.ENCODING_SIMH));
+        encodingARadioButton.setSelected(AssemblerOptions.encodingChoice.equals(AssemblerOptions.ENCODING_SIMH));
+        encodingHRadioButton.setSelected(AssemblerOptions.encodingChoice.equals(AssemblerOptions.ENCODING_SIMH));
+        encodingPrintRadioButton.setSelected(AssemblerOptions.encodingChoice.equals(AssemblerOptions.ENCODING_SIMH));
 
         enableBoot();
         enableEncoding();
@@ -911,7 +897,7 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
 
         if (traceCheckBox.isSelected()) 
 		{
-            StringBuffer letters = new StringBuffer(3);
+            StringBuilder letters = new StringBuilder(3);
 
             if (traceLexerCheckBox.isSelected()) 
 			{
@@ -996,7 +982,7 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
 		
         RopeFileChooser chooser = new RopeFileChooser(selectedPath, filePath, filters, directories, multiple);
 		chooser.setDialogTitle(title);
-        File file = chooser.choose(textField, this, multiple);
+        File file = chooser.open(this, textField, multiple);
         if (file != null) 
 		{
             selectedPath = file.getParent();
@@ -1008,40 +994,19 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
  		File file = new File(assemblerText.getText());
 		if(!file.exists() || file.isDirectory())
 		{
-			String message = String.format("Assembler path is not available: %s.\n Continue?", assemblerText.getText());
+			String message = String.format("Assembler file is not available: %s.\nContinue?", assemblerText.getText());
 			if (JOptionPane.showConfirmDialog(null, message , "ROPE", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.NO_OPTION)
 			{
 				return;
 			}
 		}
 		
-		file = new File(listingText.getText());
-		if(!file.exists() || file.isDirectory())
+		if (listingCheckBox.isSelected()) 
 		{
-			String message = String.format("Listing path is not available: %s.\n Continue?", listingText.getText());
-			if (JOptionPane.showConfirmDialog(null, message , "ROPE", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.NO_OPTION)
-			{
-				return;
-			}
-		}
-
-		file = new File(objectText.getText());
-		if(!file.exists() || file.isDirectory())
-		{
-			String message = String.format("Object path is not available: %s.\n Continue?", objectText.getText());
-			if (JOptionPane.showConfirmDialog(null, message , "ROPE", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.NO_OPTION)
-			{
-				return;
-			}
-		}
-
-        for (String path : macroText.getText().split(";")) 
-		{
-  
-			file = new File(path);
+			file = new File(listingText.getText());
 			if(!file.exists() || file.isDirectory())
 			{
-				String message = String.format("Macro path is not available: %s.\n Continue?", path);
+				String message = String.format("Listing file is not available: %s.\nContinue?", listingText.getText());
 				if (JOptionPane.showConfirmDialog(null, message , "ROPE", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.NO_OPTION)
 				{
 					return;
@@ -1049,41 +1014,76 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
 			}
 		}
 
-		file = new File(tapeText.getText());
-		if(!file.exists() || file.isDirectory())
+		if (objectCheckBox.isSelected()) 
 		{
-			String message = String.format("Tape path is not available: %s.\n Continue?", tapeText.getText());
-			if (JOptionPane.showConfirmDialog(null, message , "ROPE", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.NO_OPTION)
+			file = new File(objectText.getText());
+			if(!file.exists() || file.isDirectory())
 			{
-				return;
+				String message = String.format("Object file is not available: %s.\nContinue?", objectText.getText());
+				if (JOptionPane.showConfirmDialog(null, message , "ROPE", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.NO_OPTION)
+				{
+					return;
+				}
 			}
 		}
 
-		file = new File(diagnosticText.getText());
-		if(!file.exists() || file.isDirectory())
+		if (macroCheckBox.isSelected()) 
 		{
-			String message = String.format("Diagnostic path is not available: %s.\n Continue?", diagnosticText.getText());
-			if (JOptionPane.showConfirmDialog(null, message , "ROPE", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.NO_OPTION)
+			for (String path : macroText.getText().split(";")) 
 			{
-				return;
+				file = new File(path);
+				if(!file.exists() || !file.isDirectory())
+				{
+					String message = String.format("Macro path is not available: %s.\nContinue?", path);
+					if (JOptionPane.showConfirmDialog(null, message , "ROPE", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.NO_OPTION)
+					{
+						return;
+					}
+				}
 			}
 		}
 
+		if (tapeCheckBox.isSelected()) 
+		{
+			file = new File(tapeText.getText());
+			if(!file.exists() || file.isDirectory())
+			{
+				String message = String.format("Tape file is not available: %s.\nContinue?", tapeText.getText());
+				if (JOptionPane.showConfirmDialog(null, message , "ROPE", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.NO_OPTION)
+				{
+					return;
+				}
+			}
+		}
+
+		if (diagnosticCheckBox.isSelected()) 
+		{
+			file = new File(diagnosticText.getText());
+			if(!file.exists() || file.isDirectory())
+			{
+				String message = String.format("Diagnostic file is not available: %s.\nContinue?", diagnosticText.getText());
+				if (JOptionPane.showConfirmDialog(null, message , "ROPE", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.NO_OPTION)
+				{
+					return;
+				}
+			}
+		}
+		
 		AssemblerOptions.assemblerPath = assemblerText.getText();
 
         AssemblerOptions.boot = bootCheckBox.isSelected();
         AssemblerOptions.bootLoader =
-              bootIBMRadioButton.isSelected() ? AssemblerOptions.BOOT_IBM
-            : bootVan1RadioButton.isSelected() ? AssemblerOptions.BOOT_VAN_1
-            : bootVan2RadioButton.isSelected() ? AssemblerOptions.BOOT_VAN_2
-            : AssemblerOptions.BOOT_NONE;
+							bootIBMRadioButton.isSelected() ? AssemblerOptions.BOOT_IBM
+							: bootVan1RadioButton.isSelected() ? AssemblerOptions.BOOT_VAN_1
+							: bootVan2RadioButton.isSelected() ? AssemblerOptions.BOOT_VAN_2
+							: AssemblerOptions.BOOT_NONE;
 
         AssemblerOptions.encoding = encodingCheckBox.isSelected();
         AssemblerOptions.encodingChoice =
-              encodingSimhRadioButton.isSelected() ? AssemblerOptions.ENCODING_SIMH
-            : encodingARadioButton.isSelected() ? AssemblerOptions.ENCODING_A
-            : encodingHRadioButton.isSelected() ? AssemblerOptions.ENCODING_H
-            : AssemblerOptions.ENCODING_PRINT;
+							encodingSimhRadioButton.isSelected() ? AssemblerOptions.ENCODING_SIMH
+							: encodingARadioButton.isSelected() ? AssemblerOptions.ENCODING_A
+							: encodingHRadioButton.isSelected() ? AssemblerOptions.ENCODING_H
+							: AssemblerOptions.ENCODING_PRINT;
 
         AssemblerOptions.listing = listingCheckBox.isSelected();
         AssemblerOptions.listingPath = listingText.getText();
@@ -1148,7 +1148,7 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
 			Vector<RopeFileFilter> filters = new Vector<RopeFileFilter>();
 			filters.add(new RopeFileFilter( new String[] {".lst", ".txt"}, "Assembly files (*.lst, *.txt)"));
 			
-            browseAction("Listing path selection", null, listingText, filters, false, false);
+            browseAction("Listing file selection", null, listingText, filters, false, false);
 			
             buildCommand();
         }
@@ -1157,25 +1157,25 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
 			Vector<RopeFileFilter> filters = new Vector<RopeFileFilter>();
 			filters.add(new RopeFileFilter( new String[] {".cd", ".crd", ".obj"}, "Object deck files (*.cd, *.crd, *.obj)"));
 			
-            browseAction("Object path selection", null, objectText, filters, false, false);
+            browseAction("Object file selection", null, objectText, filters, false, false);
 			
             buildCommand();
         }
         else if (source == macroBrowseButton) 
 		{
-            browseAction("Macro path selection", null, macroText, null, true, true);
+            browseAction("Macro directories selection", null, macroText, null, true, true);
 			
             buildCommand();
         }
         else if (source == tapeBrowseButton) 
 		{
-            browseAction("Tape path selection", null, tapeText, null, false, false);
+            browseAction("Tape file selection", null, tapeText, null, false, false);
 			
             buildCommand();
         }
         else if (source == diagnosticBrowseButton) 
 		{
-            browseAction("Diagnostic path selection", null, diagnosticText, null, false, false);
+            browseAction("Diagnostic file selection", null, diagnosticText, null, false, false);
 			
             buildCommand();
         }

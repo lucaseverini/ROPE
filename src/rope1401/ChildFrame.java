@@ -85,6 +85,11 @@ public class ChildFrame extends JInternalFrame implements InternalFrameListener,
 			}
 		}
 		
+		// Reneable the items that are always active
+		mainFrame.newItem.setEnabled(canNew());
+		mainFrame.openItem.setEnabled(canOpen());
+		mainFrame.pageSetupItem.setEnabled(canPageSetup());
+		
 		// Disable all Edit menu items...
 		count = mainFrame.editMenu.getItemCount();
 		for(int idx = 0; idx < count; idx++)

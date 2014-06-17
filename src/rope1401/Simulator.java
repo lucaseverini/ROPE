@@ -95,7 +95,8 @@ class Simulator
 			{
                 for (int i = 0; i < DataOptions.unitCommands.size(); ++i) 
 				{
-                    execute((String) DataOptions.unitCommands.get(i));
+					System.out.println(DataOptions.unitCommands.get(i));
+                    execute((String)DataOptions.unitCommands.get(i));
                 }
             }
         }

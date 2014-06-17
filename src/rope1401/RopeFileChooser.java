@@ -29,7 +29,6 @@ class RopeFileChooser extends JFileChooser
 		
         this.setMultiSelectionEnabled(multiple);
         this.setFileSelectionMode(directories ? DIRECTORIES_ONLY : FILES_ONLY);
-		this.setAcceptAllFileFilterUsed(true);
 
         if (filePath != null) 
 		{
@@ -54,9 +53,9 @@ class RopeFileChooser extends JFileChooser
         this(directoryPath, filePath, filter, false, false);
     }
 
-    File choose(JTextField textField, Component parent)
+    File open(Component parent, JTextField textField)
     {
-        int option = this.showOpenDialog(parent);
+ 		int option = this.showOpenDialog(parent);
 
         if (option == JFileChooser.APPROVE_OPTION) 
 		{
@@ -71,11 +70,13 @@ class RopeFileChooser extends JFileChooser
         }
     }
 
-    File choose(JTextField textField, Component parent, boolean multiple)
+    File open(Component parent, JTextField textField, boolean multiple)
     {
+ 		this.setAcceptAllFileFilterUsed(true);
+
         if (!multiple) 
 		{
-            return choose(textField, parent);
+            return open(parent, textField);
         }
 
         int option = this.showOpenDialog(parent);
@@ -102,6 +103,88 @@ class RopeFileChooser extends JFileChooser
             return null;
         }
     }
+	
+	File save(Component parent)
+	{		
+		this.setAcceptAllFileFilterUsed(false);
+		
+		int option = this.showSaveDialog(parent);
+        if (option == JFileChooser.APPROVE_OPTION) 
+		{
+			return this.getSelectedFile();
+		}
+		else
+		{
+			return null;
+		}
+	}
+
+	@Override 
+	public void approveSelection() 
+	{
+		if (getDialogType() == SAVE_DIALOG) 
+		{
+			File selFile = getSelectedFile();
+			if ((selFile != null) && selFile.exists()) 
+			{
+				String msg = String.format("The file %s already exists.\nDo you want to replace the existing file?", selFile.getName());
+				int response = JOptionPane.showConfirmDialog(this, msg, "Ovewrite file", JOptionPane.YES_NO_OPTION, 
+																							JOptionPane.WARNING_MESSAGE);				
+				if (response != JOptionPane.YES_OPTION)
+				{
+					return;
+				}
+			}
+		}
+				
+		super.approveSelection();
+    }
+	
+	public JTextField getTextField() 
+	{
+		Container container = this;
+		for (int idx = 0; idx < container.getComponentCount(); idx++) 
+		{
+			Component child = container.getComponent(idx);
+			if (child instanceof JTextField) 
+			{
+				return (JTextField) child;
+			} 
+			else if (child instanceof Container) 
+			{
+				JTextField field = getTextFieldIter((Container) child);
+				if (field != null) 
+				{
+					return field;
+				}
+			}
+		}
+        
+		return null;
+    }
+
+		private JTextField getTextFieldIter(Container container) 
+	{
+		for (int idx = 0; idx < container.getComponentCount(); idx++) 
+		{
+			Component child = container.getComponent(idx);
+			if (child instanceof JTextField) 
+			{
+				return (JTextField) child;
+			} 
+			else if (child instanceof Container) 
+			{
+				JTextField field = getTextFieldIter((Container) child);
+				if (field != null) 
+				{
+					return field;
+				}
+			}
+		}
+        
+		return null;
+    }
+
 /*
 	RopeFileChooser(Component parent)
     {     

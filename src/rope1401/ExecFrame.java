@@ -27,6 +27,8 @@ import java.io.*;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
@@ -77,8 +79,8 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
     private ImageIcon breakPointIcon = null;
 	private String listingPath = null;
 	private String listingDir = null;
+	private String selectedPath;
 
-	
 	public BreakpointSet activeBreakpoints = null;
 
     public ExecFrame(RopeFrame parent)
@@ -86,8 +88,8 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
 		super(parent);
 	
 		// Implement a smarter way to set the initial frame position and size
-		setLocation(930, 0);
-		setSize(980, 710);
+		setLocation(920, 0);
+		setSize(990, 705);
 		
         try 
 		{
@@ -346,6 +348,9 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
         showMemoryButton.setEnabled(false);
         showConsoleButton.setEnabled(false);
         showTimerButton.setEnabled(false);
+		
+		Preferences userPrefs = Preferences.userRoot();
+		showAllCheckBox.setSelected(userPrefs.getBoolean("execShowAll", false));
 
         autoStepWaitTime = INIT_AUTO_STEP_WAIT_TIME;
         currentMessage = null;
@@ -1057,8 +1062,10 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
             int ch;
 
             try {
-                if (stderr != null) {
-                    while ((ch = stderr.read()) != -1) {
+                if (stderr != null) 
+				{
+                    while ((ch = stderr.read()) != -1)
+					{
                         System.out.print((char) ch);
                     }
                 }
@@ -1075,40 +1082,52 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
     {
         Object button = event.getSource();
 
-        if (button == simulatorButton) {
+        if (button == simulatorButton) 
+		{
             restartAction();
         }
-        else if (button == optionsButton) {
+        else if (button == optionsButton)
+		{
             optionsAction();
         }
-        else if (button == dataButton) {
+        else if (button == dataButton) 
+		{
             dataAction();
         }
-        else if (button == startButton) {
+        else if (button == startButton)
+		{
             startAction();
         }
-        else if (button == quitButton) {
+        else if (button == quitButton)
+		{
             quitAction();
         }
-        else if (button == singleStepButton) {
+        else if (button == singleStepButton)
+		{
             singleStepAction();
         }
-        else if (button == autoStepButton) {
+        else if (button == autoStepButton)
+		{
             autoStepAction();
         }
-        else if (button == slowerButton) {
+        else if (button == slowerButton) 
+		{
             slowerAction();
         }
-        else if (button == fasterButton) {
+        else if (button == fasterButton)
+		{
             fasterAction();
         }
-        else if (button == showMemoryButton) {
+        else if (button == showMemoryButton) 
+		{
             showMemoryAction();
         }
-        else if (button == showConsoleButton) {
+        else if (button == showConsoleButton)
+		{
             showConsoleAction();
         }
-        else if (button == showTimerButton) {
+        else if (button == showTimerButton) 
+		{
             showTimerAction();
         }
     }
@@ -1125,6 +1144,14 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
             loadListing();
  
 			restoreBreakpoints(activeBreakpoints);
+			
+			try 
+			{
+				Preferences userPrefs = Preferences.userRoot();
+				userPrefs.putBoolean("execShowAll", showAllCheckBox.isSelected());
+				userPrefs.sync();
+			}
+			catch(BackingStoreException ex) {}
 		}
     }
 	
@@ -1151,9 +1178,15 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
 	@Override
 	public boolean canPrint()
 	{
-		return false;
+		return true;
 	}
-	
+
+	@Override
+	public boolean canSaveAs()
+	{
+		return true;
+	}
+
 	public void checkListContent()
 	{
 		mainFrame.copyItem.setEnabled(canCopy());
@@ -1280,6 +1313,69 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
 		}
 		catch (IOException ex)
 		{
+		}
+	}
+
+	public void saveAsMenuAction(ActionEvent event)
+	{
+		if(listing != null)
+		{
+			saveAs();
+		}
+	}
+
+	private void saveAs()
+    {
+		Vector<RopeFileFilter> filters = new Vector<RopeFileFilter>();
+		filters.add(new RopeFileFilter(new String[] {".lst"}, "List files (*.lst)"));
+		filters.add(new RopeFileFilter(new String[] {".txt"}, "Text files (*.txt)"));
+
+		RopeFileChooser chooser = new RopeFileChooser(selectedPath, null, filters);
+		chooser.setDialogTitle("Save Listing File");
+		String fileName = String.format("%s.lst", baseName);
+		chooser.setSelectedFile(new File(selectedPath, fileName));
+		JTextField field = chooser.getTextField();
+		field.setSelectionStart(0);
+		field.setSelectionEnd(baseName.length());
+		File file = chooser.save(ROPE.mainFrame);
+		if(file != null)
+		{
+			selectedPath = file.getParent();
+			
+			BufferedWriter writer = null;
+			try
+			{
+				writer = new BufferedWriter(new FileWriter(file));
+
+				String text = "";
+				String separator = System.getProperty("line.separator");
+			
+				ListModel model = listing.getModel();
+				for (int idx = 0; idx < model.getSize(); idx++) 
+				{
+					text = text.concat(model.getElementAt(idx).toString() + separator);
+				}
+
+				writer.write(text);
+			}
+			catch (IOException ex)
+			{
+				ex.printStackTrace();
+			}
+			finally
+			{
+				try
+				{
+					if( writer != null)
+					{
+						writer.close();
+					}
+				}
+				catch (IOException ex)
+				{
+					ex.printStackTrace();
+				}
+			}		
 		}
 	}
 }

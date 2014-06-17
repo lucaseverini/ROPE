@@ -11,16 +11,13 @@ package rope1401;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.print.Book;
 import java.awt.print.PageFormat;
-import java.awt.print.Paper;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.io.*;
 import static java.lang.Math.abs;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Vector;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.swing.*;
@@ -35,8 +32,9 @@ public class PrintoutFrame extends ChildFrame implements Printable, ActionListen
     GridBagLayout gridBagLayout1 = new GridBagLayout();
     JPanel controlPanel = new JPanel();
     JButton updateButton = new JButton();
+    JButton saveAsButton = new JButton();
     JButton printButton = new JButton();
-    JCheckBox autoCheckBox = new JCheckBox();
+    JCheckBox autoUpdateCheckBox = new JCheckBox();
     JCheckBox stripesCheckBox = new JCheckBox();
     JCheckBox barsCheckBox = new JCheckBox();
     JScrollPane scrollPane = new JScrollPane();
@@ -47,6 +45,8 @@ public class PrintoutFrame extends ChildFrame implements Printable, ActionListen
     private Color stripeColor = new Color(25, 0, 25);
 	private Font printFont;
 	private FontMetrics printMetrics;
+	private String baseName = "";
+	private String selectedPath;
 
     public PrintoutFrame(RopeFrame parent)
     {
@@ -54,7 +54,7 @@ public class PrintoutFrame extends ChildFrame implements Printable, ActionListen
 		
 		// Implement a smarter way to set the initial frame position and size
         setLocation(0, 690);
-        setSize(940, 395);
+        setSize(930, 395);
    
 		try 
 		{
@@ -67,9 +67,11 @@ public class PrintoutFrame extends ChildFrame implements Printable, ActionListen
 
 		printoutArea.addCaretListener(this);
 	    updateButton.addActionListener(this);
+		saveAsButton.addActionListener(this);
 	    printButton.addActionListener(this);
         stripesCheckBox.addChangeListener(this);
         barsCheckBox.addChangeListener(this);
+        autoUpdateCheckBox.addChangeListener(this);
 
 		// Remove automatic key bindings because we want them controlled by menu items
 		InputMap im = printoutArea.getInputMap(JComponent.WHEN_FOCUSED);
@@ -168,36 +170,44 @@ public class PrintoutFrame extends ChildFrame implements Printable, ActionListen
 		
         controlPanel.setLayout(gridBagLayout1);
         updateButton.setText("Update");
+        saveAsButton.setText("Save As...");
         printButton.setText("Print");
-        autoCheckBox.setText("Auto update");
-        autoCheckBox.setSelected(true);
+        autoUpdateCheckBox.setText("Auto update");
         stripesCheckBox.setText("Stripes");
-        stripesCheckBox.setSelected(true);
         barsCheckBox.setText("Bars");
-        barsCheckBox.setSelected(false);
  
+		Preferences userPrefs = Preferences.userRoot();
+		autoUpdateCheckBox.setSelected(userPrefs.getBoolean("printAutoUpdate", true));
+		stripesCheckBox.setSelected(userPrefs.getBoolean("printStripes", true));
+		barsCheckBox.setSelected(userPrefs.getBoolean("printBars", false));
+
 		controlPanel.add(updateButton,
                          new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
                                                 GridBagConstraints.WEST,
                                                 GridBagConstraints.NONE,
                                                 new Insets(5, 5, 5, 0), 0, 0));
-        controlPanel.add(autoCheckBox,
+        controlPanel.add(autoUpdateCheckBox,
                          new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
                                                 GridBagConstraints.CENTER,
                                                 GridBagConstraints.NONE,
                                                 new Insets(5, 5, 5, 0), 0, 0));
-        controlPanel.add(printButton,
+        controlPanel.add(saveAsButton,
                          new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
                                                 GridBagConstraints.CENTER,
                                                 GridBagConstraints.NONE,
-                                                new Insets(5, 5, 5, 0), 0, 0));
+                                                new Insets(5, 20, 5, 0), 0, 0));
+        controlPanel.add(printButton,
+                         new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
+                                                GridBagConstraints.CENTER,
+                                                GridBagConstraints.NONE,
+                                                new Insets(5, 20, 5, 0), 0, 0));
         controlPanel.add(stripesCheckBox,
-                         new GridBagConstraints(4, 0, 1, 1, 1.0, 0.0,
+                         new GridBagConstraints(5, 0, 1, 1, 1.0, 0.0,
                                                 GridBagConstraints.EAST,
                                                 GridBagConstraints.NONE,
                                                 new Insets(5, 0, 5, 0), 0, 0));
         controlPanel.add(barsCheckBox,
-                         new GridBagConstraints(5, 0, 1, 1, 0.0, 0.0,
+                         new GridBagConstraints(6, 0, 1, 1, 0.0, 0.0,
                                                 GridBagConstraints.CENTER,
                                                 GridBagConstraints.NONE,
                                                 new Insets(0, 5, 0, 5), 0, 0));
@@ -221,11 +231,18 @@ public class PrintoutFrame extends ChildFrame implements Printable, ActionListen
             ex.printStackTrace();
         }
     }
+	
+	@Override
+	public void setTitle(String name)
+	{
+		baseName = name;
+		super.setTitle("PRINTOUT: " + baseName);
+	}
 
 	@Override
     public void execute()
     {
-        if (autoCheckBox.isSelected()) 
+        if (autoUpdateCheckBox.isSelected()) 
 		{
             update();
         }
@@ -252,11 +269,35 @@ public class PrintoutFrame extends ChildFrame implements Printable, ActionListen
     {
         Object source = event.getSource();
 
-        if ((source == stripesCheckBox) || (source == barsCheckBox)) 
+        if (source == stripesCheckBox || source == barsCheckBox)
 		{
             printoutArea.repaint();
-        }
-    }
+ 
+			try 
+			{
+				Preferences userPrefs = Preferences.userRoot();
+				userPrefs.putBoolean("printStripes", stripesCheckBox.isSelected());
+				userPrefs.putBoolean("printBars", barsCheckBox.isSelected());
+				userPrefs.sync();
+			}
+			catch(BackingStoreException ex) {}
+		}
+		else if(source == autoUpdateCheckBox)
+		{
+			if (autoUpdateCheckBox.isSelected()) 
+			{
+				update();
+			}
+			
+			try 
+			{
+				Preferences userPrefs = Preferences.userRoot();
+				userPrefs.putBoolean("printAutoUpdate", autoUpdateCheckBox.isSelected());
+				userPrefs.sync();
+			}
+			catch(BackingStoreException ex) {}
+		}
+	}
 
 	@Override
     public void actionPerformed(ActionEvent event)
@@ -265,8 +306,13 @@ public class PrintoutFrame extends ChildFrame implements Printable, ActionListen
 		
 		if(button == updateButton)
 		{
-			update();		
+			update();	
+			
 			printoutArea.repaint();
+		}
+		else if(button == saveAsButton)
+		{
+			saveAs();
 		}
 		else if(button == printButton)
 		{
@@ -296,6 +342,51 @@ public class PrintoutFrame extends ChildFrame implements Printable, ActionListen
             printoutArea.setCaretPosition(printoutArea.getText().length());
         }
     }
+	
+	private void saveAs()
+    {
+		Vector<RopeFileFilter> filters = new Vector<RopeFileFilter>();
+		filters.add(new RopeFileFilter(new String[] {".out"}, "Output files (*.out)"));
+		filters.add(new RopeFileFilter(new String[] {".txt"}, "Text files (*.txt)"));
+
+		RopeFileChooser chooser = new RopeFileChooser(selectedPath, null, filters);
+		chooser.setDialogTitle("Save Printout File");
+		String fileName = String.format("%s.out", baseName);
+		chooser.setSelectedFile(new File(selectedPath, fileName));
+		JTextField field = chooser.getTextField();
+		field.setSelectionStart(0);
+		field.setSelectionEnd(baseName.length());
+		File file = chooser.save(ROPE.mainFrame);
+		if(file != null)
+		{
+			selectedPath = file.getParent();
+			
+			BufferedWriter writer = null;
+			try
+			{
+				writer = new BufferedWriter(new FileWriter(file));
+				writer.write(printoutArea.getText());
+			}
+			catch (IOException ex)
+			{
+				ex.printStackTrace();
+			}
+			finally
+			{
+				try
+				{
+					if( writer != null)
+					{
+						writer.close();
+					}
+				}
+				catch (IOException ex)
+				{
+					ex.printStackTrace();
+				}
+			}		
+		}
+	}
 	
 	private void print()
     {
@@ -364,6 +455,12 @@ public class PrintoutFrame extends ChildFrame implements Printable, ActionListen
 	}
 	
 	@Override
+	public boolean canSaveAs()
+	{
+		return true;
+	}
+
+	@Override
 	public boolean canPrint()
 	{
 		return true;
@@ -382,6 +479,22 @@ public class PrintoutFrame extends ChildFrame implements Printable, ActionListen
 		if(printoutArea != null)
 		{
 			printoutArea.selectAll();
+		}
+	}
+
+	public void saveAsMenuAction(ActionEvent event)
+	{
+		if(printoutArea != null)
+		{
+			saveAs();
+		}
+	}
+
+	public void printMenuAction(ActionEvent event)
+	{
+		if(printoutArea != null)
+		{
+			print();
 		}
 	}
 
@@ -421,8 +534,18 @@ public class PrintoutFrame extends ChildFrame implements Printable, ActionListen
 				int lineStart = printoutArea.getLineStartOffset(lineIdx);
 				int lineLen = printoutArea.getLineEndOffset(lineIdx) - lineStart;
 				
+				String text = printoutArea.getText(lineStart, lineLen);
+				
+				//TextMeasurer t =
+					
 				yPos += lineHeight;
-				graphics.drawString(printoutArea.getText(lineStart, lineLen), pageLeft, yPos);
+				int xPos = pageLeft;
+				for(char ch : text.toCharArray())
+				{
+					String chStr = String.valueOf(ch);
+					graphics.drawString(chStr, xPos + 1, yPos);
+					xPos += printMetrics.stringWidth(chStr) + 2;
+				}
 			}
 			catch(BadLocationException ex) 
 			{

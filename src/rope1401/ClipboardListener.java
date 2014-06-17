@@ -4,13 +4,10 @@
  * @version 2.0
  */
 
-
 package rope1401;
 
 import java.awt.*;  
 import java.awt.datatransfer.*;  
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class ClipboardListener extends Thread implements ClipboardOwner 
 {  
@@ -40,8 +37,12 @@ public class ClipboardListener extends Thread implements ClipboardOwner
 	@Override
 	public void run() 
 	{  
-		regainOwnership(sysClip.getContents(this));  
-		
+		try 
+		{
+			regainOwnership(sysClip.getContents(this));  
+		}
+		catch(Exception ex) {}
+	
 		while(true) 
 		{
 			try 

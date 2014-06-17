@@ -24,7 +24,9 @@ public class PreferencesDialog extends JDialog implements ActionListener
 
     JTextField assemblerPath;
     JTextField simulatorPath;	
-	JCheckBox reopenLastSourceChk;
+	JCheckBox reopenLastEditChk;
+	JCheckBox reopenLastExecChk;
+	JCheckBox reopenLastPrintoutChk;
     JCheckBox saveBeforeAssemblyChk;
 	JCheckBox useOldConversionChk;
     JButton assemblerBrowseBtn;
@@ -79,7 +81,7 @@ public class PreferencesDialog extends JDialog implements ActionListener
 	
 		assemblerPath.setText(path1);
         simulatorPath.setText(path2);
-		reopenLastSourceChk.setSelected(userPrefs.getBoolean("reopenLastSource", true));
+		reopenLastEditChk.setSelected(userPrefs.getBoolean("reopenLastSource", true));
 		saveBeforeAssemblyChk.setSelected(userPrefs.getBoolean("saveBeforeAssembly", false));
 		useOldConversionChk.setSelected(userPrefs.getBoolean("useOldConversion", true));
      }
@@ -88,8 +90,12 @@ public class PreferencesDialog extends JDialog implements ActionListener
     {
 		assemblerPath = new JTextField();
 		simulatorPath = new JTextField();	
+		
+		// Implementare anche la Riapertura della Memory Window...
 	
-		reopenLastSourceChk = new JCheckBox("Reopen last source file");
+		reopenLastEditChk = new JCheckBox("Reopen last editing file");
+		reopenLastExecChk = new JCheckBox("Reopen last exec list");
+		reopenLastPrintoutChk = new JCheckBox("Reopen last printout");
 		saveBeforeAssemblyChk = new JCheckBox("Save source file before assembling");
 		useOldConversionChk = new JCheckBox("Use Old Conversion option with SimH");
 	
@@ -126,13 +132,19 @@ public class PreferencesDialog extends JDialog implements ActionListener
                                                   new Insets(0, 5, 5, 5), 0, 0));
 
 		checkPanel.setLayout(new GridBagLayout());
-        checkPanel.add(reopenLastSourceChk, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
+        checkPanel.add(reopenLastEditChk, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
                                                GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
                                                new Insets(5, 5, 5, 5), 0, 0));
-        checkPanel.add(saveBeforeAssemblyChk, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
+        checkPanel.add(reopenLastExecChk, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
                                                GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
                                                new Insets(0, 5, 5, 5), 0, 0));
-        checkPanel.add(useOldConversionChk, new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0,
+        checkPanel.add(reopenLastPrintoutChk, new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0,
+                                               GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+                                               new Insets(0, 5, 5, 5), 0, 0));
+        checkPanel.add(saveBeforeAssemblyChk, new GridBagConstraints(0, 3, 1, 1, 1.0, 0.0,
+                                               GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+                                               new Insets(0, 5, 5, 5), 0, 0));
+        checkPanel.add(useOldConversionChk, new GridBagConstraints(0, 4, 1, 1, 1.0, 0.0,
                                                GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
                                                new Insets(0, 5, 5, 5), 0, 0));
 
@@ -174,7 +186,7 @@ public class PreferencesDialog extends JDialog implements ActionListener
 			chooser.setFileFilter(filters.firstElement()); 
 		}
 		
-        chooser.choose(textField, this, multiple);
+        chooser.open(this, textField, multiple);
     }
 
     private void confirmAction()
@@ -205,7 +217,7 @@ public class PreferencesDialog extends JDialog implements ActionListener
 			
 			userPrefs.put("assemblerPath", assemblerPath.getText());
 			userPrefs.put("simulatorPath", simulatorPath.getText());
-			userPrefs.putBoolean("reopenLastSource", reopenLastSourceChk.isSelected());
+			userPrefs.putBoolean("reopenLastSource", reopenLastEditChk.isSelected());
 			userPrefs.putBoolean("saveBeforeAssembly", saveBeforeAssemblyChk.isSelected());
 			userPrefs.putBoolean("useOldConversion", useOldConversionChk.isSelected());
 			
@@ -217,7 +229,7 @@ public class PreferencesDialog extends JDialog implements ActionListener
 			Logger.getLogger(RopeFrame.class.getName()).log(Level.SEVERE, null, ex);
 		}
 	
-		Rope.mainFrame.reopenLastSource = reopenLastSourceChk.isSelected();
+		ROPE.mainFrame.reopenLastSource = reopenLastEditChk.isSelected();
 		AssemblerOptions.saveBeforeAssembly = saveBeforeAssemblyChk.isSelected();
 		SimulatorOptions.useOldConversion = useOldConversionChk.isSelected();
 		AssemblerOptions.assemblerPath = assemblerPath.getText();
@@ -259,7 +271,7 @@ public class PreferencesDialog extends JDialog implements ActionListener
 				Assembler.kill();
 				Simulator.kill();
 			
-				Rope.mainFrame.savePreferencesOnExit = false;
+				ROPE.mainFrame.savePreferencesOnExit = false;
 				
 				System.exit(0);
 			}
