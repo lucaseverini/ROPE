@@ -179,6 +179,63 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 		});
 		
 		// Set custom binding action for return/enter key
+		String actionKey = "backspaceKeyAction";
+		im.put(KeyStroke.getKeyStroke("BACK_SPACE"), actionKey);
+		am.put(actionKey, new AbstractAction() 
+		// How can I get the original action?
+		{
+			private static final long serialVersionUID = 1L;
+			
+			@Override
+			public void actionPerformed(ActionEvent e) 
+			{
+ 				try 
+				{
+					int caretPos = sourceArea.getCaretPosition();
+					int lineNum = sourceArea.getLineOfOffset(caretPos);
+					int startLine = sourceArea.getLineStartOffset(lineNum);
+					int endLine = sourceArea.getLineEndOffset(lineNum);
+					int linePos = caretPos - startLine;
+					
+					if(linePos == 15)
+					{
+						int endPos = 5;						
+						int charPos = linePos;
+						for(; charPos > endPos; charPos--)
+						{
+							char ch = sourceArea.getText().charAt((startLine + charPos) - 1);
+							if(!Character.isWhitespace(ch))
+							{
+								break;
+							}
+						}
+						
+						sourceArea.setCaretPosition(startLine + charPos);
+					}
+					else
+					{
+						int startSel = sourceArea.getSelectionStart();
+						int endSel = sourceArea.getSelectionEnd();
+						if(startSel == endSel)
+						{
+							startSel = caretPos - 1;
+							endSel = caretPos;
+						}
+						
+						StringBuilder sb = new StringBuilder(sourceArea.getText());
+						sb.replace(startSel, endSel, "");
+						sourceArea.setText(sb.toString());
+						sourceArea.setCaretPosition(startSel);
+					}
+				}
+				catch(BadLocationException ex) 
+				{
+					ex.printStackTrace();
+				}
+			}
+		});
+		
+		// Set custom binding action for return/enter key
 		action = "enterKeyAction";
 		im.put(KeyStroke.getKeyStroke("ENTER"), action);
 		am.put(action, new AbstractAction() 
@@ -577,8 +634,20 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 
         try 
 		{
+			String sourceText = sourceArea.getText();
+			
+			String cleanText = cleanupSource(sourceText);
+			
+			if(cleanText.length() != sourceText.length())
+			{
+				sourceArea.setText(cleanText);
+				
+				String message = String.format("One or more invalid characters at the end of the source file have been removed.");
+				JOptionPane.showMessageDialog(this, message, "ROPE", JOptionPane.INFORMATION_MESSAGE);
+			}
+			
             sourceFile = new BufferedWriter(new FileWriter(sourcePath, false));
-            sourceFile.write(sourceArea.getText());
+            sourceFile.write(cleanText);
 			
 			setSourceChanged(false);
 			
@@ -1080,5 +1149,40 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 		{
             ex.printStackTrace();
         }
+	}
+	
+	String cleanupSource(String source)
+	{
+		if(source.isEmpty())
+		{
+			return source.concat("\n");
+		}
+		
+		int lastChIdx = source.length() - 1;
+		if(source.charAt(lastChIdx) != '\n')
+		{
+			// Append a newline at the end
+			source = source.concat("\n");
+		}
+		else
+		{
+			// Remove all newlines at the end but one
+			while(lastChIdx >= 1)
+			{
+				Character ch1 = source.charAt(lastChIdx);
+				if(ch1 == '\n' || Character.isWhitespace(ch1))
+				{
+					source = source.substring(0, lastChIdx--);
+				}
+				else
+				{
+					break;
+				}
+			}
+			
+			source = source.concat("\n");
+		}
+		
+		return source;
 	}
 }
