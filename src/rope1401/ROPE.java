@@ -29,6 +29,7 @@ public class ROPE /* extends com.apple.eawt.Application */
 		
 		if(RopeHelper.isMac)
 		{
+			// Use reflection here...
 			Application.getApplication().setDockIconImage(new ImageIcon(getClass().getResource("Images/appIcon330.gif")).getImage());
 			
 			System.setProperty("apple.awt.graphics.EnableQ2DX", "true");

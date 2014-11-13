@@ -31,7 +31,8 @@ class AssemblerOptions
     static final String ENCODING_PRINT = "?";
 
     static String assemblerPath;
-    static String encodingChoice = ENCODING_SIMH;
+    static String deckEncodingChoice = ENCODING_SIMH;
+    static String tapeEncodingChoice = ENCODING_A;
     static String sourcePath;
     static String listingPath;
     static String objectPath;
@@ -42,19 +43,21 @@ class AssemblerOptions
     static String pageLength = "60";
     static Vector<String> command;
 
-    static boolean boot       = true;
-    static boolean encoding   = true;
-    static boolean listing    = true;
-    static boolean object     = true;
-    static boolean macro      = true;
-    static boolean tape       = false;
-    static boolean diagnostic = false;
-    static boolean codeOk     = false;
-    static boolean interleave = false;
-    static boolean store      = false;
-    static boolean dump       = false;
-    static boolean page       = false;
-
+    static boolean boot							= true;
+    static boolean deckEncoding					= true;
+    static boolean tapeEncoding					= false;
+    static boolean listing						= true;
+    static boolean object						= true;
+    static boolean macro						= true;
+ 	static boolean convertTapeForTapeSimulator	= false;
+    static boolean tape							= false;
+    static boolean diagnostic					= false;
+    static boolean codeOk						= false;
+    static boolean interleave					= false;
+    static boolean store						= false;
+    static boolean dump							= false;
+    static boolean page							= false;
+								
     static boolean trace        = false;
     static boolean traceLexer   = false;
     static boolean traceParser  = false;
