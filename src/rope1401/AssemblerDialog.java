@@ -746,6 +746,7 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
 		enableMacro();
 		enableTape();
 		enableDiagnostic();
+		enableTapeConversion();
 	}
 
     private void enableBoot()
@@ -863,6 +864,11 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
         extrasQueueCheckBox.setEnabled(enabled);
         extrasReloaderCheckBox.setEnabled(enabled);
     }
+
+	private void enableTapeConversion()
+    {
+		AssemblerOptions.convertTapeForTapeSimulator = convertTapeForTapeSimulatorBox.isSelected();
+	}
 
     Vector<String> buildCommand()
     {
@@ -1353,6 +1359,10 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
 		{
             enableTapeEncoding();
         }
+		else if (source == convertTapeForTapeSimulatorBox)
+		{
+			enableTapeConversion();
+		}
 
         buildCommand();
     }	

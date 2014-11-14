@@ -61,6 +61,15 @@ class Assembler
 				String[] tapeArgs = buildCommand(false).toArray(new String[0]);
 				process = Runtime.getRuntime().exec(tapeArgs);
 				stdout = new BufferedReader(new InputStreamReader(process.getInputStream()));
+				
+				// Wait for the process to complete
+				try { process.waitFor(); }
+				catch(Exception ex) {}
+
+				if(AssemblerOptions.tape && AssemblerOptions.convertTapeForTapeSimulator)
+				{
+					convertTape(AssemblerOptions.tapePath);
+				}
 
 				// ...then generate deck
 				String[] deckArgs = buildCommand(true).toArray(new String[0]);
@@ -73,15 +82,19 @@ class Assembler
 				args[0] = AssemblerOptions.assemblerPath;
 				process = Runtime.getRuntime().exec(args);
 				stdout = new BufferedReader(new InputStreamReader(process.getInputStream()));
+
+				if(AssemblerOptions.tape && AssemblerOptions.convertTapeForTapeSimulator)
+				{
+					// Wait for the process to complete
+					try { process.waitFor(); }
+					catch(Exception ex) {}
+
+					convertTape(AssemblerOptions.tapePath);
+				}
 			}
 			
 			process = null;
 			
-			if(AssemblerOptions.tape && AssemblerOptions.convertTapeForTapeSimulator)
-			{
-				convertTape(AssemblerOptions.tapePath);
-			}
-
 			return true;
         }
         catch(IOException ex) 
