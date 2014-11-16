@@ -78,7 +78,7 @@ public class ConsoleFrame extends ChildFrame implements ActionListener, ChangeLi
     JCheckBox gCheckBox = new JCheckBox();
 
     private boolean enabled = true;
-    private static int A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6;
+    private final static int A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6;
 
     ConsoleFrame(final RopeFrame parent)
     {

@@ -424,10 +424,10 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
     {
 		clearListing();
 		
-        Vector v = filterListing();
+        ArrayList v = filterListing();
         if (v != null) 
 		{
-            listing.setListData(v);
+            listing.setListData(v.toArray());
 
             if (currentMessage == null) 
 			{
@@ -442,11 +442,11 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
 		}	
     }
 
-    private Vector filterListing()
+    private ArrayList filterListing()
     {
         boolean noErrors = !mainFrame.haveAssemblyErrors();
         boolean filtering = !showAllCheckBox.isSelected();
-        Vector v = new Vector();
+        ArrayList v = new ArrayList();
         String line;
         int index = 0;
         BufferedReader listFile = null;
@@ -481,7 +481,7 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
                         boolean breakable = noErrors && canHaveBreakpoint(line);
 
                         ListingLine listingLine = new ListingLine(line, breakable);
-                        v.addElement(listingLine);
+                        v.add(listingLine);
 
                         if (breakable) 
 						{
@@ -587,7 +587,7 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
 
 	private BreakpointSet saveActiveBreakpoints()
 	{
-		Vector<ListingLine> breakpoints = new Vector<ListingLine>();
+		ArrayList<ListingLine> breakpoints = new ArrayList<ListingLine>();
 
 		ListModel model = listing.getModel();
         int size = model.getSize();
@@ -628,7 +628,7 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
     private class ListingLine implements Cloneable
     {
         private String text;
-       private boolean breakable = true;
+        private boolean breakable = true;
         private boolean breakpoint = false;
         private Integer address = null;
 		
@@ -1049,7 +1049,7 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
     private class StandardErrorMonitor
         extends Thread
     {
-        private BufferedReader stderr;
+        private final BufferedReader stderr;
 
         StandardErrorMonitor(BufferedReader stderr)
         {
@@ -1259,9 +1259,9 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
 		private static final long serialVersionUID = 1L;
 		
 		String listingFile;					// The path to the listing file the breakpoints refer to
-		Vector<ListingLine> breakpoints;	// The lines with active breakpoint
+		ArrayList<ListingLine> breakpoints;	// The lines with active breakpoint
 		
-		BreakpointSet(String file, Vector<ListingLine> breakpoints)
+		BreakpointSet(String file, ArrayList<ListingLine> breakpoints)
 		{
 			this.listingFile = file;
 			this.breakpoints = breakpoints;
@@ -1300,7 +1300,7 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
 		{
 			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath)));
 			
-			Vector<ListingLine> breakpoints = new Vector<ListingLine>();
+			ArrayList<ListingLine> breakpoints = new ArrayList<ListingLine>();
 		
 			while(reader.ready())
 			{
@@ -1326,7 +1326,7 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
 
 	private void saveAs()
     {
-		Vector<RopeFileFilter> filters = new Vector<RopeFileFilter>();
+		ArrayList<RopeFileFilter> filters = new ArrayList<RopeFileFilter>();
 		filters.add(new RopeFileFilter(new String[] {".lst"}, "List files (*.lst)"));
 		filters.add(new RopeFileFilter(new String[] {".txt"}, "Text files (*.txt)"));
 

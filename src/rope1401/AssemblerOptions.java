@@ -9,7 +9,7 @@
 
 package rope1401;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
 class AssemblerOptions
 {
@@ -41,16 +41,16 @@ class AssemblerOptions
     static String tapePath;
     static String diagnosticPath;
     static String pageLength = "60";
-    static Vector<String> command;
+    static ArrayList<String> command;
 
     static boolean boot							= true;
     static boolean deckEncoding					= true;
-    static boolean tapeEncoding					= false;
+    static boolean tapeEncoding					= true;
     static boolean listing						= true;
     static boolean object						= true;
-    static boolean macro						= true;
+    static boolean tape							= true;
  	static boolean convertTapeForTapeSimulator	= false;
-    static boolean tape							= false;
+    static boolean macro						= true;
     static boolean diagnostic					= false;
     static boolean codeOk						= false;
     static boolean interleave					= false;

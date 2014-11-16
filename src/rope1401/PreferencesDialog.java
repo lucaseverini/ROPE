@@ -10,7 +10,7 @@ import java.awt.*;
 import java.awt.Dimension;
 import java.awt.event.*;
 import java.io.*;
-import java.util.Vector;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
@@ -175,7 +175,7 @@ public class PreferencesDialog extends JDialog implements ActionListener
 		getContentPane().add(mainPanel);
     }
 
-    private void browseAction(String title, String filePath, JTextField textField, Vector<RopeFileFilter> filters, 
+    private void browseAction(String title, String filePath, JTextField textField, ArrayList<RopeFileFilter> filters, 
 																				boolean directories, boolean multiple)
     {
         RopeFileChooser chooser = new RopeFileChooser(DataOptions.directoryPath, filePath, filters, directories, multiple);
@@ -183,7 +183,7 @@ public class PreferencesDialog extends JDialog implements ActionListener
 		
 		if(filters != null)
 		{
-			chooser.setFileFilter(filters.firstElement()); 
+			chooser.setFileFilter(filters.get(0)); 
 		}
 		
         chooser.open(this, textField, multiple);
@@ -289,10 +289,10 @@ public class PreferencesDialog extends JDialog implements ActionListener
 
         if (source == assemblerBrowseBtn) 
 		{
- 			Vector<RopeFileFilter> filters = null;
+ 			ArrayList<RopeFileFilter> filters = null;
 			if(RopeHelper.isWindows)
 			{
-				filters = new Vector<RopeFileFilter>();
+				filters = new ArrayList<RopeFileFilter>();
 				filters.add(new RopeFileFilter( new String[] {".exe",}, "Windows executable (*.exe)"));
 				// filters.add(new RopeFileFilter( new String[] {".bat",}, "Windows batch (*.bat)"));
 			}
@@ -300,10 +300,10 @@ public class PreferencesDialog extends JDialog implements ActionListener
         }
         else if (source == simulatorBrowseBtn) 
 		{
-			Vector<RopeFileFilter> filters = null;
+			ArrayList<RopeFileFilter> filters = null;
 			if(RopeHelper.isWindows)
 			{
-				filters = new Vector<RopeFileFilter>();
+				filters = new ArrayList<RopeFileFilter>();
 				filters.add(new RopeFileFilter( new String[] {".exe",}, "Windows executable (*.exe)"));
 				// filters.add(new RopeFileFilter( new String[] {".bat",}, "Windows batch (*.bat)"));
 			}

@@ -10,6 +10,8 @@
 package rope1401;
 
 import java.io.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 class Simulator
 {
@@ -248,6 +250,12 @@ class Simulator
 	@Override
     protected void finalize()
     {
-        cleanup();
+		cleanup();
+		
+		try 
+		{
+			super.finalize();
+		} 
+		catch (Throwable ex) {}
     }
 }

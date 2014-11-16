@@ -36,7 +36,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
     private ConsoleFrame consoleFrame;
     private TimerFrame timerFrame;
 	private MemoryFrame memoryFrame;
-    private Vector commandWindows = new Vector();
+    private ArrayList commandWindows = new ArrayList();
     private boolean packFrame = false;
 	private Preferences userPrefs = Preferences.userRoot();
 	private boolean closed;
@@ -274,7 +274,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 			printoutFrame.initialize();
 			printoutFrame.toFront();
 		
-			commandWindows.addElement(printoutFrame);
+			commandWindows.add(printoutFrame);
 
 			execFrame.toFront();
 			execFrame.setSelected(true);
@@ -311,7 +311,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 			
 			desktop.add(memoryFrame);
 
-			commandWindows.addElement(memoryFrame);
+			commandWindows.add(memoryFrame);
 			
 			try 
 			{
@@ -359,7 +359,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 					
 			desktop.add(consoleFrame);
 
-            commandWindows.addElement(consoleFrame);
+            commandWindows.add(consoleFrame);
         }
         else 
 		{
@@ -401,7 +401,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 			
 			desktop.add(timerFrame);
 
-            commandWindows.addElement(timerFrame);
+            commandWindows.add(timerFrame);
 		}
         else 
 		{
@@ -434,30 +434,30 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 
     void updateCommandWindows()
     {
-        Enumeration elements = commandWindows.elements();
-        while (elements.hasMoreElements()) 
+        Iterator iter = commandWindows.iterator();
+        while (iter.hasNext()) 
 		{
-            CommandWindow window = (CommandWindow) elements.nextElement();
+            CommandWindow window = (CommandWindow)iter.next();
             window.execute();
         }
     }
 
     void lockCommandWindows()
     {
-        Enumeration elements = commandWindows.elements();
-        while (elements.hasMoreElements()) 
+        Iterator iter = commandWindows.iterator();
+        while (iter.hasNext()) 
 		{
-            CommandWindow window = (CommandWindow) elements.nextElement();
+            CommandWindow window = (CommandWindow)iter.next();
             window.lock();
         }
     }
 
     void unlockCommandWindows()
     {
-        Enumeration elements = commandWindows.elements();
-        while (elements.hasMoreElements()) 
+        Iterator iter = commandWindows.iterator();
+        while (iter.hasNext()) 
 		{
-            CommandWindow window = (CommandWindow) elements.nextElement();
+            CommandWindow window = (CommandWindow)iter.next();
             window.unlock();
         }
     }

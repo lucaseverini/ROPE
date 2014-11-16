@@ -13,6 +13,7 @@ import java.awt.*;
 import java.awt.Dimension;
 import java.awt.event.*;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -870,9 +871,9 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
 		AssemblerOptions.convertTapeForTapeSimulator = convertTapeForTapeSimulatorBox.isSelected();
 	}
 
-    Vector<String> buildCommand()
+    ArrayList<String> buildCommand()
     {
-        Vector<String> command = new Vector<String>();
+        ArrayList<String> command = new ArrayList<String>();
 
         command.add(assemblerText.getText());
 
@@ -1065,7 +1066,7 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
         return command;
     }
 
-    private void browseAction(String title, String filePath, JTextField textField, Vector<RopeFileFilter> filters, 
+    private void browseAction(String title, String filePath, JTextField textField, ArrayList<RopeFileFilter> filters, 
 																				boolean directories, boolean multiple)
     {
 		if(selectedPath == null)
@@ -1234,10 +1235,10 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
 
         if (source == assemblerBrowseButton) 
 		{
- 			Vector<RopeFileFilter> filters = null;
+ 			ArrayList<RopeFileFilter> filters = null;
 			if(RopeHelper.isWindows)
 			{
-				filters = new Vector<RopeFileFilter>();
+				filters = new ArrayList<RopeFileFilter>();
 				filters.add(new RopeFileFilter( new String[] {".exe",}, "Windows executable (*.exe)"));
 			}
 			
@@ -1247,7 +1248,7 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
         }
         else if (source == listingBrowseButton) 
 		{
-			Vector<RopeFileFilter> filters = new Vector<RopeFileFilter>();
+			ArrayList<RopeFileFilter> filters = new ArrayList<RopeFileFilter>();
 			filters.add(new RopeFileFilter( new String[] {".lst", ".txt"}, "Assembly files (*.lst, *.txt)"));
 			
             browseAction("Listing file selection", null, listingText, filters, false, false);
@@ -1256,7 +1257,7 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
         }
         else if (source == objectBrowseButton) 
 		{
-			Vector<RopeFileFilter> filters = new Vector<RopeFileFilter>();
+			ArrayList<RopeFileFilter> filters = new ArrayList<RopeFileFilter>();
 			filters.add(new RopeFileFilter( new String[] {".cd", ".crd", ".obj"}, "Object deck files (*.cd, *.crd, *.obj)"));
 			
             browseAction("Object file selection", null, objectText, filters, false, false);

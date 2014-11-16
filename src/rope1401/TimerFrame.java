@@ -213,7 +213,7 @@ public class TimerFrame extends ChildFrame implements ActionListener, CommandWin
         long seconds = time/SECOND;
         long millis  = time - seconds*SECOND;
 
-        StringBuffer buffer = new StringBuffer(64);
+        StringBuilder buffer = new StringBuilder(64);
         buffer.append(NN.format(days)).append(" days ")
               .append(NN.format(hours)).append(" hours ")
               .append(NN.format(minutes)).append(" minutes ")

@@ -56,7 +56,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 	private String fileExt;
 	private boolean assembleFailed;
     private boolean haveAssemblyErrors;
-    private Vector messages;
+    private ArrayList messages;
 	private boolean sourceChanged;
 	public String sourcePath;
 	private Document document;
@@ -405,8 +405,8 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 
     private class AssemblyFileFilter extends FileFilter
     {
-        private String extensions[];
-        private String description;
+        private final String extensions[];
+        private final String description;
 
         public AssemblyFileFilter(String extensions[], String description)
         {
@@ -497,7 +497,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 			}
 		}
 
-		Vector<RopeFileFilter> filters = new Vector<RopeFileFilter>();
+		ArrayList<RopeFileFilter> filters = new ArrayList<RopeFileFilter>();
 		filters.add(new RopeFileFilter(new String[] {".a", ".asm", ".aut", ".s"}, "Assembly files (*.a *.asm *.aut *.s)"));
 		filters.add(new RopeFileFilter(new String[] {".m", ".mac"}, "Macro files (*.m *.mac)"));
 		filters.add(new RopeFileFilter(new String[] {".lst"}, "List files (*.lst)"));
@@ -505,7 +505,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 
 		RopeFileChooser chooser = new RopeFileChooser(selectedPath, null, filters);
 		chooser.setDialogTitle("Source document selection");
-		chooser.setFileFilter(filters.firstElement());
+		chooser.setFileFilter(filters.get(0));
 		chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 		
         File file = chooser.open(this, fileText);
@@ -688,7 +688,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 	
 	public void saveAs()
 	{
-		Vector<RopeFileFilter> filters = new Vector<RopeFileFilter>();
+		ArrayList<RopeFileFilter> filters = new ArrayList<RopeFileFilter>();
 		
 		if(fileExt.equals("m") || fileExt.equals("mac"))
 		{
@@ -753,7 +753,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
     private void assembleAction()
     {
         String line;
-        messages = new Vector();
+        messages = new ArrayList();
 
         mainFrame.resetExecWindow();
 
@@ -766,7 +766,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 		{
 			while ((line = Assembler.output()) != null) 
 			{
-				messages.addElement(line);
+				messages.add(line);
 			}
 
 			Assembler.setPaths(baseName, sourcePath);
@@ -777,7 +777,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 				{
 					System.out.println(line);
 					
-					messages.addElement(line);
+					messages.add(line);
 					
 					if(line.startsWith(" [ERROR:"))
 					{
@@ -785,7 +785,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 					}
 				}
 
-				messageList.setListData(messages);
+				messageList.setListData(messages.toArray());
 				messageList.ensureIndexIsVisible(0);
 
 				mainFrame.showExecWindow(baseName);
@@ -828,7 +828,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 
 	private void highlightError(int index)
     {
-        String message = (String) messages.elementAt(index);
+        String message = (String) messages.get(index);
         int i = message.indexOf(":");
 
         if ((i != -1) && (i < 10)) 

@@ -47,7 +47,7 @@ public class ClipboardListener extends Thread implements ClipboardOwner
 		{
 			try 
 			{
-				sleep(100);
+				Thread.sleep(100);
 			}
 			catch(InterruptedException ex) {}
 		}  

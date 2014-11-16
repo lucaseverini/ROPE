@@ -13,7 +13,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Vector;
 import javax.swing.*;
 import javax.swing.border.*;
 
@@ -369,7 +368,7 @@ public class DataDialog extends JDialog implements ActionListener
         }
     }
 
-    private String browseAction(String filePath, JTextField textField, Vector<RopeFileFilter> filters)
+    private String browseAction(String filePath, JTextField textField, ArrayList<RopeFileFilter> filters)
     {
         RopeFileChooser chooser = new RopeFileChooser(DataOptions.directoryPath, filePath, filters);
         File choice = chooser.open(this, textField);
@@ -425,8 +424,8 @@ public class DataDialog extends JDialog implements ActionListener
         File objectFile = new File(AssemblerOptions.objectPath);
         String objectName = objectFile.getName();
         String cardDeckName = cardDeckFile.getName();
-        String name1 = new String(objectName);
-        String name2 = new String(cardDeckName);
+        String name1 = objectName;
+        String name2 = cardDeckName;
 
         int index = name1.lastIndexOf(".");
         if (index != -1)

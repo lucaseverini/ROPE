@@ -184,6 +184,7 @@ public class MemoryFrame extends ChildFrame implements ActionListener, ChangeLis
                                                 new Insets(5, 10, 5, 0), 0, 0));
     }
 
+	@Override
     public void execute()
     {
         if (autoCheckBox.isSelected()) 
@@ -196,16 +197,19 @@ public class MemoryFrame extends ChildFrame implements ActionListener, ChangeLis
         }
     }
 
+	@Override
     public void lock()
     {
         showButton.setEnabled(false);
     }
 
+	@Override
     public void unlock()
     {
         showButton.setEnabled(true);
     }
 
+	@Override
     public void stateChanged(ChangeEvent event)
     {
         if (event.getSource() == barsCheckBox) 
@@ -214,6 +218,7 @@ public class MemoryFrame extends ChildFrame implements ActionListener, ChangeLis
         }
     }
 
+	@Override
     public void actionPerformed(ActionEvent event)
     {
         Object button = event.getSource();
@@ -250,7 +255,7 @@ public class MemoryFrame extends ChildFrame implements ActionListener, ChangeLis
 
         int offset = to - from;
         int last = offset - offset%50 + from;
-        StringBuffer buffer = new StringBuffer(1024);
+        StringBuilder buffer = new StringBuilder(1024);
 
 		if(Simulator.isActive())
 		{
@@ -266,8 +271,8 @@ public class MemoryFrame extends ChildFrame implements ActionListener, ChangeLis
 						buffer.append(text).append('\n');
 					}
 
-					int i = text.indexOf(":");
-					if ((i != -1) && (i <= 5)) 
+					int i = (text == null) ? -1 : text.indexOf(":");
+					if (i != -1 && i <= 5) 
 					{
 						try 
 						{

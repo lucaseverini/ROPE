@@ -10,7 +10,7 @@
 package rope1401;
 
 import java.io.*;
-import java.util.Vector;
+import java.util.ArrayList;
 
 class Assembler
 {
@@ -55,7 +55,7 @@ class Assembler
 			Simulator.kill();
 						
 			if(AssemblerOptions.tape && AssemblerOptions.tapeEncoding && 
-							AssemblerOptions.tapeEncodingChoice != AssemblerOptions.deckEncodingChoice)
+							!AssemblerOptions.tapeEncodingChoice.equals(AssemblerOptions.deckEncodingChoice))
 			{
 				// Generate tape first...
 				String[] tapeArgs = buildCommand(false).toArray(new String[0]);
@@ -168,9 +168,9 @@ class Assembler
         }		
 	}
 
-    static Vector<String> buildCommand(boolean forDeckOrTape)
+    static ArrayList<String> buildCommand(boolean forDeckOrTape)
     {
-        Vector<String> command = new Vector<String>();
+        ArrayList<String> command = new ArrayList<String>();
 
 		command.add(AssemblerOptions.assemblerPath);
 
@@ -198,19 +198,19 @@ class Assembler
 			{
 				command.add("-e");
 
-				if(AssemblerOptions.deckEncodingChoice == AssemblerOptions.ENCODING_SIMH)
+				if(AssemblerOptions.deckEncodingChoice.equals(AssemblerOptions.ENCODING_SIMH))
 				{
 					command.add("S");
 				}
-				else if(AssemblerOptions.deckEncodingChoice == AssemblerOptions.ENCODING_A)
+				else if(AssemblerOptions.deckEncodingChoice.equals(AssemblerOptions.ENCODING_A))
 				{
 					command.add("A");
 				}
-				else if(AssemblerOptions.deckEncodingChoice == AssemblerOptions.ENCODING_H)
+				else if(AssemblerOptions.deckEncodingChoice.equals(AssemblerOptions.ENCODING_H))
 				{
 					command.add("H");
 				}
-				else if(AssemblerOptions.deckEncodingChoice == AssemblerOptions.ENCODING_PRINT)
+				else if(AssemblerOptions.deckEncodingChoice.equals(AssemblerOptions.ENCODING_PRINT))
 				{
 					command.add("?");
 				}
@@ -229,15 +229,15 @@ class Assembler
 			{
 				command.add("-e");
 
-				if(AssemblerOptions.tapeEncodingChoice == AssemblerOptions.ENCODING_SIMH)
+				if(AssemblerOptions.tapeEncodingChoice.equals(AssemblerOptions.ENCODING_SIMH))
 				{
 					command.add("S");
 				}
-				else if(AssemblerOptions.tapeEncodingChoice == AssemblerOptions.ENCODING_A)
+				else if(AssemblerOptions.tapeEncodingChoice.equals(AssemblerOptions.ENCODING_A))
 				{
 					command.add("A");
 				}
-				else if(AssemblerOptions.tapeEncodingChoice == AssemblerOptions.ENCODING_H)
+				else if(AssemblerOptions.tapeEncodingChoice.equals(AssemblerOptions.ENCODING_H))
 				{
 					command.add("H");
 				}
