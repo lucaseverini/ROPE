@@ -69,7 +69,7 @@ class AssemblerOptions
     static boolean extrasQueue    = false;
     static boolean extrasReloader = false;
 
-    static int bootLoader = BOOT_IBM;
+    static int bootLoader = BOOT_VAN_2;
     static int coreSize   = SIZE_16000;
 	
 	static boolean saveBeforeAssembly = false;
