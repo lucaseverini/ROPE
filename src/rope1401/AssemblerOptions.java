@@ -49,7 +49,7 @@ class AssemblerOptions
     static boolean listing						= true;
     static boolean object						= true;
     static boolean tape							= true;
- 	static boolean convertTapeForTapeSimulator	= false;
+ 	static boolean convertTapeForTapeSimulator	= true;
     static boolean macro						= true;
     static boolean diagnostic					= false;
     static boolean codeOk						= false;
