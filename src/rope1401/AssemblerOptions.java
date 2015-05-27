@@ -3,7 +3,7 @@
  * <p>Description: </p>
  * <p>Copyright: Copyright (c) 2005</p>
  * <p>Company: NASA Ames Research Center</p>
- * @author Ronald Mak
+ * @author Ronald Mak & Luca Severini <lucaseverini@mac.com>
  * @version 2.0
  */
 
@@ -23,7 +23,7 @@ class AssemblerOptions
     static final int SIZE_4000  =  4000;
     static final int SIZE_8000  =  8000;
     static final int SIZE_12000 = 12000;
-    static final int SIZE_16000 = 14000;
+    static final int SIZE_16000 = 16000;
 
     static final String ENCODING_SIMH  = "S";
     static final String ENCODING_A     = "A";
@@ -69,7 +69,7 @@ class AssemblerOptions
     static boolean extrasQueue    = false;
     static boolean extrasReloader = false;
 
-    static int bootLoader = BOOT_VAN_2;
+    static int bootLoader = BOOT_IBM;
     static int coreSize   = SIZE_16000;
 	
 	static boolean saveBeforeAssembly = false;

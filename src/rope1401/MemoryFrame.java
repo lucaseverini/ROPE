@@ -1,9 +1,9 @@
 /**
- * <p>Title: </p>
+ * <p>Title: MemoryFrame.java</p>
  * <p>Description: </p>
  * <p>Copyright: Copyright (c) 2005</p>
  * <p>Company: NASA Ames Research Center</p>
- * @author Ronald Mak
+ * @author Ronald Mak & Luca Severini <lucaseverini@mac.com>
  * @version 2.0
  */
 
@@ -17,6 +17,7 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.swing.*;
 import javax.swing.event.*;
+import javax.swing.text.DefaultCaret;
 
 public class MemoryFrame extends ChildFrame implements ActionListener, ChangeListener, CommandWindow
 {
@@ -83,6 +84,9 @@ public class MemoryFrame extends ChildFrame implements ActionListener, ChangeLis
         showButton.addActionListener(this);
         barsCheckBox.addChangeListener(this);
 		
+		DefaultCaret caret = (DefaultCaret)memoryArea.getCaret();
+		caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
+		
 		showMemory();
 	}
 
@@ -139,7 +143,7 @@ public class MemoryFrame extends ChildFrame implements ActionListener, ChangeLis
         toLabel.setText("to");
         toText.setMinimumSize(new Dimension(56, 20));
         toText.setPreferredSize(new Dimension(56, 20));
-        toText.setText("512");
+        toText.setText("1512");
         showButton.setText("Update");
         autoCheckBox.setText("Auto update");
         barsCheckBox.setText("Bars");

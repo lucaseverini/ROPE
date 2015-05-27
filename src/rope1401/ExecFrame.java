@@ -1,9 +1,9 @@
 /**
- * <p>Title: </p>
+ * <p>Title: ExecFrame.java</p>
  * <p>Description: </p>
  * <p>Copyright: Copyright (c) 2005</p>
  * <p>Company: NASA Ames Research Center</p>
- * @author Ronald Mak
+ * @author Ronald Mak & Luca Severini <lucaseverini@mac.com>
  * @version 2.0
  */
 
@@ -901,6 +901,7 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
             synchronized(Simulator.class) 
 			{
                 Simulator.execute("b cdr");
+				
                 processOutput();
             }
 
@@ -1015,8 +1016,7 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
         mainFrame.createTimerFrame();
     }
 
-    private class AutoStepper
-        extends Thread
+    private class AutoStepper extends Thread
     {
 		@Override
         public void run()
@@ -1032,7 +1032,6 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
                     Thread.sleep(autoStepWaitTime);
                 }
                 catch (InterruptedException ignore) {}
-
             }
             while (autoStepping && (message != null) && message.startsWith("Step"));
 
@@ -1046,8 +1045,7 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
         }
     }
 
-    private class StandardErrorMonitor
-        extends Thread
+    private class StandardErrorMonitor extends Thread
     {
         private final BufferedReader stderr;
 
@@ -1061,7 +1059,8 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
         {
             int ch;
 
-            try {
+            try 
+			{
                 if (stderr != null) 
 				{
                     while ((ch = stderr.read()) != -1)

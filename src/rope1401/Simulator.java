@@ -1,9 +1,9 @@
 /**
- * <p>Title: </p>
+ * <p>Title: Simulator.java</p>
  * <p>Description: </p>
  * <p>Copyright: Copyright (c) 2005</p>
  * <p>Company: NASA Ames Research Center</p>
- * @author Ronald Mak
+ * @author Ronald Mak & Luca Severini <lucaseverini@mac.com>
  * @version 2.0
  */
 
@@ -62,7 +62,6 @@ class Simulator
 			
 			if(SimulatorOptions.useOldConversion)
 			{
-				// send "SET CPU OLDCONVERSIONS" to use the old conversion
 				execute("SET CPU OLDCONVERSIONS");
 			}
 
@@ -142,20 +141,24 @@ class Simulator
 
     static boolean hasOutput()
     {
-        try {
+        try 
+		{
             return stdout.ready();
         }
         catch (IOException ex) 
 		{
             ex.printStackTrace();
+			
             return false;
         }
     }
 
     static boolean hasOutput(int waitTime)
     {
-        try {
+        try 
+		{
             Thread.sleep(waitTime);
+			
             return stdout.ready();
         }
         catch (IOException ex) 
@@ -172,7 +175,8 @@ class Simulator
 
     static String output()
     {
-        try {
+        try 
+		{
  			String output = stdout.readLine();
 			
             simulatorElapsedTime += System.currentTimeMillis() - simulatorStartTime;
@@ -185,6 +189,7 @@ class Simulator
         catch (IOException ex) 
 		{
             ex.printStackTrace();
+			
             return null;
         }
     }

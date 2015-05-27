@@ -1,9 +1,9 @@
 /**
- * <p>Title: </p>
+ * <p>Title: PrintoutFrame.java</p>
  * <p>Description: </p>
  * <p>Copyright: Copyright (c) 2005</p>
  * <p>Company: NASA Ames Research Center</p>
- * @author Ronald Mak
+ * @author Ronald Mak & Luca Severini <lucaseverini@mac.com>
  * @version 2.0
  */
 
@@ -221,6 +221,8 @@ public class PrintoutFrame extends ChildFrame implements Printable, ActionListen
 			{
                 printout.close();
             }
+			
+			System.out.println("#####" + DataOptions.outputPath);
 
             printout = new BufferedReader(new FileReader(DataOptions.outputPath));
             printoutArea.setText(null);
