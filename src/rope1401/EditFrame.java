@@ -42,6 +42,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
     JButton optionsButton = new JButton();
     JButton assembleButton = new JButton();
     JButton saveButton = new JButton();
+	JButton saveMessagesButton = new JButton();
     JPanel positionPanel = new JPanel();
     JLabel lineLabel = new JLabel();
     JTextField lineText = new JTextField();
@@ -86,6 +87,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
         optionsButton.addActionListener(this);
         assembleButton.addActionListener(this);
         saveButton.addActionListener(this);
+        saveMessagesButton.addActionListener(this);
 
         messageList.addMouseListener(new MouseAdapter()
         {
@@ -315,6 +317,8 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
         assembleButton.setText("Assemble file");
         saveButton.setEnabled(false);
         saveButton.setText("Save file");
+        saveMessagesButton.setEnabled(true);
+        saveMessagesButton.setText("Save messages ...");
         lineLabel.setText("Line:");
         lineText.setMinimumSize(new Dimension(50, 20));
         lineText.setPreferredSize(new Dimension(50, 20));
@@ -351,8 +355,44 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
                                                 GridBagConstraints.CENTER,
                                                 GridBagConstraints.HORIZONTAL,
                                                 new Insets(5, 5, 0, 5), 0, 0));
-        controlPanel.add(optionsButton,
-                         new GridBagConstraints(2, 1, 1, 1, 1.0, 0.0,
+        controlPanel.add(positionPanel,
+                         new GridBagConstraints(0, 1, 4, 1, 0.8, 0.0,
+                                                GridBagConstraints.WEST,
+                                                GridBagConstraints.NONE,
+                                                new Insets(5, 5, 0, 0), 0, 0));
+		positionPanel.add(lineLabel,
+                          new GridBagConstraints(0, 0, 1, 1, 0.6, 0.0,
+                                                 GridBagConstraints.WEST,
+                                                 GridBagConstraints.NONE,
+                                                 new Insets(0, 0, 0, 0), 0, 0));
+		positionPanel.add(lineText,
+                          new GridBagConstraints(1, 0, 1, 1, 0.6, 0.0,
+                                                 GridBagConstraints.WEST,
+                                                 GridBagConstraints.NONE,
+                                                 new Insets(0, 5, 0, 0), 0, 0));
+        positionPanel.add(columnLabel,
+                          new GridBagConstraints(2, 0, 1, 1, 0.7, 0.0,
+                                                 GridBagConstraints.WEST,
+                                                 GridBagConstraints.NONE,
+                                                 new Insets(0, 10, 0, 0), 0, 0));
+        positionPanel.add(columnText,
+                          new GridBagConstraints(3, 0, 1, 1, 0.7, 0.0,
+                                                 GridBagConstraints.WEST,
+                                                 GridBagConstraints.NONE,
+                                                 new Insets(0, 5, 0, 0), 0, 0));
+        controlPanel.add(messageScrollPane,
+                         new GridBagConstraints(0, 2, 5, 1, 1.0, 1.0,
+                                                GridBagConstraints.CENTER,
+                                                GridBagConstraints.BOTH,
+                                                new Insets(5, 5, 5, 5), 0, 0));
+		controlPanel.add(saveMessagesButton,
+                         new GridBagConstraints(1, 1, 1, 1, 0.1, 0.0,
+                                                GridBagConstraints.EAST,
+                                                GridBagConstraints.NONE,
+                                                new Insets(5, 5, 0, 0), 0, 0));
+
+		controlPanel.add(optionsButton,
+                         new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0,
                                                 GridBagConstraints.EAST,
                                                 GridBagConstraints.NONE,
                                                 new Insets(5, 5, 0, 0), 0, 0));
@@ -363,40 +403,10 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
                                                 new Insets(5, 5, 0, 0), 0, 0));
         controlPanel.add(saveButton,
                          new GridBagConstraints(4, 1, 1, 1, 0.0, 0.0,
-                                                GridBagConstraints.CENTER,
-                                                GridBagConstraints.HORIZONTAL,
-                                                new Insets(5, 5, 0, 5), 0, 0));
-        controlPanel.add(positionPanel,
-                         new GridBagConstraints(0, 1, 2, 1, 0.0, 0.0,
-                                                GridBagConstraints.CENTER,
+                                                GridBagConstraints.EAST,
                                                 GridBagConstraints.NONE,
-                                                new Insets(5, 5, 0, 0), 0, 0));
-		positionPanel.add(lineLabel,
-                          new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-                                                 GridBagConstraints.EAST,
-                                                 GridBagConstraints.NONE,
-                                                 new Insets(0, 0, 0, 0), 0, 0));
-		positionPanel.add(lineText,
-                          new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-                                                 GridBagConstraints.EAST,
-                                                 GridBagConstraints.NONE,
-                                                 new Insets(0, 5, 0, 0), 0, 0));
-        positionPanel.add(columnLabel,
-                          new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-                                                 GridBagConstraints.EAST,
-                                                 GridBagConstraints.NONE,
-                                                 new Insets(0, 10, 0, 0), 0, 0));
-        positionPanel.add(columnText,
-                          new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
-                                                 GridBagConstraints.EAST,
-                                                 GridBagConstraints.NONE,
-                                                 new Insets(0, 5, 0, 0), 0, 0));
-        controlPanel.add(messageScrollPane,
-                         new GridBagConstraints(0, 2, 5, 1, 1.0, 1.0,
-                                                GridBagConstraints.CENTER,
-                                                GridBagConstraints.BOTH,
-                                                new Insets(5, 5, 5, 5), 0, 0));
-	}
+                                                new Insets(5, 5, 0, 5), 0, 0));
+ 	}
 
     boolean haveAssemblyErrors()
     {
@@ -457,7 +467,11 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
         }
         else if (button == saveButton) 
 		{
-            save();
+            saveAction();
+        }
+        else if (button == saveMessagesButton) 
+		{
+            saveMessagesAction();
         }
         else if (button == optionsButton) 
 		{
@@ -629,8 +643,13 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 		
 		return result;
 	}	
-	
-    public void save()
+
+	public void saveMessagesAction()
+    {
+		System.out.println("Not implemented yet.");
+	}
+		
+    public void saveAction()
     {
 		BufferedWriter sourceFile = null;
 
@@ -755,9 +774,12 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
         String line;
         messages = new ArrayList();
 
+		// Removes the .lst, .cd and .out files
+		removeAssemblerFiles(sourcePath);
+
         mainFrame.resetExecWindow();
 
-        save();
+        saveAction();
 		
 		assembleFailed = false;
         haveAssemblyErrors = false;
@@ -814,7 +836,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 	{
 		if(sourceArea != null)
 		{
-			save();
+			saveAction();
 		}
 	}
 
@@ -831,7 +853,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
         String message = (String) messages.get(index);
         int i = message.indexOf(":");
 
-        if ((i != -1) && (i < 10)) 
+        if ((i != -1) && (i < 10) && Character.isDigit(message.charAt(i - 1))) 
 		{
 			try 
 			{
@@ -1186,5 +1208,46 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 		}
 		
 		return source;
+	}
+	
+	void removeAssemblerFiles(String sourcePath)
+	{
+		if (sourcePath == null || sourcePath.length() == 0)
+		{
+			return;
+		}
+		
+		String basePath = "";
+		int endIndex = sourcePath.lastIndexOf(".");
+		if (endIndex != -1)  
+		{
+			basePath = sourcePath.substring(0, endIndex);
+		}
+
+		System.out.println(basePath);
+		
+		try{  		
+    		File file = new File(basePath + ".cd");   
+			if(file.exists())
+			{
+				file.delete();
+			}
+			
+    		file = new File(basePath + ".lst");  
+			if(file.exists())
+			{
+				file.delete();
+			}
+			
+			file = new File(basePath + ".out");       
+			if(file.exists())
+			{
+				file.delete();
+			}
+	   	}
+		catch(Exception ex) 
+		{
+			ex.printStackTrace();
+		}
 	}
 }

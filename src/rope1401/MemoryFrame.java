@@ -258,37 +258,47 @@ public class MemoryFrame extends ChildFrame implements ActionListener, ChangeLis
         setTitle("MEMORY: " + from + " - " + to);
 
         int offset = to - from;
-        int last = offset - offset%50 + from;
+        int last = offset - (offset % 50) + from;
         StringBuilder buffer = new StringBuilder(1024);
 
 		if(Simulator.isActive())
 		{
 			synchronized(Simulator.class) 
 			{
+				Simulator.output();		// Clean previous output
+				
 				Simulator.execute("e -d " + from + "-" + to);
 				for (; ; ) 
 				{
 					String text = Simulator.output();
-
-					if ((text != null) && (text.length() > 0)) 
+					if (TextIsValidForMemoryDump(text)) 
 					{
-						buffer.append(text).append('\n');
-					}
-
-					int i = (text == null) ? -1 : text.indexOf(":");
-					if (i != -1 && i <= 5) 
-					{
-						try 
+						int idx = text.indexOf(":");
+						if(idx > 0 && idx <= 6)
 						{
-							int address = Integer.parseInt(text.substring(0, i));
-							if (address == last) 
-							{
-								break;
-							}
+							StringBuilder strBuild = new StringBuilder(text);
+							strBuild.setCharAt(idx, ' ');
+							text = strBuild.toString();
+							// text = text.replace(":", " ");
 						}
-						catch (Exception ex) 
+						
+						buffer.append(text).append('\n');
+
+						if (idx <= 6) 
 						{
-							ex.printStackTrace();
+							try 
+							{
+								String numberStr = text.substring(0, idx).replaceAll("[^0-9]", "");
+								int address = Integer.parseInt(numberStr);
+								if (address == last) 
+								{
+									break;
+								}
+							}
+							catch (Exception ex) 
+							{
+								ex.printStackTrace();
+							}
 						}
 					}
 				}
@@ -326,5 +336,24 @@ public class MemoryFrame extends ChildFrame implements ActionListener, ChangeLis
 		{
 			Logger.getLogger(RopeFrame.class.getName()).log(Level.SEVERE, null, ex);
 		}
+	}
+	
+	boolean TextIsValidForMemoryDump (String text)
+	{
+		if(text == null || text.length() < 7)
+		{
+			return false;
+		}
+		
+		for(int idx = 0; idx < 7; idx++)
+		{
+			char ch = text.charAt(idx);
+			if(!Character.isDigit(ch) && ch != ' ' && ch != ':')
+			{
+				return false;
+			}
+		}
+		
+		return true;
 	}
 }

@@ -20,6 +20,7 @@ class Simulator
     private static BufferedReader stderr;
     private static Process process;
     private static boolean isActive;
+    private static boolean isBusy;
 
     private static long wallStartTime;
     private static long simulatorStartTime;
@@ -27,6 +28,11 @@ class Simulator
 
     private static boolean timersReset = true;
 	
+	static boolean isBusy()
+	{
+		return isBusy;
+	}
+
 	static boolean isActive()
 	{
 		return isActive;
@@ -177,7 +183,19 @@ class Simulator
     {
         try 
 		{
- 			String output = stdout.readLine();
+			String output = "";
+			if(stdout.ready())
+			{
+				output = stdout.readLine();
+				
+				isBusy = false;
+			}
+			else
+			{
+				System.out.println("Not ready");
+				
+				isBusy = true;
+			}
 			
             simulatorElapsedTime += System.currentTimeMillis() - simulatorStartTime;
             simulatorStartTime = System.currentTimeMillis();
@@ -221,6 +239,7 @@ class Simulator
             System.out.println("Simulator killed");
 			
 			isActive = false;
+			isBusy = false;
         }
     }
 

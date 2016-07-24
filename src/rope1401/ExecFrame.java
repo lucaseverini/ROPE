@@ -731,7 +731,7 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
 		{
             message = Simulator.output();
 
-            if ((message != null) && (message.length() > 0)) 
+            if (message != null && message.length() > 0) 
 			{
                 writeMessage(Color.BLUE, message);
             }
@@ -740,7 +740,7 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
         }
         while (Simulator.hasOutput());
 
-        if (message != null) 
+        if (message != null && message.length() > 0) 
 		{
             selectCurrentLine(message);
         }
@@ -860,7 +860,9 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
 
         simulatorRunning = false;
         programRunning = false;
+		
         simulatorButton.setText("Restart simulator");
+		startButton.setText("Start program");
     }
 
     private void optionsAction()
@@ -905,17 +907,29 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
                 processOutput();
             }
 
-            startButton.setText("Continue program");
             dataButton.setEnabled(false);
             quitButton.setEnabled(true);
             singleStepButton.setEnabled(true);
             autoStepButton.setEnabled(true);
-
+						
             programRunning = true;
         }
 
         mainFrame.updateCommandWindows();
         mainFrame.enableSenseSwitches();
+		
+		if(Simulator.isBusy())
+		{
+			startButton.setText("Break program");
+			
+			quitButton.setEnabled(false);
+            singleStepButton.setEnabled(false);
+            autoStepButton.setEnabled(false);
+		}
+		else
+		{
+			startButton.setText("Continue program");
+		}
     }
 
     private void quitAction()

@@ -97,7 +97,8 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
         this.setSize(frameSize);
         this.setLocation((screenSize.width - frameSize.width) / 2, 10);
 		
-        this.setTitle(MessageFormat.format(RopeResources.getString("RopeFrameTitle"), RopeResources.getString("RopeVersion")));
+		String ropeVersion = MessageFormat.format(RopeResources.getString("RopeVersion"), RopeResources.getBuildString("BuildNumber"));
+        this.setTitle(MessageFormat.format(RopeResources.getString("RopeFrameTitle"), ropeVersion));
     
         JPanel contentPanel = (JPanel)this.getContentPane();
         contentPanel.add(desktop);
@@ -764,7 +765,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 	
 	public boolean aboutRope() 
 	{	
-		String ropeVersion = RopeResources.getString("RopeVersion");
+		String ropeVersion = MessageFormat.format(RopeResources.getString("RopeVersion"), RopeResources.getBuildString("BuildNumber"));
 		String s1 = RopeResources.getString("AboutText1");
 
 		String s2 = MessageFormat.format(RopeResources.getString("AboutText2"), ropeVersion);
@@ -810,7 +811,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 			}
 			else if (result == JOptionPane.YES_OPTION)
 			{
-				editFrame.save();
+				editFrame.saveAction();
 			}
 		}
 	
