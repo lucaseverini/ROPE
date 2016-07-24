@@ -26,8 +26,7 @@ public class RopeResources
 	{
 		try
 		{
-			strings = ResourceBundle.getBundle("rope1401.Resources.Strings");
-			
+			strings = ResourceBundle.getBundle("rope1401.Resources.Strings");			
 			buildTimeStrings = ResourceBundle.getBundle("rope1401.Resources.BuildTimeStrings");
 		}
 		catch(Exception ex)
