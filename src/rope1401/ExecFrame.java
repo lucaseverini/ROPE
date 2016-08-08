@@ -630,7 +630,7 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
         private String text;
         private boolean breakable = true;
         private boolean breakpoint = false;
-        private Integer address = null;
+        private Integer address = 0;
 		
         ListingLine(String text, boolean breakable)
         {
@@ -722,29 +722,44 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
         }
     }
 
-    private String processOutput()
+    private String processOutput(boolean restart)
     {
         String message = null;
+		
         clearMessage();
 
-        do 
+		while(true)
 		{
-            message = Simulator.output();
-
-            if (message != null && message.length() > 0) 
+			do 
 			{
-                writeMessage(Color.BLUE, message);
-            }
+				message = Simulator.output();
 
-			// System.out.println(message);
-        }
-        while (Simulator.hasOutput());
+				if (message != null && message.length() > 0) 
+				{
+					writeMessage(Color.BLUE, message);
+				}
+			}
+			while (Simulator.hasOutput());
 
-        if (message != null && message.length() > 0) 
-		{
-            selectCurrentLine(message);
-        }
-
+			if (message != null && message.length() > 0) 
+			{
+				if(message.startsWith("IBM 1401 simulator"))
+				{
+					// When the message from simh is the boot information "IBM 1401 simulator V..." and is a restart
+					// then continue to get the output from simh because there should be more...
+					if(!restart)
+					{
+						break;
+					}
+				}
+				else
+				{
+					selectCurrentLine(message);
+					break;
+				}
+			}
+		}
+		
         return message;
     }
 
@@ -803,7 +818,7 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
 				return false;
 			}
 			
-            processOutput();
+            processOutput(false);
         }
 
         Thread monitor = new StandardErrorMonitor(Simulator.getStderr());
@@ -895,7 +910,8 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
             synchronized(Simulator.class) 
 			{
                 Simulator.execute("c");
-                processOutput();
+				
+                processOutput(true);
             }
         }
         else 
@@ -904,7 +920,7 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
 			{
                 Simulator.execute("b cdr");
 				
-                processOutput();
+                processOutput(false);
             }
 
             dataButton.setEnabled(false);
@@ -937,7 +953,8 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
         synchronized(Simulator.class) 
 		{
             Simulator.stop();
-            processOutput();
+			
+            processOutput(false);
         }
 
         startButton.setText("Start program");
@@ -952,6 +969,8 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
         showMemoryButton.setEnabled(false);
         showConsoleButton.setEnabled(false);
 		
+		listing.clearSelection();
+
         clearBreakpoints();
 		
         mainFrame.lockCommandWindows();
@@ -967,9 +986,17 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
 
         synchronized(Simulator.class) 
 		{
-            Simulator.execute("s");
-            message = processOutput();
-        }
+			if(nextLineHasBreakpoint())
+			{
+				Simulator.execute("s 2");
+			}
+			else
+			{
+				Simulator.execute("s");
+			}
+			
+            message = processOutput(false);
+       }
 
         mainFrame.updateCommandWindows();
         mainFrame.enableSenseSwitches();
@@ -1326,6 +1353,34 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
 		}
 		catch (IOException ex)
 		{
+		}
+	}
+	
+	public boolean nextLineHasBreakpoint()
+	{
+		int lines[] = listing.getSelectedIndices();
+		if(lines.length > 0)
+		{
+			ListModel model = listing.getModel();
+			int curLine = lines[0];
+			
+			while(true)
+			{
+				if(curLine == listing.getModel().getSize() - 1)
+				{
+					return false;
+				}
+			
+				ListingLine currentLine = (ListingLine)model.getElementAt(++curLine);
+				if(currentLine.isBreakable())
+				{
+					return currentLine.breakpoint;
+				}
+			}
+		}
+		else
+		{
+			return false;
 		}
 	}
 

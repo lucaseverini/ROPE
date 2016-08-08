@@ -284,7 +284,7 @@ public class MemoryFrame extends ChildFrame implements ActionListener, ChangeLis
 						
 						buffer.append(text).append('\n');
 
-						if (idx <= 6) 
+						if (idx >= 0 && idx <= 6) 
 						{
 							try 
 							{

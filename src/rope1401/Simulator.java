@@ -192,16 +192,17 @@ class Simulator
 			}
 			else
 			{
-				System.out.println("Not ready");
-				
 				isBusy = true;
 			}
 			
             simulatorElapsedTime += System.currentTimeMillis() - simulatorStartTime;
             simulatorStartTime = System.currentTimeMillis();
 
-            System.out.println(output);
-
+			if(output.length() > 0)
+			{
+				System.out.println(output);
+			}
+			
             return output;
         }
         catch (IOException ex) 
