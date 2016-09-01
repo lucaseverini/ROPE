@@ -16,6 +16,9 @@ nb-configuration.xml
 # Project specific #
 BuildTimeStrings.properties
 
+# Resulting zip file.
+dist.zip
+
 # Class Files #
 *.class
 
@@ -23,4 +26,3 @@ BuildTimeStrings.properties
 *.jar
 *.war
 *.ear
-

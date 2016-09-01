@@ -1,8 +1,8 @@
-#!/bin/sh
+#!/bin/bash
 #
-# This bash script creates the property file containing the properties used 
+# This bash script creates the property file containing the properties used
 # in the java program ROPE.
-# On Windows, it requires MinGW (http://www.mingw.org) or compatible 
+# On Windows, it requires MinGW (http://www.mingw.org) or compatible
 # unix shell environment.
 #
 # By Luca Severini (lucaseverini@mac.com)
@@ -12,9 +12,10 @@
 
 PROPERTIES_FILE_PATH=./src/rope1401/Resources/BuildTimeStrings.properties
 
-if [[ "$(uname)" = "Darwin" ]]
-then
+if [[ "$(uname)" = "Darwin" ]] ; then
 	PLATFORM="Mac OS X"
+elif [[ "$(uname)" = "Linux" ]] ; then
+        PLATFORM="Linux"
 else
 	PLATFORM="Windows"
 fi
