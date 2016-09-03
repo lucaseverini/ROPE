@@ -7,7 +7,7 @@
 nbproject/private/
 build/
 nbbuild/
-dist/
+# dist/
 nbdist/
 nbactions.xml
 nb-configuration.xml
@@ -16,7 +16,7 @@ nb-configuration.xml
 BuildTimeStrings.properties
 
 # Resulting zip file.
-dist.zip
+# dist.zip
 
 # Class Files #
 *.class
