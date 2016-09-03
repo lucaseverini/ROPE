@@ -12,7 +12,7 @@
                CS          * 200s  201 IS HIGH ORDER OF PRINT AREA - TO 332
                SW   500,350  * SET WORD MARKS FOR WORK AREAS
                SW   200    * SET WORD MARK FOR PRINT AREA COMPARE 
-               MCW  @1@,632 * SET INITIAL 2^0
+               MCW  @1@,632  * SET INITIAL 2^0
                MCW  @56789@,204  * set test pattern for bug check ;-))
                W           *write the TEST PATTERN  area to the printer
      *                       SEE IF LOCATION 202 IS KLOBBERED :-))
