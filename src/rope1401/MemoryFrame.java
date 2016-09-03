@@ -44,7 +44,7 @@ public class MemoryFrame extends ChildFrame implements ActionListener, ChangeLis
 		
 		// Implement a smarter way to set the initial frame position and size
 		setLocation(930, 690);
-		setSize(510, 395);
+		setSize(508, 395);
 		
         try 
 		{
@@ -268,9 +268,21 @@ public class MemoryFrame extends ChildFrame implements ActionListener, ChangeLis
 				Simulator.output();		// Clean previous output
 				
 				Simulator.execute("e -d " + from + "-" + to);
-				for (; ; ) 
+				
+				Boolean nothingYet = true;
+				while(true) 
 				{
 					String text = Simulator.output();
+
+					if(!nothingYet && text.length() == 0)
+					{
+						break;
+					}
+					else if(nothingYet && text.length() > 0)
+					{
+						nothingYet = false;
+					}
+					
 					if (TextIsValidForMemoryDump(text)) 
 					{
 						int idx = text.indexOf(":");
@@ -357,3 +369,5 @@ public class MemoryFrame extends ChildFrame implements ActionListener, ChangeLis
 		return true;
 	}
 }
+
+

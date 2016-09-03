@@ -11,9 +11,7 @@
 package rope1401;
 
 import java.io.*;
-import java.nio.file.Files;
 import java.util.ArrayList;
-import static rope1401.AssemblerOptions.ENCODING_SIMH;
 
 class Assembler
 {
