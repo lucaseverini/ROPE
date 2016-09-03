@@ -7,7 +7,7 @@ Rope Integrated Development and Simulation Environment (IDSE) for the IBM 1401.
 Installing
 -
 
-    	$ git clone http://github.com/lucaseverini/ROPE.git
+    $ git clone http://github.com/lucaseverini/ROPE.git
 	$ cd ROPE
 	$ unzip dist.zip
 	$ cd dist
