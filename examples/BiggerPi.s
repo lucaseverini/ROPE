@@ -33,7 +33,7 @@
      * OVERLAY PRINT AREA
      START     MCW  @000000@,ITCNT  * ZERO ITERATION CNTR
                MCW  @000001@,IX2P1  * INIT INTER DIVISOR
-               MCW  @+@,ACCUM&5049 * ZERO ACCUMULATOR
+               MCW  @+@,ACCUM&5049  * ZERO ACCUMULATOR
                MCW  @0@,ACCUM&5048
                MCW  ACCUM&5048,ACCUM&5047 
                MCW  @0@,BASET&5048
@@ -121,7 +121,7 @@
                SW   203,214    * SET WORD MARKS FOR B FIELD
                SW   225,236
                SW   247,265
-               A    @00050@,269 * ADD 50 TO EXPONENT
+               A    @00050@,269  * ADD 50 TO EXPONENT
                MCW  ACCUM&X1,212  MOVE 1ST FIELD
                SBR  X1,10&X1     * STEP X1
                MCW  ACCUM&X1,223  MOVE 2ND FIELD

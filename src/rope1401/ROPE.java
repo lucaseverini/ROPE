@@ -9,9 +9,11 @@
 
 package rope1401;
 
-import com.apple.eawt.Application;
 import javax.swing.ImageIcon;
 import javax.swing.UIManager;
+
+// Only import these when compiling on Mac
+// import com.apple.eawt.Application;
 // import com.apple.eawt.QuitStrategy;
 
 public class ROPE /* extends com.apple.eawt.Application */
@@ -29,8 +31,8 @@ public class ROPE /* extends com.apple.eawt.Application */
 		
 		if(RopeHelper.isMac)
 		{
-			// Use reflection here...
-			Application.getApplication().setDockIconImage(new ImageIcon(getClass().getResource("Images/appIcon330.gif")).getImage());
+			// TODO: Use reflection here so that it works on all platforms...
+			//Application.getApplication().setDockIconImage(new ImageIcon(getClass().getResource("Images/appIcon330.gif")).getImage());
 			
 			System.setProperty("apple.awt.graphics.EnableQ2DX", "true");
 			System.setProperty("apple.laf.useScreenMenuBar", "true");
