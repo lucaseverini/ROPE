@@ -70,3 +70,4 @@ public class ROPE /* extends com.apple.eawt.Application */
         ROPE rope = new ROPE();
     }
 }
+

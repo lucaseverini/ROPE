@@ -221,9 +221,7 @@ public class PrintoutFrame extends ChildFrame implements Printable, ActionListen
 			{
                 printout.close();
             }
-			
-			System.out.println("#####" + DataOptions.outputPath);
-
+		
             printout = new BufferedReader(new FileReader(DataOptions.outputPath));
             printoutArea.setText(null);
         }
@@ -558,3 +556,4 @@ public class PrintoutFrame extends ChildFrame implements Printable, ActionListen
 		return PAGE_EXISTS;
 	}
 }
+

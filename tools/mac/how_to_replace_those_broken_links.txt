@@ -1,0 +1,3 @@
+Replace the links with the real programs you can find in {REPO_ROOT}/dist/tools/mac
+Or you can change the paths to those programs in the Preferences dialog of ROPE.
+
