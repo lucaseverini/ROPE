@@ -1,11 +1,12 @@
 /**
- * <p>Title: </p>
+ * <p>Title: TimerFrame.java</p>
  * <p>Description: </p>
  * <p>Copyright: Copyright (c) 2005</p>
  * <p>Company: NASA Ames Research Center</p>
- * @author Ronald Mak
+ * @author Ronald Mak & Luca Severini <lucaseverini@mac.com>
  * @version 2.0
  */
+
 
 package rope1401;
 
@@ -213,7 +214,7 @@ public class TimerFrame extends ChildFrame implements ActionListener, CommandWin
         long seconds = time/SECOND;
         long millis  = time - seconds*SECOND;
 
-        StringBuffer buffer = new StringBuffer(64);
+        StringBuilder buffer = new StringBuilder(64);
         buffer.append(NN.format(days)).append(" days ")
               .append(NN.format(hours)).append(" hours ")
               .append(NN.format(minutes)).append(" minutes ")

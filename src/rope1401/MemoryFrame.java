@@ -1,9 +1,9 @@
 /**
- * <p>Title: </p>
+ * <p>Title: MemoryFrame.java</p>
  * <p>Description: </p>
  * <p>Copyright: Copyright (c) 2005</p>
  * <p>Company: NASA Ames Research Center</p>
- * @author Ronald Mak
+ * @author Ronald Mak & Luca Severini <lucaseverini@mac.com>
  * @version 2.0
  */
 
@@ -17,6 +17,7 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.swing.*;
 import javax.swing.event.*;
+import javax.swing.text.DefaultCaret;
 
 public class MemoryFrame extends ChildFrame implements ActionListener, ChangeListener, CommandWindow
 {
@@ -43,7 +44,7 @@ public class MemoryFrame extends ChildFrame implements ActionListener, ChangeLis
 		
 		// Implement a smarter way to set the initial frame position and size
 		setLocation(930, 690);
-		setSize(510, 395);
+		setSize(508, 395);
 		
         try 
 		{
@@ -70,18 +71,21 @@ public class MemoryFrame extends ChildFrame implements ActionListener, ChangeLis
 			@Override
 			public void componentHidden(ComponentEvent e) 
 			{
-				System.out.println("Hidden");
+				// System.out.println("Hidden");
 			}
 			
 			@Override
 			public void componentShown(ComponentEvent e) 
 			{
-				System.out.println("Shown");
+				// System.out.println("Shown");
 			}
 		});
 		
         showButton.addActionListener(this);
         barsCheckBox.addChangeListener(this);
+		
+		DefaultCaret caret = (DefaultCaret)memoryArea.getCaret();
+		caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
 		
 		showMemory();
 	}
@@ -139,7 +143,7 @@ public class MemoryFrame extends ChildFrame implements ActionListener, ChangeLis
         toLabel.setText("to");
         toText.setMinimumSize(new Dimension(56, 20));
         toText.setPreferredSize(new Dimension(56, 20));
-        toText.setText("512");
+        toText.setText("1512");
         showButton.setText("Update");
         autoCheckBox.setText("Auto update");
         barsCheckBox.setText("Bars");
@@ -184,6 +188,7 @@ public class MemoryFrame extends ChildFrame implements ActionListener, ChangeLis
                                                 new Insets(5, 10, 5, 0), 0, 0));
     }
 
+	@Override
     public void execute()
     {
         if (autoCheckBox.isSelected()) 
@@ -196,16 +201,19 @@ public class MemoryFrame extends ChildFrame implements ActionListener, ChangeLis
         }
     }
 
+	@Override
     public void lock()
     {
         showButton.setEnabled(false);
     }
 
+	@Override
     public void unlock()
     {
         showButton.setEnabled(true);
     }
 
+	@Override
     public void stateChanged(ChangeEvent event)
     {
         if (event.getSource() == barsCheckBox) 
@@ -214,6 +222,7 @@ public class MemoryFrame extends ChildFrame implements ActionListener, ChangeLis
         }
     }
 
+	@Override
     public void actionPerformed(ActionEvent event)
     {
         Object button = event.getSource();
@@ -249,38 +258,42 @@ public class MemoryFrame extends ChildFrame implements ActionListener, ChangeLis
         setTitle("MEMORY: " + from + " - " + to);
 
         int offset = to - from;
-        int last = offset - offset%50 + from;
-        StringBuffer buffer = new StringBuffer(1024);
+        int last = offset - (offset % 50) + from;
+        StringBuilder buffer = new StringBuilder(1024);
 
 		if(Simulator.isActive())
 		{
 			synchronized(Simulator.class) 
 			{
+				Simulator.output();		// Clean previous output
+				
 				Simulator.execute("e -d " + from + "-" + to);
-				for (; ; ) 
+				
+				Boolean nothingYet = true;
+				while(true) 
 				{
 					String text = Simulator.output();
 
-					if ((text != null) && (text.length() > 0)) 
+					if(!nothingYet && text.length() == 0)
 					{
-						buffer.append(text).append('\n');
+						break;
 					}
-
-					int i = text.indexOf(":");
-					if ((i != -1) && (i <= 5)) 
+					else if(nothingYet && text.length() > 0)
 					{
-						try 
+						nothingYet = false;
+					}
+					
+					if (TextIsValidForMemoryDump(text)) 
+					{
+						int idx = text.indexOf(":");
+						if(idx > 0 && idx <= 6)
 						{
-							int address = Integer.parseInt(text.substring(0, i));
-							if (address == last) 
-							{
-								break;
-							}
+							StringBuilder strBuild = new StringBuilder(text);
+							strBuild.setCharAt(idx, ' ');
+							text = strBuild.toString();
 						}
-						catch (Exception ex) 
-						{
-							ex.printStackTrace();
-						}
+						
+						buffer.append(text).append('\n');
 					}
 				}
 
@@ -318,4 +331,25 @@ public class MemoryFrame extends ChildFrame implements ActionListener, ChangeLis
 			Logger.getLogger(RopeFrame.class.getName()).log(Level.SEVERE, null, ex);
 		}
 	}
+	
+	boolean TextIsValidForMemoryDump (String text)
+	{
+		if(text == null || text.length() < 7)
+		{
+			return false;
+		}
+		
+		for(int idx = 0; idx < 7; idx++)
+		{
+			char ch = text.charAt(idx);
+			if(!Character.isDigit(ch) && ch != ' ' && ch != ':')
+			{
+				return false;
+			}
+		}
+		
+		return true;
+	}
 }
+
+

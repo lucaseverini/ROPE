@@ -1,9 +1,9 @@
 /**
- * <p>Title: </p>
+ * <p>Title: ExecFrame.java</p>
  * <p>Description: </p>
  * <p>Copyright: Copyright (c) 2005</p>
  * <p>Company: NASA Ames Research Center</p>
- * @author Ronald Mak
+ * @author Ronald Mak & Luca Severini <lucaseverini@mac.com>
  * @version 2.0
  */
 
@@ -424,10 +424,10 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
     {
 		clearListing();
 		
-        Vector v = filterListing();
+        ArrayList v = filterListing();
         if (v != null) 
 		{
-            listing.setListData(v);
+            listing.setListData(v.toArray());
 
             if (currentMessage == null) 
 			{
@@ -442,11 +442,11 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
 		}	
     }
 
-    private Vector filterListing()
+    private ArrayList filterListing()
     {
         boolean noErrors = !mainFrame.haveAssemblyErrors();
         boolean filtering = !showAllCheckBox.isSelected();
-        Vector v = new Vector();
+        ArrayList v = new ArrayList();
         String line;
         int index = 0;
         BufferedReader listFile = null;
@@ -481,7 +481,7 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
                         boolean breakable = noErrors && canHaveBreakpoint(line);
 
                         ListingLine listingLine = new ListingLine(line, breakable);
-                        v.addElement(listingLine);
+                        v.add(listingLine);
 
                         if (breakable) 
 						{
@@ -587,7 +587,7 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
 
 	private BreakpointSet saveActiveBreakpoints()
 	{
-		Vector<ListingLine> breakpoints = new Vector<ListingLine>();
+		ArrayList<ListingLine> breakpoints = new ArrayList<ListingLine>();
 
 		ListModel model = listing.getModel();
         int size = model.getSize();
@@ -628,9 +628,9 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
     private class ListingLine implements Cloneable
     {
         private String text;
-       private boolean breakable = true;
+        private boolean breakable = true;
         private boolean breakpoint = false;
-        private Integer address = null;
+        private Integer address = 0;
 		
         ListingLine(String text, boolean breakable)
         {
@@ -722,29 +722,44 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
         }
     }
 
-    private String processOutput()
+    private String processOutput(boolean restart)
     {
         String message = null;
+		
         clearMessage();
 
-        do 
+		while(true)
 		{
-            message = Simulator.output();
-
-            if ((message != null) && (message.length() > 0)) 
+			do 
 			{
-                writeMessage(Color.BLUE, message);
-            }
+				message = Simulator.output();
 
-			// System.out.println(message);
-        }
-        while (Simulator.hasOutput());
+				if (message != null && message.length() > 0) 
+				{
+					writeMessage(Color.BLUE, message);
+				}
+			}
+			while (Simulator.hasOutput());
 
-        if (message != null) 
-		{
-            selectCurrentLine(message);
-        }
-
+			if (message != null && message.length() > 0) 
+			{
+				if(message.startsWith("IBM 1401 simulator"))
+				{
+					// When the message from simh is the boot information "IBM 1401 simulator V..." and is a restart
+					// then continue to get the output from simh because there should be more...
+					if(!restart)
+					{
+						break;
+					}
+				}
+				else
+				{
+					selectCurrentLine(message);
+					break;
+				}
+			}
+		}
+		
         return message;
     }
 
@@ -803,7 +818,7 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
 				return false;
 			}
 			
-            processOutput();
+            processOutput(false);
         }
 
         Thread monitor = new StandardErrorMonitor(Simulator.getStderr());
@@ -860,7 +875,9 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
 
         simulatorRunning = false;
         programRunning = false;
+		
         simulatorButton.setText("Restart simulator");
+		startButton.setText("Start program");
     }
 
     private void optionsAction()
@@ -893,7 +910,8 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
             synchronized(Simulator.class) 
 			{
                 Simulator.execute("c");
-                processOutput();
+				
+                processOutput(true);
             }
         }
         else 
@@ -901,20 +919,33 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
             synchronized(Simulator.class) 
 			{
                 Simulator.execute("b cdr");
-                processOutput();
+				
+                processOutput(false);
             }
 
-            startButton.setText("Continue program");
             dataButton.setEnabled(false);
             quitButton.setEnabled(true);
             singleStepButton.setEnabled(true);
             autoStepButton.setEnabled(true);
-
+						
             programRunning = true;
         }
 
         mainFrame.updateCommandWindows();
         mainFrame.enableSenseSwitches();
+		
+		if(Simulator.isBusy())
+		{
+			startButton.setText("Break program");
+			
+			quitButton.setEnabled(false);
+            singleStepButton.setEnabled(false);
+            autoStepButton.setEnabled(false);
+		}
+		else
+		{
+			startButton.setText("Continue program");
+		}
     }
 
     private void quitAction()
@@ -922,7 +953,8 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
         synchronized(Simulator.class) 
 		{
             Simulator.stop();
-            processOutput();
+			
+            processOutput(false);
         }
 
         startButton.setText("Start program");
@@ -937,6 +969,8 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
         showMemoryButton.setEnabled(false);
         showConsoleButton.setEnabled(false);
 		
+		listing.clearSelection();
+
         clearBreakpoints();
 		
         mainFrame.lockCommandWindows();
@@ -952,9 +986,17 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
 
         synchronized(Simulator.class) 
 		{
-            Simulator.execute("s");
-            message = processOutput();
-        }
+			if(nextLineHasBreakpoint())
+			{
+				Simulator.execute("s 2");
+			}
+			else
+			{
+				Simulator.execute("s");
+			}
+			
+            message = processOutput(false);
+       }
 
         mainFrame.updateCommandWindows();
         mainFrame.enableSenseSwitches();
@@ -1015,8 +1057,7 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
         mainFrame.createTimerFrame();
     }
 
-    private class AutoStepper
-        extends Thread
+    private class AutoStepper extends Thread
     {
 		@Override
         public void run()
@@ -1032,7 +1073,6 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
                     Thread.sleep(autoStepWaitTime);
                 }
                 catch (InterruptedException ignore) {}
-
             }
             while (autoStepping && (message != null) && message.startsWith("Step"));
 
@@ -1046,10 +1086,9 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
         }
     }
 
-    private class StandardErrorMonitor
-        extends Thread
+    private class StandardErrorMonitor extends Thread
     {
-        private BufferedReader stderr;
+        private final BufferedReader stderr;
 
         StandardErrorMonitor(BufferedReader stderr)
         {
@@ -1061,7 +1100,8 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
         {
             int ch;
 
-            try {
+            try 
+			{
                 if (stderr != null) 
 				{
                     while ((ch = stderr.read()) != -1)
@@ -1259,9 +1299,9 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
 		private static final long serialVersionUID = 1L;
 		
 		String listingFile;					// The path to the listing file the breakpoints refer to
-		Vector<ListingLine> breakpoints;	// The lines with active breakpoint
+		ArrayList<ListingLine> breakpoints;	// The lines with active breakpoint
 		
-		BreakpointSet(String file, Vector<ListingLine> breakpoints)
+		BreakpointSet(String file, ArrayList<ListingLine> breakpoints)
 		{
 			this.listingFile = file;
 			this.breakpoints = breakpoints;
@@ -1300,7 +1340,7 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
 		{
 			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath)));
 			
-			Vector<ListingLine> breakpoints = new Vector<ListingLine>();
+			ArrayList<ListingLine> breakpoints = new ArrayList<ListingLine>();
 		
 			while(reader.ready())
 			{
@@ -1315,6 +1355,34 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
 		{
 		}
 	}
+	
+	public boolean nextLineHasBreakpoint()
+	{
+		int lines[] = listing.getSelectedIndices();
+		if(lines.length > 0)
+		{
+			ListModel model = listing.getModel();
+			int curLine = lines[0];
+			
+			while(true)
+			{
+				if(curLine == listing.getModel().getSize() - 1)
+				{
+					return false;
+				}
+			
+				ListingLine currentLine = (ListingLine)model.getElementAt(++curLine);
+				if(currentLine.isBreakable())
+				{
+					return currentLine.breakpoint;
+				}
+			}
+		}
+		else
+		{
+			return false;
+		}
+	}
 
 	public void saveAsMenuAction(ActionEvent event)
 	{
@@ -1326,7 +1394,7 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
 
 	private void saveAs()
     {
-		Vector<RopeFileFilter> filters = new Vector<RopeFileFilter>();
+		ArrayList<RopeFileFilter> filters = new ArrayList<RopeFileFilter>();
 		filters.add(new RopeFileFilter(new String[] {".lst"}, "List files (*.lst)"));
 		filters.add(new RopeFileFilter(new String[] {".txt"}, "Text files (*.txt)"));
 

@@ -7,6 +7,12 @@
 <!-- the Compile on Save feature is turned off for the project. -->
 <!-- You can turn off the Compile on Save (or Deploy on Save) setting -->
 <!-- in the project's Project Properties dialog box.-->
+
+<!--
+Last changes by Luca Severini (lucaseverini@mac.com) on April 24 2014.
+                Henner Zeller (h.zeller@acm.org) Sept 2016
+-->
+
 <project name="rope1401" default="default" basedir=".">
     <description>Builds, tests, and runs the project rope1401.</description>
     <import file="nbproject/build-impl.xml"/>
@@ -110,4 +116,70 @@
 		</chmod>
     </target>
 	
+	
+	
+  <property name="dist.dir" value="dist"/>
+  <property name="build.dir" value="build"/>
+
+  <target name="default" depends="compile_man"/>
+  <target name="dist_man" depends="jar,-post-jar_man"/>
+
+  <target name="dist.zip" depends="dist_man">
+    <zip destfile="dist.zip" basedir="${dist.dir}"/>
+  </target>
+
+  <target name="compile_man" depends="-pre-compile_man">
+    <mkdir dir="${build.dir}"/>
+    <javac srcdir="src" destdir="build"/>
+  </target>
+
+  <target name="jar_man" depends="compile_man">
+    <mkdir dir="${dist.dir}"/>
+    <jar destfile="${dist.dir}/rope1401.jar">
+      <fileset dir="src/" includes="rope1401/Images/**"/>
+      <fileset dir="src/" includes="rope1401/Resources/**"/>
+      <fileset dir="${build.dir}/"/>
+      <manifest>
+	<attribute name="Main-Class" value="rope1401.ROPE"/>
+      </manifest>
+    </jar>
+  </target>
+
+  <!--
+      Execute the script that creates the property file containing some
+      properties used as strings
+  -->
+  <target name="-pre-compile_man">
+    <exec dir="." executable="/bin/bash" os="Linux">
+      <arg line="create_properties.sh"/>
+    </exec>
+    <exec dir="." executable="/bin/sh" os="Mac OS X">
+      <arg line="create_properties.sh"/>
+    </exec>
+    <exec dir="." executable="C:\Programmi\Git\bin\sh.exe" os="Windows XP 5.1">
+      <arg line="--login -i create_properties.sh"/>
+    </exec>
+  </target>
+
+  <!--
+      Copy the tools folder with all its content except invisible files
+  -->
+  <target name="-post-jar_man">
+    <copy todir="${dist.dir}/tools" includeEmptyDirs="true"
+	  verbose="true" overwrite="true" preservelastmodified="true">
+      <!-- need to exclude mac tool right now as it is a dead links -->
+      <fileset dir="tools/" followsymlinks="true" excludes="mac/*">
+	<include name="*/*"/>
+      </fileset>
+    </copy>
+
+    <!--
+	Make the mac/linux tools executable
+    -->
+    <chmod perm="ug+x">
+      <fileset dir="${dist.dir}/tools">
+	<include name="*/*"/>
+      </fileset>
+    </chmod>
+  </target>
 </project>

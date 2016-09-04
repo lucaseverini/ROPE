@@ -1,9 +1,9 @@
 /**
- * <p>Title: </p>
+ * <p>Title: EditFrame.java</p>
  * <p>Description: </p>
  * <p>Copyright: Copyright (c) 2005</p>
  * <p>Company: NASA Ames Research Center</p>
- * @author Ronald Mak
+ * @author Ronald Mak & Luca Severini <lucaseverini@mac.com>
  * @version 2.0
  */
 
@@ -42,6 +42,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
     JButton optionsButton = new JButton();
     JButton assembleButton = new JButton();
     JButton saveButton = new JButton();
+	JButton saveMessagesButton = new JButton();
     JPanel positionPanel = new JPanel();
     JLabel lineLabel = new JLabel();
     JTextField lineText = new JTextField();
@@ -56,7 +57,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 	private String fileExt;
 	private boolean assembleFailed;
     private boolean haveAssemblyErrors;
-    private Vector messages;
+    private ArrayList messages;
 	private boolean sourceChanged;
 	public String sourcePath;
 	private Document document;
@@ -86,6 +87,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
         optionsButton.addActionListener(this);
         assembleButton.addActionListener(this);
         saveButton.addActionListener(this);
+        saveMessagesButton.addActionListener(this);
 
         messageList.addMouseListener(new MouseAdapter()
         {
@@ -179,6 +181,63 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 		});
 		
 		// Set custom binding action for return/enter key
+		String actionKey = "backspaceKeyAction";
+		im.put(KeyStroke.getKeyStroke("BACK_SPACE"), actionKey);
+		am.put(actionKey, new AbstractAction() 
+		// How can I get the original action?
+		{
+			private static final long serialVersionUID = 1L;
+			
+			@Override
+			public void actionPerformed(ActionEvent e) 
+			{
+ 				try 
+				{
+					int caretPos = sourceArea.getCaretPosition();
+					int lineNum = sourceArea.getLineOfOffset(caretPos);
+					int startLine = sourceArea.getLineStartOffset(lineNum);
+					int endLine = sourceArea.getLineEndOffset(lineNum);
+					int linePos = caretPos - startLine;
+					
+					if(linePos == 15)
+					{
+						int endPos = 5;						
+						int charPos = linePos;
+						for(; charPos > endPos; charPos--)
+						{
+							char ch = sourceArea.getText().charAt((startLine + charPos) - 1);
+							if(!Character.isWhitespace(ch))
+							{
+								break;
+							}
+						}
+						
+						sourceArea.setCaretPosition(startLine + charPos);
+					}
+					else
+					{
+						int startSel = sourceArea.getSelectionStart();
+						int endSel = sourceArea.getSelectionEnd();
+						if(startSel == endSel)
+						{
+							startSel = caretPos - 1;
+							endSel = caretPos;
+						}
+						
+						StringBuilder sb = new StringBuilder(sourceArea.getText());
+						sb.replace(startSel, endSel, "");
+						sourceArea.setText(sb.toString());
+						sourceArea.setCaretPosition(startSel);
+					}
+				}
+				catch(BadLocationException ex) 
+				{
+					ex.printStackTrace();
+				}
+			}
+		});
+		
+		// Set custom binding action for return/enter key
 		action = "enterKeyAction";
 		im.put(KeyStroke.getKeyStroke("ENTER"), action);
 		am.put(action, new AbstractAction() 
@@ -258,6 +317,8 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
         assembleButton.setText("Assemble file");
         saveButton.setEnabled(false);
         saveButton.setText("Save file");
+        saveMessagesButton.setEnabled(true);
+        saveMessagesButton.setText("Save messages ...");
         lineLabel.setText("Line:");
         lineText.setMinimumSize(new Dimension(50, 20));
         lineText.setPreferredSize(new Dimension(50, 20));
@@ -294,8 +355,44 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
                                                 GridBagConstraints.CENTER,
                                                 GridBagConstraints.HORIZONTAL,
                                                 new Insets(5, 5, 0, 5), 0, 0));
-        controlPanel.add(optionsButton,
-                         new GridBagConstraints(2, 1, 1, 1, 1.0, 0.0,
+        controlPanel.add(positionPanel,
+                         new GridBagConstraints(0, 1, 4, 1, 0.8, 0.0,
+                                                GridBagConstraints.WEST,
+                                                GridBagConstraints.NONE,
+                                                new Insets(5, 5, 0, 0), 0, 0));
+		positionPanel.add(lineLabel,
+                          new GridBagConstraints(0, 0, 1, 1, 0.6, 0.0,
+                                                 GridBagConstraints.WEST,
+                                                 GridBagConstraints.NONE,
+                                                 new Insets(0, 0, 0, 0), 0, 0));
+		positionPanel.add(lineText,
+                          new GridBagConstraints(1, 0, 1, 1, 0.6, 0.0,
+                                                 GridBagConstraints.WEST,
+                                                 GridBagConstraints.NONE,
+                                                 new Insets(0, 5, 0, 0), 0, 0));
+        positionPanel.add(columnLabel,
+                          new GridBagConstraints(2, 0, 1, 1, 0.7, 0.0,
+                                                 GridBagConstraints.WEST,
+                                                 GridBagConstraints.NONE,
+                                                 new Insets(0, 10, 0, 0), 0, 0));
+        positionPanel.add(columnText,
+                          new GridBagConstraints(3, 0, 1, 1, 0.7, 0.0,
+                                                 GridBagConstraints.WEST,
+                                                 GridBagConstraints.NONE,
+                                                 new Insets(0, 5, 0, 0), 0, 0));
+        controlPanel.add(messageScrollPane,
+                         new GridBagConstraints(0, 2, 5, 1, 1.0, 1.0,
+                                                GridBagConstraints.CENTER,
+                                                GridBagConstraints.BOTH,
+                                                new Insets(5, 5, 5, 5), 0, 0));
+		controlPanel.add(saveMessagesButton,
+                         new GridBagConstraints(1, 1, 1, 1, 0.1, 0.0,
+                                                GridBagConstraints.EAST,
+                                                GridBagConstraints.NONE,
+                                                new Insets(5, 5, 0, 0), 0, 0));
+
+		controlPanel.add(optionsButton,
+                         new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0,
                                                 GridBagConstraints.EAST,
                                                 GridBagConstraints.NONE,
                                                 new Insets(5, 5, 0, 0), 0, 0));
@@ -306,40 +403,10 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
                                                 new Insets(5, 5, 0, 0), 0, 0));
         controlPanel.add(saveButton,
                          new GridBagConstraints(4, 1, 1, 1, 0.0, 0.0,
-                                                GridBagConstraints.CENTER,
-                                                GridBagConstraints.HORIZONTAL,
-                                                new Insets(5, 5, 0, 5), 0, 0));
-        controlPanel.add(positionPanel,
-                         new GridBagConstraints(0, 1, 2, 1, 0.0, 0.0,
-                                                GridBagConstraints.CENTER,
+                                                GridBagConstraints.EAST,
                                                 GridBagConstraints.NONE,
-                                                new Insets(5, 5, 0, 0), 0, 0));
-		positionPanel.add(lineLabel,
-                          new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-                                                 GridBagConstraints.EAST,
-                                                 GridBagConstraints.NONE,
-                                                 new Insets(0, 0, 0, 0), 0, 0));
-		positionPanel.add(lineText,
-                          new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-                                                 GridBagConstraints.EAST,
-                                                 GridBagConstraints.NONE,
-                                                 new Insets(0, 5, 0, 0), 0, 0));
-        positionPanel.add(columnLabel,
-                          new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-                                                 GridBagConstraints.EAST,
-                                                 GridBagConstraints.NONE,
-                                                 new Insets(0, 10, 0, 0), 0, 0));
-        positionPanel.add(columnText,
-                          new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
-                                                 GridBagConstraints.EAST,
-                                                 GridBagConstraints.NONE,
-                                                 new Insets(0, 5, 0, 0), 0, 0));
-        controlPanel.add(messageScrollPane,
-                         new GridBagConstraints(0, 2, 5, 1, 1.0, 1.0,
-                                                GridBagConstraints.CENTER,
-                                                GridBagConstraints.BOTH,
-                                                new Insets(5, 5, 5, 5), 0, 0));
-	}
+                                                new Insets(5, 5, 0, 5), 0, 0));
+ 	}
 
     boolean haveAssemblyErrors()
     {
@@ -348,8 +415,8 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 
     private class AssemblyFileFilter extends FileFilter
     {
-        private String extensions[];
-        private String description;
+        private final String extensions[];
+        private final String description;
 
         public AssemblyFileFilter(String extensions[], String description)
         {
@@ -400,7 +467,11 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
         }
         else if (button == saveButton) 
 		{
-            save();
+            saveAction();
+        }
+        else if (button == saveMessagesButton) 
+		{
+            saveMessagesAction();
         }
         else if (button == optionsButton) 
 		{
@@ -440,7 +511,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 			}
 		}
 
-		Vector<RopeFileFilter> filters = new Vector<RopeFileFilter>();
+		ArrayList<RopeFileFilter> filters = new ArrayList<RopeFileFilter>();
 		filters.add(new RopeFileFilter(new String[] {".a", ".asm", ".aut", ".s"}, "Assembly files (*.a *.asm *.aut *.s)"));
 		filters.add(new RopeFileFilter(new String[] {".m", ".mac"}, "Macro files (*.m *.mac)"));
 		filters.add(new RopeFileFilter(new String[] {".lst"}, "List files (*.lst)"));
@@ -448,7 +519,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 
 		RopeFileChooser chooser = new RopeFileChooser(selectedPath, null, filters);
 		chooser.setDialogTitle("Source document selection");
-		chooser.setFileFilter(filters.firstElement());
+		chooser.setFileFilter(filters.get(0));
 		chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 		
         File file = chooser.open(this, fileText);
@@ -484,6 +555,8 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 		AssemblerOptions.sourcePath = sourcePath;
 		AssemblerOptions.listingPath = basePath + ".lst";
 		AssemblerOptions.objectPath = basePath + ".cd";
+		AssemblerOptions.tapePath = basePath + ".tobj";
+		AssemblerOptions.diagnosticPath = basePath + ".diag";
 
 		String var = System.getenv("ROPE_MACROS_DIR");
 		if(var != null && !var.isEmpty())
@@ -570,15 +643,32 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 		
 		return result;
 	}	
-	
-    public void save()
+
+	public void saveMessagesAction()
+    {
+		System.out.println("Not implemented yet.");
+	}
+		
+    public void saveAction()
     {
 		BufferedWriter sourceFile = null;
 
         try 
 		{
+			String sourceText = sourceArea.getText();
+			
+			String cleanText = cleanupSource(sourceText);
+			
+			if(cleanText.length() != sourceText.length())
+			{
+				sourceArea.setText(cleanText);
+				
+				String message = String.format("One or more invalid characters at the end of the source file have been removed.");
+				JOptionPane.showMessageDialog(this, message, "ROPE", JOptionPane.INFORMATION_MESSAGE);
+			}
+			
             sourceFile = new BufferedWriter(new FileWriter(sourcePath, false));
-            sourceFile.write(sourceArea.getText());
+            sourceFile.write(cleanText);
 			
 			setSourceChanged(false);
 			
@@ -617,7 +707,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 	
 	public void saveAs()
 	{
-		Vector<RopeFileFilter> filters = new Vector<RopeFileFilter>();
+		ArrayList<RopeFileFilter> filters = new ArrayList<RopeFileFilter>();
 		
 		if(fileExt.equals("m") || fileExt.equals("mac"))
 		{
@@ -682,11 +772,14 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
     private void assembleAction()
     {
         String line;
-        messages = new Vector();
+        messages = new ArrayList();
+
+		// Removes the .lst, .cd and .out files
+		removeAssemblerFiles(sourcePath);
 
         mainFrame.resetExecWindow();
 
-        save();
+        saveAction();
 		
 		assembleFailed = false;
         haveAssemblyErrors = false;
@@ -695,7 +788,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 		{
 			while ((line = Assembler.output()) != null) 
 			{
-				messages.addElement(line);
+				messages.add(line);
 			}
 
 			Assembler.setPaths(baseName, sourcePath);
@@ -706,7 +799,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 				{
 					System.out.println(line);
 					
-					messages.addElement(line);
+					messages.add(line);
 					
 					if(line.startsWith(" [ERROR:"))
 					{
@@ -714,7 +807,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 					}
 				}
 
-				messageList.setListData(messages);
+				messageList.setListData(messages.toArray());
 				messageList.ensureIndexIsVisible(0);
 
 				mainFrame.showExecWindow(baseName);
@@ -743,7 +836,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 	{
 		if(sourceArea != null)
 		{
-			save();
+			saveAction();
 		}
 	}
 
@@ -757,10 +850,10 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 
 	private void highlightError(int index)
     {
-        String message = (String) messages.elementAt(index);
+        String message = (String) messages.get(index);
         int i = message.indexOf(":");
 
-        if ((i != -1) && (i < 10)) 
+        if ((i != -1) && (i < 10) && Character.isDigit(message.charAt(i - 1))) 
 		{
 			try 
 			{
@@ -1080,5 +1173,81 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 		{
             ex.printStackTrace();
         }
+	}
+	
+	String cleanupSource(String source)
+	{
+		if(source.isEmpty())
+		{
+			return source.concat("\n");
+		}
+		
+		int lastChIdx = source.length() - 1;
+		if(source.charAt(lastChIdx) != '\n')
+		{
+			// Append a newline at the end
+			source = source.concat("\n");
+		}
+		else
+		{
+			// Remove all newlines at the end but one
+			while(lastChIdx >= 1)
+			{
+				Character ch1 = source.charAt(lastChIdx);
+				if(ch1 == '\n' || Character.isWhitespace(ch1))
+				{
+					source = source.substring(0, lastChIdx--);
+				}
+				else
+				{
+					break;
+				}
+			}
+			
+			source = source.concat("\n");
+		}
+		
+		return source;
+	}
+	
+	void removeAssemblerFiles(String sourcePath)
+	{
+		if (sourcePath == null || sourcePath.length() == 0)
+		{
+			return;
+		}
+		
+		String basePath = "";
+		int endIndex = sourcePath.lastIndexOf(".");
+		if (endIndex != -1)  
+		{
+			basePath = sourcePath.substring(0, endIndex);
+		}
+
+		System.out.println(basePath);
+		
+		try{  		
+    		File file = new File(basePath + ".cd");   
+			if(file.exists())
+			{
+				file.delete();
+			}
+			
+    		file = new File(basePath + ".lst");  
+			if(file.exists())
+			{
+				file.delete();
+			}
+			
+			file = new File(basePath + ".out");       
+			if(file.exists())
+			{
+				file.delete();
+			}
+	   	}
+		catch(Exception ex) 
+		{
+			ex.printStackTrace();
+		}
 	}
 }

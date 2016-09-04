@@ -3,13 +3,13 @@
  * <p>Description: </p>
  * <p>Copyright: Copyright (c) 2005</p>
  * <p>Company: NASA Ames Research Center</p>
- * @author Ronald Mak
+ * @author Ronald Mak & Luca Severini <lucaseverini@mac.com>
  * @version 2.0
  */
 
 package rope1401;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
 class AssemblerOptions
 {
@@ -23,7 +23,7 @@ class AssemblerOptions
     static final int SIZE_4000  =  4000;
     static final int SIZE_8000  =  8000;
     static final int SIZE_12000 = 12000;
-    static final int SIZE_16000 = 14000;
+    static final int SIZE_16000 = 16000;
 
     static final String ENCODING_SIMH  = "S";
     static final String ENCODING_A     = "A";
@@ -31,7 +31,8 @@ class AssemblerOptions
     static final String ENCODING_PRINT = "?";
 
     static String assemblerPath;
-    static String encodingChoice = ENCODING_SIMH;
+    static String deckEncodingChoice = ENCODING_SIMH;
+    static String tapeEncodingChoice = ENCODING_A;
     static String sourcePath;
     static String listingPath;
     static String objectPath;
@@ -40,21 +41,23 @@ class AssemblerOptions
     static String tapePath;
     static String diagnosticPath;
     static String pageLength = "60";
-    static Vector<String> command;
+    static ArrayList<String> command;
 
-    static boolean boot       = true;
-    static boolean encoding   = true;
-    static boolean listing    = true;
-    static boolean object     = true;
-    static boolean macro      = true;
-    static boolean tape       = false;
-    static boolean diagnostic = false;
-    static boolean codeOk     = false;
-    static boolean interleave = false;
-    static boolean store      = false;
-    static boolean dump       = false;
-    static boolean page       = false;
-
+    static boolean boot							= true;
+    static boolean deckEncoding					= true;
+    static boolean tapeEncoding					= true;
+    static boolean listing						= true;
+    static boolean object						= true;
+    static boolean tape							= true;
+ 	static boolean convertTapeForTapeSimulator	= false;
+    static boolean macro						= true;
+    static boolean diagnostic					= false;
+    static boolean codeOk						= false;
+    static boolean interleave					= false;
+    static boolean store						= false;
+    static boolean dump							= false;
+    static boolean page							= false;
+								
     static boolean trace        = false;
     static boolean traceLexer   = false;
     static boolean traceParser  = false;

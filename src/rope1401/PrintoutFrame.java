@@ -1,14 +1,15 @@
 /**
- * <p>Title: </p>
+ * <p>Title: PrintoutFrame.java</p>
  * <p>Description: </p>
  * <p>Copyright: Copyright (c) 2005</p>
  * <p>Company: NASA Ames Research Center</p>
- * @author Ronald Mak
+ * @author Ronald Mak & Luca Severini <lucaseverini@mac.com>
  * @version 2.0
  */
 
 package rope1401;
 
+import static java.lang.Math.abs;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.print.PageFormat;
@@ -16,8 +17,7 @@ import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.io.*;
-import static java.lang.Math.abs;
-import java.util.Vector;
+import java.util.ArrayList;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.swing.*;
@@ -221,7 +221,7 @@ public class PrintoutFrame extends ChildFrame implements Printable, ActionListen
 			{
                 printout.close();
             }
-
+		
             printout = new BufferedReader(new FileReader(DataOptions.outputPath));
             printoutArea.setText(null);
         }
@@ -345,7 +345,7 @@ public class PrintoutFrame extends ChildFrame implements Printable, ActionListen
 	
 	private void saveAs()
     {
-		Vector<RopeFileFilter> filters = new Vector<RopeFileFilter>();
+		ArrayList<RopeFileFilter> filters = new ArrayList<RopeFileFilter>();
 		filters.add(new RopeFileFilter(new String[] {".out"}, "Output files (*.out)"));
 		filters.add(new RopeFileFilter(new String[] {".txt"}, "Text files (*.txt)"));
 
@@ -556,3 +556,4 @@ public class PrintoutFrame extends ChildFrame implements Printable, ActionListen
 		return PAGE_EXISTS;
 	}
 }
+

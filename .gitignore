@@ -1,10 +1,9 @@
-# Last change: April-14-2014 by Luca Severini
+# Last change: September-3-2016 by Luca Severini
 
 # OS specific #
 .DS_Store
 
 # NetBeans specific #
-build-impl.xml
 nbproject/private/
 build/
 nbbuild/
@@ -16,11 +15,13 @@ nb-configuration.xml
 # Project specific #
 BuildTimeStrings.properties
 
+# Resulting zip file.
+# dist.zip
+
 # Class Files #
 *.class
 
 # Package Files #
-*.jar
+# *.jar
 *.war
 *.ear
-

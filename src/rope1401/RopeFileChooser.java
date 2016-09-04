@@ -1,9 +1,9 @@
 /**
- * <p>Title: </p>
+ * <p>Title: RopeFileChooser.java</p>
  * <p>Description: </p>
  * <p>Copyright: Copyright (c) 2005</p>
  * <p>Company: NASA Ames Research Center</p>
- * @author Ronald Mak
+ * @author Ronald Mak & Luca Severini <lucaseverini@mac.com>
  * @version 2.0
  */
 
@@ -11,7 +11,7 @@ package rope1401;
 
 import java.awt.*;
 import java.io.*;
-import java.util.Vector;
+import java.util.ArrayList;
 import javax.swing.*;
 
 // TO BE DONE:
@@ -23,7 +23,7 @@ class RopeFileChooser extends JFileChooser
 	
 	private Component parent;
 	
-    RopeFileChooser(String directoryPath, String filePath, Vector<RopeFileFilter> filters, boolean directories, boolean multiple)
+    RopeFileChooser(String directoryPath, String filePath, ArrayList<RopeFileFilter> filters, boolean directories, boolean multiple)
     {
         super();
 		
@@ -48,7 +48,7 @@ class RopeFileChooser extends JFileChooser
         }
     }
 
-    RopeFileChooser(String directoryPath, String filePath, Vector<RopeFileFilter> filter)
+    RopeFileChooser(String directoryPath, String filePath, ArrayList<RopeFileFilter> filter)
     {
         this(directoryPath, filePath, filter, false, false);
     }
@@ -84,7 +84,7 @@ class RopeFileChooser extends JFileChooser
         if (option == JFileChooser.APPROVE_OPTION) 
 		{
             File files[] = this.getSelectedFiles();
-            StringBuffer buffer = new StringBuffer();
+            StringBuilder buffer = new StringBuilder();
 
             for (int i = 0; i < files.length; ++i) 
 			{

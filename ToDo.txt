@@ -1,10 +1,22 @@
-ToDo list
+ToDo list (updated Sep-3-2016 by Luca Severini)
 
-1) Implement environment variable ROPE_MACROS_PATH as requested by Stan.
-2) Print for active window.
-3) Add a Print button on Printout window.
-4) Save breakpoints.
-5) Save/Restore status between Rope sessions (Windows position, open files, breakpoints, execution status).
-6) Application Icon (the rope icon sent by Stan).
-7) Unnoticed exception in ClipboardListener.java line 41 "regainOwnership(sysClip.getContents(this));"
-
+1)  Implement environment variable ROPE_MACROS_PATH as requested by Stan. (Done?)
+2)  Print for active window other than Printout window.
+3)  Add a Print button on Printout window. [DONE]
+4)  Save breakpoints. [DONE]
+7)  Unnoticed exception in ClipboardListener.java line 41 "regainOwnership(sysClip.getContents(this));"
+8)  Impossible to interrupt a simulator operation.
+9)  Improvements to Editing.
+10) Find/Replace.
+11) Reload current source.
+12) Conditional breakpoints.
+13) Should not be possible to change selected row in EXEC window if not for setting the next instruction to be executed.
+14) Set current/next instruction in EXEC.
+15) Option to keep content of Output window when simulator is restarted.
+16) Option to maintain content of Output window between sessions.
+17) Improvements to error reporting for some Assembly error like when a label or instruction is on wrong column.
+18) Implement a way to simulate card-deck input (or event tape) with keyboard input.
+19) In the memory window show the memory changed by last instruction in a different color.
+20) Output must be showed immediately, not only when the simulator has completed the operation.
+21) A Window where is possible to observe the variables and edit their values too.
+22) A button to clean the output at any moment.

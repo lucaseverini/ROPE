@@ -1,6 +1,9 @@
 /**
- * @title RopeResources.java
- * @author Luca Severini <lucaseverini@mac.com>
+ * <p>Title: RopeFileFilter.java</p>
+ * <p>Description: </p>
+ * <p>Copyright: Copyright (c) 2005</p>
+ * <p>Company: NASA Ames Research Center</p>
+ * @author Ronald Mak & Luca Severini <lucaseverini@mac.com>
  * @version 2.0
  */
 

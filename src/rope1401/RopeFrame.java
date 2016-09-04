@@ -1,9 +1,9 @@
 /**
- * <p>Title: </p>
+ * <p>Title: RopeFrame.java</p>
  * <p>Description: </p>
  * <p>Copyright: Copyright (c) 2005</p>
  * <p>Company: NASA Ames Research Center</p>
- * @author Ronald Mak
+ * @author Ronald Mak & Luca Severini <lucaseverini@mac.com>
  * @version 2.0
  */
 
@@ -36,7 +36,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
     private ConsoleFrame consoleFrame;
     private TimerFrame timerFrame;
 	private MemoryFrame memoryFrame;
-    private Vector commandWindows = new Vector();
+    private ArrayList commandWindows = new ArrayList();
     private boolean packFrame = false;
 	private Preferences userPrefs = Preferences.userRoot();
 	private boolean closed;
@@ -97,7 +97,8 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
         this.setSize(frameSize);
         this.setLocation((screenSize.width - frameSize.width) / 2, 10);
 		
-        this.setTitle(MessageFormat.format(RopeResources.getString("RopeFrameTitle"), RopeResources.getString("RopeVersion")));
+		String ropeVersion = MessageFormat.format(RopeResources.getString("RopeVersion"), RopeResources.getBuildString("BuildNumber"));
+        this.setTitle(MessageFormat.format(RopeResources.getString("RopeFrameTitle"), ropeVersion));
     
         JPanel contentPanel = (JPanel)this.getContentPane();
         contentPanel.add(desktop);
@@ -274,7 +275,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 			printoutFrame.initialize();
 			printoutFrame.toFront();
 		
-			commandWindows.addElement(printoutFrame);
+			commandWindows.add(printoutFrame);
 
 			execFrame.toFront();
 			execFrame.setSelected(true);
@@ -311,7 +312,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 			
 			desktop.add(memoryFrame);
 
-			commandWindows.addElement(memoryFrame);
+			commandWindows.add(memoryFrame);
 			
 			try 
 			{
@@ -359,7 +360,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 					
 			desktop.add(consoleFrame);
 
-            commandWindows.addElement(consoleFrame);
+            commandWindows.add(consoleFrame);
         }
         else 
 		{
@@ -401,7 +402,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 			
 			desktop.add(timerFrame);
 
-            commandWindows.addElement(timerFrame);
+            commandWindows.add(timerFrame);
 		}
         else 
 		{
@@ -434,30 +435,30 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 
     void updateCommandWindows()
     {
-        Enumeration elements = commandWindows.elements();
-        while (elements.hasMoreElements()) 
+        Iterator iter = commandWindows.iterator();
+        while (iter.hasNext()) 
 		{
-            CommandWindow window = (CommandWindow) elements.nextElement();
+            CommandWindow window = (CommandWindow)iter.next();
             window.execute();
         }
     }
 
     void lockCommandWindows()
     {
-        Enumeration elements = commandWindows.elements();
-        while (elements.hasMoreElements()) 
+        Iterator iter = commandWindows.iterator();
+        while (iter.hasNext()) 
 		{
-            CommandWindow window = (CommandWindow) elements.nextElement();
+            CommandWindow window = (CommandWindow)iter.next();
             window.lock();
         }
     }
 
     void unlockCommandWindows()
     {
-        Enumeration elements = commandWindows.elements();
-        while (elements.hasMoreElements()) 
+        Iterator iter = commandWindows.iterator();
+        while (iter.hasNext()) 
 		{
-            CommandWindow window = (CommandWindow) elements.nextElement();
+            CommandWindow window = (CommandWindow)iter.next();
             window.unlock();
         }
     }
@@ -764,7 +765,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 	
 	public boolean aboutRope() 
 	{	
-		String ropeVersion = RopeResources.getString("RopeVersion");
+		String ropeVersion = MessageFormat.format(RopeResources.getString("RopeVersion"), RopeResources.getBuildString("BuildNumber"));
 		String s1 = RopeResources.getString("AboutText1");
 
 		String s2 = MessageFormat.format(RopeResources.getString("AboutText2"), ropeVersion);
@@ -810,7 +811,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 			}
 			else if (result == JOptionPane.YES_OPTION)
 			{
-				editFrame.save();
+				editFrame.saveAction();
 			}
 		}
 	

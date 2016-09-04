@@ -1,9 +1,9 @@
 /**
- * <p>Title: </p>
+ * <p>Title: Simulator.java</p>
  * <p>Description: </p>
  * <p>Copyright: Copyright (c) 2005</p>
  * <p>Company: NASA Ames Research Center</p>
- * @author Ronald Mak
+ * @author Ronald Mak & Luca Severini <lucaseverini@mac.com>
  * @version 2.0
  */
 
@@ -18,6 +18,7 @@ class Simulator
     private static BufferedReader stderr;
     private static Process process;
     private static boolean isActive;
+    private static boolean isBusy;
 
     private static long wallStartTime;
     private static long simulatorStartTime;
@@ -25,6 +26,11 @@ class Simulator
 
     private static boolean timersReset = true;
 	
+	static boolean isBusy()
+	{
+		return isBusy;
+	}
+
 	static boolean isActive()
 	{
 		return isActive;
@@ -60,7 +66,6 @@ class Simulator
 			
 			if(SimulatorOptions.useOldConversion)
 			{
-				// send "SET CPU OLDCONVERSIONS" to use the old conversion
 				execute("SET CPU OLDCONVERSIONS");
 			}
 
@@ -140,20 +145,24 @@ class Simulator
 
     static boolean hasOutput()
     {
-        try {
+        try 
+		{
             return stdout.ready();
         }
         catch (IOException ex) 
 		{
             ex.printStackTrace();
+			
             return false;
         }
     }
 
     static boolean hasOutput(int waitTime)
     {
-        try {
+        try 
+		{
             Thread.sleep(waitTime);
+			
             return stdout.ready();
         }
         catch (IOException ex) 
@@ -170,19 +179,34 @@ class Simulator
 
     static String output()
     {
-        try {
- 			String output = stdout.readLine();
+        try 
+		{
+			String output = "";
+			if(stdout.ready())
+			{
+				output = stdout.readLine();
+				
+				isBusy = false;
+			}
+			else
+			{
+				isBusy = true;
+			}
 			
             simulatorElapsedTime += System.currentTimeMillis() - simulatorStartTime;
             simulatorStartTime = System.currentTimeMillis();
 
-            System.out.println(output);
-
+			if(output.length() > 0)
+			{
+				System.out.println(output);
+			}
+			
             return output;
         }
         catch (IOException ex) 
 		{
             ex.printStackTrace();
+			
             return null;
         }
     }
@@ -214,6 +238,7 @@ class Simulator
             System.out.println("Simulator killed");
 			
 			isActive = false;
+			isBusy = false;
         }
     }
 
@@ -248,6 +273,12 @@ class Simulator
 	@Override
     protected void finalize()
     {
-        cleanup();
+		cleanup();
+		
+		try 
+		{
+			super.finalize();
+		} 
+		catch (Throwable ex) {}
     }
 }

@@ -1,17 +1,19 @@
 /**
- * <p>Title: </p>
+ * <p>Title: ROPE.java</p>
  * <p>Description: </p>
  * <p>Copyright: Copyright (c) 2005</p>
  * <p>Company: NASA Ames Research Center</p>
- * @author Ronald Mak
+ * @author Ronald Mak & Luca Severini <lucaseverini@mac.com>
  * @version 2.0
  */
 
 package rope1401;
 
-import com.apple.eawt.Application;
 import javax.swing.ImageIcon;
 import javax.swing.UIManager;
+
+// Only import these when compiling on Mac
+// import com.apple.eawt.Application;
 // import com.apple.eawt.QuitStrategy;
 
 public class ROPE /* extends com.apple.eawt.Application */
@@ -29,7 +31,8 @@ public class ROPE /* extends com.apple.eawt.Application */
 		
 		if(RopeHelper.isMac)
 		{
-			Application.getApplication().setDockIconImage(new ImageIcon(getClass().getResource("Images/appIcon330.gif")).getImage());
+			// TODO: Use reflection here so that it works on all platforms...
+			//Application.getApplication().setDockIconImage(new ImageIcon(getClass().getResource("Images/appIcon330.gif")).getImage());
 			
 			System.setProperty("apple.awt.graphics.EnableQ2DX", "true");
 			System.setProperty("apple.laf.useScreenMenuBar", "true");
@@ -69,3 +72,4 @@ public class ROPE /* extends com.apple.eawt.Application */
         ROPE rope = new ROPE();
     }
 }
+
