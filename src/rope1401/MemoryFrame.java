@@ -71,13 +71,13 @@ public class MemoryFrame extends ChildFrame implements ActionListener, ChangeLis
 			@Override
 			public void componentHidden(ComponentEvent e) 
 			{
-				System.out.println("Hidden");
+				// System.out.println("Hidden");
 			}
 			
 			@Override
 			public void componentShown(ComponentEvent e) 
 			{
-				System.out.println("Shown");
+				// System.out.println("Shown");
 			}
 		});
 		
@@ -291,27 +291,9 @@ public class MemoryFrame extends ChildFrame implements ActionListener, ChangeLis
 							StringBuilder strBuild = new StringBuilder(text);
 							strBuild.setCharAt(idx, ' ');
 							text = strBuild.toString();
-							// text = text.replace(":", " ");
 						}
 						
 						buffer.append(text).append('\n');
-
-						if (idx >= 0 && idx <= 6) 
-						{
-							try 
-							{
-								String numberStr = text.substring(0, idx).replaceAll("[^0-9]", "");
-								int address = Integer.parseInt(numberStr);
-								if (address == last) 
-								{
-									break;
-								}
-							}
-							catch (Exception ex) 
-							{
-								ex.printStackTrace();
-							}
-						}
 					}
 				}
 
