@@ -48,7 +48,8 @@ public class MemoryFrame extends ChildFrame implements ActionListener, ChangeLis
 		
 		// TODO: Implement a smarter way to set the initial frame position and size
 		setLocation(932, 300);
-		setSize(RopeHelper.isWindows ? 496 : 508, 610);
+		setSize(RopeHelper.isWindows ? 496 : 508, 610);	
+		setMaximumSize(new Dimension((int)getSize().getWidth(), parent.getHeight()));
 		
         try 
 		{
