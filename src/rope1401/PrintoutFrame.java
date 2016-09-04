@@ -53,8 +53,8 @@ public class PrintoutFrame extends ChildFrame implements Printable, ActionListen
 		super(parent);
 		
 		// Implement a smarter way to set the initial frame position and size
-        setLocation(0, 690);
-        setSize(930, 395);
+        setLocation(0, 670);
+        setSize(930, 150);
    
 		try 
 		{

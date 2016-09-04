@@ -35,6 +35,10 @@ public class MemoryFrame extends ChildFrame implements ActionListener, ChangeLis
     JButton showButton = new JButton();
     JCheckBox autoCheckBox = new JCheckBox();
     JCheckBox barsCheckBox = new JCheckBox();
+	Font font = new Font("Monospaced", Font.PLAIN, 14);
+	boolean stripesInitialized = false;
+	int stripe1X, stripe2X, stripe3X;
+	int stripeWidth;
 
     private Color barColor = new Color(15, 15, 15);
 
@@ -42,9 +46,9 @@ public class MemoryFrame extends ChildFrame implements ActionListener, ChangeLis
     {
 		super(parent);
 		
-		// Implement a smarter way to set the initial frame position and size
-		setLocation(930, 690);
-		setSize(508, 395);
+		// TODO: Implement a smarter way to set the initial frame position and size
+		setLocation(932, 300);
+		setSize(RopeHelper.isWindows ? 496 : 508, 610);
 		
         try 
 		{
@@ -100,7 +104,7 @@ public class MemoryFrame extends ChildFrame implements ActionListener, ChangeLis
         this.getContentPane().setLayout(borderLayout1);
         this.getContentPane().add(controlPanel, BorderLayout.NORTH);
         this.getContentPane().add(scrollPane, BorderLayout.CENTER);
- 		
+		
  		memoryArea = new JTextArea() 
 		{
 			private static final long serialVersionUID = 1L;
@@ -113,23 +117,33 @@ public class MemoryFrame extends ChildFrame implements ActionListener, ChangeLis
                 if (barsCheckBox.isSelected()) 
 				{
                     Dimension size = this.getSize();
-                    FontMetrics fm = g.getFontMetrics();
-                    int charWidth = fm.charWidth('w');
-                    int w = 10*charWidth;
-                    int x1 = 8*charWidth;
-                    int x2 = x1 + 2*w;
-                    int x3 = x1 + 4*w;
-
+					g.setFont(font);
+					
+					if(!stripesInitialized)
+					{
+						stripesInitialized = true;
+						
+						FontMetrics fm = g.getFontMetrics();				
+						int charWidth = (int)Math.ceil(fm.getStringBounds("0", g).getWidth());
+ 					
+						stripeWidth = 10 * charWidth;
+						// Small adjustement to make things looks nicer on ugly Windows...
+						stripe1X = (8 * charWidth) + (RopeHelper.isWindows ? 1 : 0);
+					    stripe2X = stripe1X + (stripeWidth * 2);
+						stripe3X = stripe1X + (stripeWidth * 4);					
+					}
+					
                     g.setColor(barColor);
                     g.setXORMode(Color.BLACK);
-                    g.fillRect(x1, 0, w, size.height);
-                    g.fillRect(x2, 0, w, size.height);
-                    g.fillRect(x3, 0, w, size.height);
+                    g.fillRect(stripe1X, 0, stripeWidth, size.height);
+                    g.fillRect(stripe2X, 0, stripeWidth, size.height);
+                    g.fillRect(stripe3X, 0, stripeWidth, size.height);
                     g.setPaintMode();
                 }
             }
         };
-        memoryArea.setFont(new java.awt.Font("Courier", 0, 14));
+		
+ 		memoryArea.setFont(font);
         memoryArea.setDoubleBuffered(true);
         memoryArea.setEditable(false);		
         scrollPane.getViewport().add(memoryArea, null);
@@ -235,8 +249,7 @@ public class MemoryFrame extends ChildFrame implements ActionListener, ChangeLis
 	
 	public void showMemory()
     {
-        int from = 0;
-        int to = 0;
+        int from, to;
 
         try {
             String toString = toText.getText().trim();
@@ -289,7 +302,7 @@ public class MemoryFrame extends ChildFrame implements ActionListener, ChangeLis
 						if(idx > 0 && idx <= 6)
 						{
 							StringBuilder strBuild = new StringBuilder(text);
-							strBuild.setCharAt(idx, ' ');
+							strBuild.setCharAt(idx, ':');
 							text = strBuild.toString();
 						}
 						
@@ -342,9 +355,16 @@ public class MemoryFrame extends ChildFrame implements ActionListener, ChangeLis
 		for(int idx = 0; idx < 7; idx++)
 		{
 			char ch = text.charAt(idx);
-			if(!Character.isDigit(ch) && ch != ' ' && ch != ':')
+			if(!Character.isDigit(ch) && !Character.isWhitespace(ch))
 			{
-				return false;
+				if(ch == ':')
+				{
+					break;
+				}
+				else
+				{
+					return false;
+				}
 			}
 		}
 		

@@ -32,7 +32,7 @@ public class ROPE /* extends com.apple.eawt.Application */
 		if(RopeHelper.isMac)
 		{
 			// TODO: Use reflection here so that it works on all platforms...
-			//Application.getApplication().setDockIconImage(new ImageIcon(getClass().getResource("Images/appIcon330.gif")).getImage());
+			// Application.getApplication().setDockIconImage(new ImageIcon(getClass().getResource("Images/appIcon330.gif")).getImage());
 			
 			System.setProperty("apple.awt.graphics.EnableQ2DX", "true");
 			System.setProperty("apple.laf.useScreenMenuBar", "true");
