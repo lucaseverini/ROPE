@@ -1,7 +1,7 @@
 ROPE
 ====
 
-ROPE is an Integrated Development and Simulation Environment (IDSE) for the IBM 1401, the historical and successful mainframe introduced in 1959. (http://ibm-1401.info/index.html).<br>
+ROPE is an Integrated Development and Simulation Environment (IDSE) for the IBM 1401, the historical and successful mainframe introduced in 1959 that can still be seen in action at the Computer History Museum in Mountain View. (http://ibm-1401.info/index.html).<br>
 ROPE is the acronym of Ron's Own Programming Environment.<br>
 Ron Mak, NASA scientist, CS professor at SJSU and volunteer at the Computer History Museum (http://www.cs.sjsu.edu/~mak/), wrote the first version of ROPE in 2005.<br>
 Luca Severini, Mak's student, took his place in the development and maintenance in 2013.
