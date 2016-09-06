@@ -1,8 +1,12 @@
 ROPE
 ====
 
-Rope Integrated Development and Simulation Environment (IDSE) for the IBM 1401.
-
+ROPE is an Integrated Development Environment (IDE) for the IBM 1401. 
+ROPE is the acronym of Ron's Own Programming Environment.
+Ron Mak, NASA scientist, CS professor at SJSU and volunteer at the Computer History Museum (http://www.cs.sjsu.edu/~mak/), wrote the first version of ROPE in 2005.
+Luca Severini, Mak's student, took his place in the development and maintenance in 2013.
+ROPE is made of three main parts. The front-end developed in java whose source is in this repository, the Autocoder assembler developed in Fortran by W Van Snyder (https://science.jpl.nasa.gov/people/Snyder), and the SimH simulator (http://simh.trailing-edge.com).
+Every comment and bug reporting is more than welcome.
 
 Installing
 -
@@ -35,3 +39,5 @@ Learn more
 -
 
 The manuals availble here are invaluable in programming the IBM 1401: http://ibm-1401.info/1401SoftwDevel.html#Reference
+
+
