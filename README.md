@@ -6,7 +6,7 @@ ROPE is the acronym of Ron's Own Programming Environment.<br>
 Ron Mak, NASA scientist, CS professor at SJSU and volunteer at the Computer History Museum (http://www.cs.sjsu.edu/~mak/), wrote the first version of ROPE in 2005.<br>
 Luca Severini, Mak's student, took his place in the development and maintenance in 2013.
 ROPE is made of three main parts. The front-end developed in java whose source is in this repository, the Autocoder assembler developed in Fortran by W Van Snyder (https://science.jpl.nasa.gov/people/Snyder), and the SimH simulator (http://simh.trailing-edge.com).
-Every comment, bug reporting or fixing is welcome.
+Every comment, bug reporting or fixing is welcome.<br>
 Thank you!
 
 Installing
