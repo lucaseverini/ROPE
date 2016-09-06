@@ -1,7 +1,7 @@
 ROPE
 ====
 
-ROPE is an Integrated Development Environment (IDE) for the IBM 1401. 
+ROPE is an Integrated Development Environment (IDE) for the IBM 1401 (http://ibm-1401.info/index.html).
 ROPE is the acronym of Ron's Own Programming Environment.
 Ron Mak, NASA scientist, CS professor at SJSU and volunteer at the Computer History Museum (http://www.cs.sjsu.edu/~mak/), wrote the first version of ROPE in 2005.
 Luca Severini, Mak's student, took his place in the development and maintenance in 2013.
