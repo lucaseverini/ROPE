@@ -1246,7 +1246,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 			source = source.concat("\n");
 		}
 		
-		// Add the date/time 4-digit timeID to the JOB cards
+		// Add the filename, the date/time and the 4-digit timeID to the JOB cards
 		boolean jobCardModified = false;
 		List<String> lines = new ArrayList<>();		
 		try (BufferedReader reader = new BufferedReader(new StringReader(source))) 
@@ -1265,8 +1265,9 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 						line = line.substring(0, 75);
 					}
 					
-					line = line.substring(0, 75 - (timeStr.length() + 3));
-					line = line.concat(timeStr + "   ");
+					String fileName = baseName + "." + fileExt;
+					line = line.substring(0, 75 - (2 + fileName.length() + 2 + timeStr.length() + 2));
+					line = line.concat("  " + fileName + "  " + timeStr + "  ");
 
 					line = line.concat(timeID);
 
