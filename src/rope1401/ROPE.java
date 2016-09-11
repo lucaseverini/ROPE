@@ -11,12 +11,10 @@ package rope1401;
 
 import javax.swing.ImageIcon;
 import javax.swing.UIManager;
+import java.lang.reflect.Method;
+import java.awt.Image;
 
-// Only import these when compiling on Mac
-// import com.apple.eawt.Application;
-// import com.apple.eawt.QuitStrategy;
-
-public class ROPE /* extends com.apple.eawt.Application */
+public class ROPE
 {
 	public static RopeFrame mainFrame;
 	public static ImageIcon appIcon128;
@@ -31,21 +29,35 @@ public class ROPE /* extends com.apple.eawt.Application */
 		
 		if(RopeHelper.isMac)
 		{
-			// TODO: Use reflection here so that it works on all platforms...
-			// Application.getApplication().setDockIconImage(new ImageIcon(getClass().getResource("Images/appIcon330.gif")).getImage());
-			
-			System.setProperty("apple.awt.graphics.EnableQ2DX", "true");
-			System.setProperty("apple.laf.useScreenMenuBar", "true");
-			System.setProperty("com.apple.mrj.application.apple.menu.about.name", "ROPE");
-			
-			// setQuitStrategy(QuitStrategy.SYSTEM_EXIT_0);
+			// Uses reflection to load eand execute methods of Mac-specific class com.apple.eawt.Application
+			try 
+			{
+				Class application = Class.forName("com.apple.eawt.Application");
+				Method getApplication = application.getMethod("getApplication");
+				Object applicationInstance = getApplication.invoke(null);
+				Method setDockIconImage = applicationInstance.getClass().getMethod("setDockIconImage", java.awt.Image.class);
+				
+				Image icon = new ImageIcon(getClass().getResource("Images/appIcon330.gif")).getImage();
+				setDockIconImage.invoke(applicationInstance, icon);
+
+				System.setProperty("apple.awt.graphics.EnableQ2DX", "true");
+				System.setProperty("apple.laf.useScreenMenuBar", "true");
+				System.setProperty("com.apple.mrj.application.apple.menu.about.name", "ROPE");
+			}
+			catch (Exception ex) 
+			{
+				ex.printStackTrace();
+			}
 		}
 
 		try
 		{
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		}
-		catch (Exception ex) {}
+		catch (Exception ex) 
+		{
+			ex.printStackTrace();
+		}
 	   
 		Runtime.getRuntime().addShutdownHook(new Thread()
 		{
@@ -56,6 +68,8 @@ public class ROPE /* extends com.apple.eawt.Application */
 				if(mainFrame != null && !mainFrame.closed())
 				{
 					mainFrame.savePreferences();
+
+					mainFrame.setIconImage(new ImageIcon(getClass().getResource("Images/appIcon330.gif")).getImage());
 				}
 
 				// Kill Assembler and Simulator if still open
