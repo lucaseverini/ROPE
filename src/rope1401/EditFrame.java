@@ -70,6 +70,16 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 	private Action redoAction;
 	private String selectedPath;
 
+	public class BoolRef 
+	{ 
+		BoolRef(boolean initval)
+		{
+			value = initval;
+		}
+		
+		public boolean value; 
+	}
+	
     EditFrame(RopeFrame parent)
     {
 		super(parent);
@@ -671,14 +681,14 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 
         try 
 		{
-			Boolean removedInvalidChars = false;
+			BoolRef removedInvalidChars = new BoolRef(false);
 			String cleanText = cleanupSource(sourceArea.getText(), removedInvalidChars);
 			
 			int caretPos = sourceArea.getCaretPosition();
 			sourceArea.setText(cleanText);
-			sourceArea.setCaretPosition(caretPos);
+			sourceArea.setCaretPosition(caretPos > cleanText.length() ? cleanText.length() : caretPos);
 			
-			if(removedInvalidChars)
+			if(removedInvalidChars.value)
 			{
 				String message = String.format("One or more invalid characters at the end of the source file have been removed.");
 				JOptionPane.showMessageDialog(this, message, "ROPE", JOptionPane.INFORMATION_MESSAGE);
@@ -1192,9 +1202,9 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
         }
 	}
 	
-	String cleanupSource(String source, Boolean removedInvalidChars) throws Exception
+	String cleanupSource(String source, BoolRef removedInvalidChars) throws Exception
 	{
-		removedInvalidChars = false;
+		removedInvalidChars.value = false;
 		
 		if(source.isEmpty())
 		{
@@ -1228,7 +1238,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 				}
 			}
 			
-			removedInvalidChars = (removedNewlines > 1);
+			removedInvalidChars.value = (removedNewlines > 1);
 			
 			source = source.concat("\n");
 		}
