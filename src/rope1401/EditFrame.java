@@ -290,6 +290,15 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 				setSourceChanged(true);
 			}
 		});
+		
+		this.addComponentListener(new ComponentAdapter() 
+		{
+			@Override
+            public void componentResized(ComponentEvent e) 
+			{
+                fileText.setText(sourcePath);
+            }
+        });
 	}
 	
     void jbInit() throws Exception
@@ -314,9 +323,9 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
         browseButton.setSelected(false);
         browseButton.setText("Browse ...");
         assembleButton.setEnabled(false);
-        assembleButton.setText("Assemble file");
+        assembleButton.setText("Assemble");
         saveButton.setEnabled(false);
-        saveButton.setText("Save file");
+        saveButton.setText("Save");
         saveMessagesButton.setEnabled(true);
         saveMessagesButton.setText("Save messages ...");
         lineLabel.setText("Line:");
@@ -332,13 +341,15 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
         messageScrollPane.setMinimumSize(new Dimension(33, 61));
         messageScrollPane.setPreferredSize(new Dimension(60, 90));
         optionsButton.setEnabled(false);
-        optionsButton.setText("Assembler options ...");
+        optionsButton.setText("Options ...");
         messageScrollPane.getViewport().add(messageList, null);
         messageList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         this.getContentPane().add(splitPane, BorderLayout.CENTER);
         splitPane.add(textScrollPane, JSplitPane.TOP);
         splitPane.add(controlPanel, JSplitPane.BOTTOM);
         textScrollPane.getViewport().add(sourceArea, null);
+		
+		saveMessagesButton.setVisible(false); // Not implemented yet...
 		
         controlPanel.add(fileLabel,
                          new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
@@ -392,7 +403,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
                                                 new Insets(5, 5, 0, 0), 0, 0));
 
 		controlPanel.add(optionsButton,
-                         new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0,
+                         new GridBagConstraints(2, 1, 1, 1, 0.2, 0.0,
                                                 GridBagConstraints.EAST,
                                                 GridBagConstraints.NONE,
                                                 new Insets(5, 5, 0, 0), 0, 0));
@@ -404,7 +415,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
         controlPanel.add(saveButton,
                          new GridBagConstraints(4, 1, 1, 1, 0.0, 0.0,
                                                 GridBagConstraints.EAST,
-                                                GridBagConstraints.NONE,
+                                                GridBagConstraints.HORIZONTAL,
                                                 new Insets(5, 5, 0, 5), 0, 0));
  	}
 
