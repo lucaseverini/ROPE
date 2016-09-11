@@ -9,8 +9,13 @@
 
 package rope1401;
 
-import static java.lang.Math.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Toolkit;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
@@ -303,7 +308,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 	
     void jbInit() throws Exception
     {
-        titledBorder1 = new TitledBorder(BorderFactory.createLineBorder( new Color(153, 153, 153), 2), "Assembler messages");
+        titledBorder1 = new TitledBorder(BorderFactory.createLineBorder(new Color(153, 153, 153), 2), "Assembler messages");
         this.getContentPane().setLayout(borderLayout1);
 		
         this.setIconifiable(true);
@@ -666,18 +671,19 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 
         try 
 		{
-			String sourceText = sourceArea.getText();
+			Boolean removedInvalidChars = false;
+			String cleanText = cleanupSource(sourceArea.getText(), removedInvalidChars);
 			
-			String cleanText = cleanupSource(sourceText);
+			int caretPos = sourceArea.getCaretPosition();
+			sourceArea.setText(cleanText);
+			sourceArea.setCaretPosition(caretPos);
 			
-			if(cleanText.length() != sourceText.length())
+			if(removedInvalidChars)
 			{
-				sourceArea.setText(cleanText);
-				
 				String message = String.format("One or more invalid characters at the end of the source file have been removed.");
 				JOptionPane.showMessageDialog(this, message, "ROPE", JOptionPane.INFORMATION_MESSAGE);
 			}
-			
+		
             sourceFile = new BufferedWriter(new FileWriter(sourcePath, false));
             sourceFile.write(cleanText);
 			
@@ -685,7 +691,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 			
 			setupMenus();
         }
-        catch (IOException ex) 
+        catch (Exception ex) 
 		{
             ex.printStackTrace();
         }
@@ -1138,7 +1144,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
         }
 		
 		int length = sourceArea.getText().length();
-		if(length == 0 || abs(mark - dot) == length)
+		if(length == 0 || Math.abs(mark - dot) == length)
 		{
 			mainFrame.selectAllItem.setEnabled(false);
 		}
@@ -1186,12 +1192,16 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
         }
 	}
 	
-	String cleanupSource(String source)
+	String cleanupSource(String source, Boolean removedInvalidChars) throws Exception
 	{
+		removedInvalidChars = false;
+		
 		if(source.isEmpty())
 		{
 			return source.concat("\n");
 		}
+		
+		String timeID = getTimeID();
 		
 		int lastChIdx = source.length() - 1;
 		if(source.charAt(lastChIdx) != '\n')
@@ -1202,12 +1212,15 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 		else
 		{
 			// Remove all newlines at the end but one
+			int removedNewlines = 0;
 			while(lastChIdx >= 1)
 			{
 				Character ch1 = source.charAt(lastChIdx);
 				if(ch1 == '\n' || Character.isWhitespace(ch1))
 				{
 					source = source.substring(0, lastChIdx--);
+					
+					removedNewlines++;
 				}
 				else
 				{
@@ -1215,7 +1228,49 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 				}
 			}
 			
+			removedInvalidChars = (removedNewlines > 1);
+			
 			source = source.concat("\n");
+		}
+		
+		// Add the 4-digit timeID to the JOB cards
+		boolean jobCardModified = false;
+		List<String> lines = new ArrayList<>();		
+		try (BufferedReader reader = new BufferedReader(new StringReader(source))) 
+		{
+			String line;
+			while ((line = reader.readLine()) != null) 
+			{
+				if(line.length() >= 18 && line.substring(15, 18).compareTo("JOB") == 0)
+				{					
+					if(line.length() < 75)
+					{
+						line = String.format("%-75s", line);
+					}
+					else if(line.length() > 75)
+					{
+						line = line.substring(0, 75);
+					}
+
+					line = line.concat(timeID);
+					System.out.println("Added TimeID " + timeID + " to source file " + baseName + "." + fileExt);
+
+					jobCardModified = true;
+				}
+
+				lines.add(line);
+			}
+		}
+		
+		if(jobCardModified)
+		{
+			StringWriter writer = new StringWriter();
+			for(String line : lines)
+			{
+				writer.write(line + "\n");
+			}
+			
+			source = writer.toString();
 		}
 		
 		return source;
@@ -1260,5 +1315,12 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 		{
 			ex.printStackTrace();
 		}
+	}
+	
+	String getTimeID() throws Exception
+	{
+		long secs = (new Date().getTime())/1000;
+		String timeStr = Long.toString(secs);
+		return timeStr.substring(timeStr.length() - 4);
 	}
 }
