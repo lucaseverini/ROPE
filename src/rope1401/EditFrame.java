@@ -18,6 +18,8 @@ import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.*;
 import java.io.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
@@ -1212,6 +1214,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 		}
 		
 		String timeID = getTimeID();
+		String timeStr = getTimeString();
 		
 		int lastChIdx = source.length() - 1;
 		if(source.charAt(lastChIdx) != '\n')
@@ -1243,7 +1246,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 			source = source.concat("\n");
 		}
 		
-		// Add the 4-digit timeID to the JOB cards
+		// Add the date/time 4-digit timeID to the JOB cards
 		boolean jobCardModified = false;
 		List<String> lines = new ArrayList<>();		
 		try (BufferedReader reader = new BufferedReader(new StringReader(source))) 
@@ -1261,9 +1264,11 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 					{
 						line = line.substring(0, 75);
 					}
+					
+					line = line.substring(0, 75 - (timeStr.length() + 3));
+					line = line.concat(timeStr + "   ");
 
 					line = line.concat(timeID);
-					System.out.println("Added TimeID " + timeID + " to source file " + baseName + "." + fileExt);
 
 					jobCardModified = true;
 				}
@@ -1331,6 +1336,12 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 	{
 		long secs = (new Date().getTime())/1000;
 		String timeStr = Long.toString(secs);
-		return timeStr.substring(timeStr.length() - 4);
+		return timeStr.substring(timeStr.length() - 5);
+	}
+	
+	String getTimeString() throws Exception
+	{
+		DateFormat dateFormat = new SimpleDateFormat("MM/dd/yy hh:mm:ss");
+        return dateFormat.format(new Date());
 	}
 }
