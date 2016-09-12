@@ -147,6 +147,12 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
                 }
 				else
 				{
+/*
+					// In the Exec window the selected line represents the current instruction so it can't be changed.
+					// If we are going to implement a functionality to jump to (read arbitrarily set) a different instruction,
+					// then we should use a small arrow placed between the breakpoints and the line number to show what is
+					// the current instruction.
+					
 					Point mouseLoc = event.getPoint();
 					int idx = listing.locationToIndex(mouseLoc);
 					if(idx >= 0)
@@ -164,6 +170,7 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
 							}
 						}
 					}
+*/
 				}
 
 				repaint();
@@ -390,6 +397,7 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
        }
 
 		loadBreakpoints();
+		
 		restoreBreakpoints(activeBreakpoints);
 	}
 
@@ -417,6 +425,7 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
 	void clearListing()
 	{
         listing.clearSelection();
+		
 		listing.removeAll();
 	}
 
@@ -424,10 +433,9 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
     {
 		clearListing();
 		
-        ArrayList v = filterListing();
-        if (v != null) 
+        if (filterListing() != null) 
 		{
-            listing.setListData(v.toArray());
+            listing.setListData(filterListing().toArray());
 
             if (currentMessage == null) 
 			{
@@ -934,7 +942,7 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
         mainFrame.updateCommandWindows();
         mainFrame.enableSenseSwitches();
 		
-		if(Simulator.isBusy())
+		if(Simulator.isBusy()) // At now this is never true
 		{
 			startButton.setText("Break program");
 			
@@ -945,6 +953,10 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
 		else
 		{
 			startButton.setText("Continue program");
+
+			quitButton.setEnabled(true);
+            singleStepButton.setEnabled(true);
+            autoStepButton.setEnabled(true);
 		}
     }
 
