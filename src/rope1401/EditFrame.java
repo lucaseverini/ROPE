@@ -1335,14 +1335,15 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 	
 	String getTimeID() throws Exception
 	{
-		long secs = (new Date().getTime())/1000;
+		long secs = Calendar.getInstance(TimeZone.getDefault()).getTime().getTime() / 1000;
 		String timeStr = Long.toString(secs);
 		return timeStr.substring(timeStr.length() - 5);
 	}
 	
 	String getTimeString() throws Exception
 	{
-		DateFormat dateFormat = new SimpleDateFormat("MM/dd/yy hh:mm:ss");
-        return dateFormat.format(new Date());
+		Date currentDate = Calendar.getInstance(TimeZone.getDefault()).getTime();
+		DateFormat dateFormat = new SimpleDateFormat("MM/dd/yy HH:mm:ss");
+        return dateFormat.format(currentDate);
 	}
 }
