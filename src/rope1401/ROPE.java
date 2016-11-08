@@ -29,7 +29,7 @@ public class ROPE
 		
 		if(RopeHelper.isMac)
 		{
-			// Uses reflection to load eand execute methods of Mac-specific class com.apple.eawt.Application
+			// Uses reflection to load and execute methods of Mac-specific class com.apple.eawt.Application
 			try 
 			{
 				Class application = Class.forName("com.apple.eawt.Application");
