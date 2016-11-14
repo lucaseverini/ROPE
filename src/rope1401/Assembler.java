@@ -72,6 +72,8 @@ class Assembler
 				{
 					convertTape(AssemblerOptions.tapePath);
 				}
+				
+				addRowToTape(AssemblerOptions.tapePath, "~L038I9C~N000~B007~TAPE DCW @TAPE@ ~}");
 
 				// ...then generate deck
 				buildDeck();
@@ -85,6 +87,8 @@ class Assembler
 				{
 					convertTape(AssemblerOptions.tapePath);
 				}
+				
+				addRowToTape(AssemblerOptions.tapePath, "~L038I9C~N000~B007~TAPE DCW @TAPE@ ~}");
 			}
 			
 			process = null;
@@ -153,6 +157,54 @@ class Assembler
  
 			file.seek(0);
 			file.write(buffer);
+
+			file.close();
+		}
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }		
+	}
+
+	static void addRowToTape(String tapePath, String rowStr)
+	{
+		try
+		{
+			RandomAccessFile file = new RandomAccessFile(new File(tapePath), "rws");
+			
+			int len = (int)file.length();
+			
+			byte[] buffer = new byte[len];
+			file.readFully(buffer);
+			
+			int lineCount = 0;
+			for (int idx = 0; idx < len; idx++) 
+			{
+				if (buffer[idx] == '\n') 
+				{
+					lineCount++;
+				}
+			}
+ 
+			int curLine = 0;
+			int buffIdx = 0;
+			for (; buffIdx < len; buffIdx++) 
+			{
+				if (buffer[buffIdx] == '\n') 
+				{
+					if(++curLine == lineCount - 1)
+					{
+						file.seek(0);
+						file.write(buffer, 0, ++buffIdx);	
+						break;
+					}
+				}
+			}
+			
+			rowStr = rowStr.concat("\n");
+			file.writeBytes(rowStr);
+			
+			file.write(buffer, buffIdx, len - buffIdx);
 
 			file.close();
 		}
