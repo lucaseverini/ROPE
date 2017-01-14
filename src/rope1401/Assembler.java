@@ -66,13 +66,13 @@ class Assembler
 							!AssemblerOptions.tapeEncodingChoice.equals(AssemblerOptions.deckEncodingChoice))
 			{
 				// Generate assembly and tape first...
-				buildTape();
-				
+				buildTape();			
+/*
 				if(AssemblerOptions.tape && AssemblerOptions.convertTapeForTapeSimulator)
 				{
 					convertTape(AssemblerOptions.tapePath);
 				}
-				
+*/
 				addRowToTape(AssemblerOptions.tapePath, "~L038I9C~N000~B007~TAPE DCW @TAPE@ ~}");
 
 				// ...then generate deck
@@ -82,12 +82,12 @@ class Assembler
 			{
 				// Generate the assembly 
 				buildAssembly();
-				
+/*				
 				if(AssemblerOptions.tape && AssemblerOptions.convertTapeForTapeSimulator)
 				{
 					convertTape(AssemblerOptions.tapePath);
 				}
-				
+*/				
 				addRowToTape(AssemblerOptions.tapePath, "~L038I9C~N000~B007~TAPE DCW @TAPE@ ~}");
 			}
 			

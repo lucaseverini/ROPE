@@ -539,11 +539,13 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
                                                 GridBagConstraints.CENTER,
                                                 GridBagConstraints.NONE,
                                                 new Insets(5, 5, 0, 15), 0, 0));
+/*
         optionsPanel.add(convertTapeForTapeSimulatorBox,
                          new GridBagConstraints(1, 6, 4, 1, 0.0, 0.0,
                                                 GridBagConstraints.WEST,
                                                 GridBagConstraints.NONE,
                                                 new Insets(5, 15, 0, 0), 0, 0));
+*/
         optionsPanel.add(macroCheckBox,
                          new GridBagConstraints(0, 7, 1, 1, 0.0, 0.0,
                                                 GridBagConstraints.WEST,
@@ -726,11 +728,11 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
         deckEncodingARadioButton.setSelected(AssemblerOptions.deckEncodingChoice.equals(AssemblerOptions.ENCODING_SIMH));
         deckEncodingHRadioButton.setSelected(AssemblerOptions.deckEncodingChoice.equals(AssemblerOptions.ENCODING_SIMH));
         deckEncodingPrintRadioButton.setSelected(AssemblerOptions.deckEncodingChoice.equals(AssemblerOptions.ENCODING_SIMH));
-
+/*
 		tapeEncodingSimhRadioButton.setSelected(AssemblerOptions.tapeEncodingChoice.equals(AssemblerOptions.ENCODING_SIMH));
         tapeEncodingARadioButton.setSelected(AssemblerOptions.tapeEncodingChoice.equals(AssemblerOptions.ENCODING_SIMH));
         tapeEncodingHRadioButton.setSelected(AssemblerOptions.tapeEncodingChoice.equals(AssemblerOptions.ENCODING_SIMH));
- 
+*/		
         enableBoot();
         enableDeckEncoding();
         enableTapeEncoding();
@@ -779,12 +781,16 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
 	private void enableTapeEncoding()
     {
         boolean enabled = tapeEncodingCheckBox.isSelected();
-
+/*
         tapeEncodingSimhRadioButton.setEnabled(enabled);
         tapeEncodingARadioButton.setEnabled(enabled);
         tapeEncodingHRadioButton.setEnabled(enabled);
- 
-        tapeEncodingARadioButton.setSelected(AssemblerOptions.tapeEncodingChoice.equals(AssemblerOptions.ENCODING_A));
+*/ 
+        tapeEncodingSimhRadioButton.setEnabled(false);
+        tapeEncodingARadioButton.setEnabled(enabled);
+        tapeEncodingHRadioButton.setEnabled(false);
+
+		tapeEncodingARadioButton.setSelected(AssemblerOptions.tapeEncodingChoice.equals(AssemblerOptions.ENCODING_A));
     }
 
     private void enableInterleave()
