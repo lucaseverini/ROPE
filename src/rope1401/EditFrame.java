@@ -1251,43 +1251,32 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 		List<String> lines = new ArrayList<>();		
 		try (BufferedReader reader = new BufferedReader(new StringReader(source))) 
 		{
+			// Remove all JOB rows
 			String line;
 			while ((line = reader.readLine()) != null) 
 			{
-				if(line.length() >= 18 && line.substring(15, 18).compareTo("JOB") == 0)
-				{					
-					if(line.length() < 75)
-					{
-						line = String.format("%-75s", line);
-					}
-					else if(line.length() > 75)
-					{
-						line = line.substring(0, 75);
-					}
-					
-					String fileName = baseName + "." + fileExt;
-					line = line.substring(0, 75 - (2 + fileName.length() + 2 + timeStr.length() + 2));
-					line = line.concat("  " + fileName + "  " + timeStr + "  ");
-
-					line = line.concat(timeID);
-
-					jobCardModified = true;
+				if(line.length() < 18 || line.substring(15, 18).compareTo("JOB") != 0)
+				{		
+					lines.add(line);
 				}
-
-				lines.add(line);
 			}
 		}
 		
-		if(jobCardModified)
+		// Add a new JOB row at the beginning
+		String fileName = baseName.toUpperCase() + "." + fileExt.toUpperCase();
+		String jobLine = "               JOB  " + fileName + " " + timeStr; 
+		jobLine = String.format("%-75s", jobLine);
+		jobLine = jobLine.concat(timeID);		
+		lines.add(0, jobLine);
+		
+		// Write all rows
+		StringWriter writer = new StringWriter();
+		for(String line : lines)
 		{
-			StringWriter writer = new StringWriter();
-			for(String line : lines)
-			{
-				writer.write(line + "\n");
-			}
-			
-			source = writer.toString();
+			writer.write(line + "\n");
 		}
+
+		source = writer.toString();
 		
 		return source;
 	}
@@ -1337,7 +1326,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 	{
 		long secs = Calendar.getInstance(TimeZone.getDefault()).getTime().getTime() / 1000;
 		String timeStr = Long.toString(secs);
-		return timeStr.substring(timeStr.length() - 5);
+		return timeStr.substring(timeStr.length() - 4);
 	}
 	
 	String getTimeString() throws Exception
