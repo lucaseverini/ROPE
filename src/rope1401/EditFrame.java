@@ -1326,7 +1326,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 	{
 		long secs = Calendar.getInstance(TimeZone.getDefault()).getTime().getTime() / 1000;
 		String timeStr = Long.toString(secs);
-		return "." + timeStr.substring(timeStr.length() - 4);
+		return "-" + timeStr.substring(timeStr.length() - 4);
 	}
 	
 	String getTimeString() throws Exception
