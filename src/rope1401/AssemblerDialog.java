@@ -728,11 +728,11 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
         deckEncodingARadioButton.setSelected(AssemblerOptions.deckEncodingChoice.equals(AssemblerOptions.ENCODING_SIMH));
         deckEncodingHRadioButton.setSelected(AssemblerOptions.deckEncodingChoice.equals(AssemblerOptions.ENCODING_SIMH));
         deckEncodingPrintRadioButton.setSelected(AssemblerOptions.deckEncodingChoice.equals(AssemblerOptions.ENCODING_SIMH));
-/*
+
 		tapeEncodingSimhRadioButton.setSelected(AssemblerOptions.tapeEncodingChoice.equals(AssemblerOptions.ENCODING_SIMH));
         tapeEncodingARadioButton.setSelected(AssemblerOptions.tapeEncodingChoice.equals(AssemblerOptions.ENCODING_SIMH));
         tapeEncodingHRadioButton.setSelected(AssemblerOptions.tapeEncodingChoice.equals(AssemblerOptions.ENCODING_SIMH));
-*/		
+		
         enableBoot();
         enableDeckEncoding();
         enableTapeEncoding();
@@ -781,15 +781,15 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
 	private void enableTapeEncoding()
     {
         boolean enabled = tapeEncodingCheckBox.isSelected();
-/*
+
         tapeEncodingSimhRadioButton.setEnabled(enabled);
         tapeEncodingARadioButton.setEnabled(enabled);
         tapeEncodingHRadioButton.setEnabled(enabled);
-*/ 
+/*
         tapeEncodingSimhRadioButton.setEnabled(false);
         tapeEncodingARadioButton.setEnabled(enabled);
         tapeEncodingHRadioButton.setEnabled(false);
-
+*/
 		tapeEncodingARadioButton.setSelected(AssemblerOptions.tapeEncodingChoice.equals(AssemblerOptions.ENCODING_A));
     }
 
@@ -905,7 +905,7 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
                           : deckEncodingHRadioButton.isSelected() ? "H"
                           : "?");
         }
-/*
+
         if (tapeEncodingCheckBox.isSelected())
 		{
             command.add("-E");
@@ -919,7 +919,7 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
 		{
             command.add("-c");
         }
-*/
+
 		if (listingCheckBox.isSelected()) 
 		{
             command.add("-l");			
