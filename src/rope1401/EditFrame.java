@@ -804,7 +804,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
         messages = new ArrayList();
 
 		// Removes the .lst, .cd and .out files
-		removeAssemblerFiles(sourcePath);
+		// removeAssemblerFiles(sourcePath);
 
         mainFrame.resetExecWindow();
 
@@ -1315,7 +1315,19 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 			{
 				file.delete();
 			}
-	   	}
+
+   		    file = new File(basePath + ".tobj");   
+			if(file.exists())
+			{
+				file.delete();
+			}
+
+			file = new File(basePath + ".diag");   
+			if(file.exists())
+			{
+				file.delete();
+			}
+		}
 		catch(Exception ex) 
 		{
 			ex.printStackTrace();
