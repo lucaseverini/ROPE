@@ -1248,9 +1248,9 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 		
 		// Add the filename, the date/time and the 4-digit timeID to the JOB cards
 		boolean jobCardModified = false;
-		List<String> lines = new ArrayList<>();		
-		try (BufferedReader reader = new BufferedReader(new StringReader(source))) 
-		{
+		List<String> lines = new ArrayList<String>();		
+		BufferedReader reader = new BufferedReader(new StringReader(source));
+		try {
 			// Remove all JOB rows
 			String line;
 			while ((line = reader.readLine()) != null) 
@@ -1260,6 +1260,10 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 					lines.add(line);
 				}
 			}
+		}
+		catch(Exception ex)
+		{
+			ex.printStackTrace();
 		}
 		
 		// Add a new JOB row at the beginning
@@ -1315,7 +1319,19 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 			{
 				file.delete();
 			}
-	   	}
+
+   		    file = new File(basePath + ".tobj");   
+			if(file.exists())
+			{
+				file.delete();
+			}
+
+			file = new File(basePath + ".diag");   
+			if(file.exists())
+			{
+				file.delete();
+			}
+		}
 		catch(Exception ex) 
 		{
 			ex.printStackTrace();

@@ -725,13 +725,13 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
         size16000RadioButton.setSelected(AssemblerOptions.coreSize == AssemblerOptions.SIZE_16000);
 
         deckEncodingSimhRadioButton.setSelected(AssemblerOptions.deckEncodingChoice.equals(AssemblerOptions.ENCODING_SIMH));
-        deckEncodingARadioButton.setSelected(AssemblerOptions.deckEncodingChoice.equals(AssemblerOptions.ENCODING_SIMH));
-        deckEncodingHRadioButton.setSelected(AssemblerOptions.deckEncodingChoice.equals(AssemblerOptions.ENCODING_SIMH));
-        deckEncodingPrintRadioButton.setSelected(AssemblerOptions.deckEncodingChoice.equals(AssemblerOptions.ENCODING_SIMH));
+        deckEncodingARadioButton.setSelected(AssemblerOptions.deckEncodingChoice.equals(AssemblerOptions.ENCODING_A));
+        deckEncodingHRadioButton.setSelected(AssemblerOptions.deckEncodingChoice.equals(AssemblerOptions.ENCODING_H));
+        deckEncodingPrintRadioButton.setSelected(AssemblerOptions.deckEncodingChoice.equals(AssemblerOptions.ENCODING_PRINT));
 
 		tapeEncodingSimhRadioButton.setSelected(AssemblerOptions.tapeEncodingChoice.equals(AssemblerOptions.ENCODING_SIMH));
-        tapeEncodingARadioButton.setSelected(AssemblerOptions.tapeEncodingChoice.equals(AssemblerOptions.ENCODING_SIMH));
-        tapeEncodingHRadioButton.setSelected(AssemblerOptions.tapeEncodingChoice.equals(AssemblerOptions.ENCODING_SIMH));
+        tapeEncodingARadioButton.setSelected(AssemblerOptions.tapeEncodingChoice.equals(AssemblerOptions.ENCODING_A));
+        tapeEncodingHRadioButton.setSelected(AssemblerOptions.tapeEncodingChoice.equals(AssemblerOptions.ENCODING_H));
 		
         enableBoot();
         enableDeckEncoding();
