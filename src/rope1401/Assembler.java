@@ -467,9 +467,9 @@ class Assembler
 		// Wait for the process to complete
 		try { process.waitFor(); }
 		catch(Exception ex) {}
+		
+		System.out.println("Assembly done!");
 	}
-
-	static void buildTape() throws IOException
 	{
 		String[] tapeArgs = buildCommand(false).toArray(new String[0]);
 		process = Runtime.getRuntime().exec(tapeArgs);
