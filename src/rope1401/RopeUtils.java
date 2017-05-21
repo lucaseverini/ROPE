@@ -10,9 +10,15 @@
 package rope1401;
 
 // RopeUtils -----------------------------------------------------
+
+import java.io.File;
+import java.nio.file.*;
+import java.io.IOException;
+
 public class RopeUtils 
 {
 	public static String separator = System.getProperty("file.separator");
+	public static String tmpDir = System.getProperty("java.io.tmpdir");
 
 	public static String removeExtension(String path) 
 	{
@@ -23,6 +29,17 @@ public class RopeUtils
 		}
 		
 		return path.substring(0, extensionIndex);
+	}
+
+	public static String getExtension(String path) 
+	{
+		int extensionIndex = path.lastIndexOf(".");
+		if (extensionIndex == -1)
+		{
+			return "";
+		}
+		
+		return path.substring(extensionIndex + 1);
 	}
 
 	public static String getFileName(String path) 
@@ -42,5 +59,33 @@ public class RopeUtils
 	{
 		int idx = filename.lastIndexOf(separator);	  
 		return (idx > -1) ? filename.substring(0, idx) : filename;
+	}
+	
+	public static String addPathSeparator(String path)
+	{
+		if(path.lastIndexOf(separator) == path.length() - 1)
+		{
+			return path;
+		}
+		else
+		{
+			return path + separator;
+		}
+	}
+	
+	public static String copyFile(String source, boolean copyInTmpDir) throws IOException
+	{
+		String filePath = addPathSeparator(copyInTmpDir ? tmpDir : pathComponent(source));
+		String fileName = getFileName(source);
+		String fileExt = getExtension(fileName);
+		String timeStr = "" + System.currentTimeMillis();
+				
+		String dest = filePath + removeExtension(fileName) + "_" + timeStr + "." + getExtension(fileName);
+		
+		File fileSource = new File(source);
+		File fileDest = new File(dest);
+		Files.copy(fileSource.toPath(), fileDest.toPath());
+		
+		return dest;
 	}
 }

@@ -11,7 +11,10 @@
 package rope1401;
 
 import java.io.*;
+import java.nio.*;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.prefs.Preferences;
 
 class Assembler
 {
@@ -19,6 +22,7 @@ class Assembler
 	// private static String sourcePath;
     private static BufferedReader stdout;
     private static Process process;
+	private static final Preferences userPrefs = Preferences.userRoot();
 
     static void setPaths(String sourceName, String sourcePath)
     {
@@ -120,6 +124,11 @@ class Assembler
 				outFile.delete();
 			}
 			
+			if (userPrefs.getBoolean("convertPlusToAmpersand", true))
+			{
+				convertAmpToPlusInList(listFile.getPath());
+			}
+
 			process = null;
 			
 			return true;
@@ -161,6 +170,130 @@ class Assembler
         }
     }
 	
+	// From Stan Paddock request
+	// Replace '&' with '+' in code positions from 22 until comment or EOL		
+	static void convertPlusToAmpInSource(String sourcePath)
+	{
+		try
+		{
+			BufferedReader reader = new BufferedReader(new FileReader(sourcePath));
+			
+			List<String> lines = new ArrayList<String>();
+			String line = null;
+			while ((line = reader.readLine()) != null)
+			{
+				lines.add(line);
+			}
+			reader.close();
+			
+			String[] strings = lines.toArray(new String[lines.size()]);
+			
+			BufferedWriter writer = new BufferedWriter(new FileWriter(sourcePath));
+						
+			for (int strIdx = 0; strIdx < strings.length; strIdx++)
+			{
+				String str = strings[strIdx];
+				int strLen = str.length();
+				if (strLen > 6)
+				{
+					char chars[] = str.toCharArray();
+					if (chars[5] != '*')
+					{
+						int adjacentSpaces = 0;
+						for (int chIdx = 6; chIdx < strLen; chIdx++)
+						{
+							adjacentSpaces = (chIdx >= 20 && chars[chIdx] == ' ' ? adjacentSpaces + 1 : 0);
+							if (adjacentSpaces == 2)
+							{
+								break; // Now we are in comment space...
+							}
+							
+							if (chars[chIdx] == '+')
+							{
+								chars[chIdx] = '&';
+							}
+						}
+						
+						str = new String(chars);
+					}				
+				}
+				
+				writer.write(str);
+				writer.newLine();
+			}
+			 
+			writer.close(); 
+		}
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }		
+	}
+	
+	static void convertAmpToPlusInList(String listPath)
+	{
+		File listFile = new File(listPath);
+		if (!listFile.exists())
+		{
+			return;
+		}
+		
+		try
+		{
+			BufferedReader reader = new BufferedReader(new FileReader(listPath));
+			
+			List<String> lines = new ArrayList<String>();
+			String line = null;
+			while ((line = reader.readLine()) != null)
+			{
+				lines.add(line);
+			}
+			reader.close();
+			
+			String[] strings = lines.toArray(new String[lines.size()]);
+			
+			BufferedWriter writer = new BufferedWriter(new FileWriter(listPath));
+						
+			for (int strIdx = 0; strIdx < strings.length; strIdx++)
+			{
+				String str = strings[strIdx];
+				int strLen = str.length();
+				if (strLen > 15)
+				{
+					char chars[] = str.toCharArray();
+					if (chars[14] != '*')
+					{
+						int adjacentSpaces = 0;
+						for (int chIdx = 6; chIdx < strLen; chIdx++)
+						{
+							adjacentSpaces = (chIdx >= 29 && chars[chIdx] == ' ' ? adjacentSpaces + 1 : 0);
+							if (adjacentSpaces == 2)
+							{
+								break; // Now we are in comment space...
+							}
+							
+							if (chars[chIdx] == '&')
+							{
+								chars[chIdx] = '+';
+							}
+						}
+						
+						str = new String(chars);
+					}				
+				}
+				
+				writer.write(str);
+				writer.newLine();
+			}
+			 
+			writer.close(); 
+		}
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }				
+	}
+
 	static void convertTape(String tapePath)
 	{
 		try
@@ -250,8 +383,8 @@ class Assembler
         }		
 	}
 
-    static ArrayList<String> buildCommand(boolean forDeckOrTape)
-    {
+    static ArrayList<String> buildCommand(boolean forDeckOrTape) throws IOException
+    {		
         ArrayList<String> command = new ArrayList<String>();
 
 		command.add(AssemblerOptions.assemblerPath);
@@ -474,8 +607,15 @@ class Assembler
                 command.add("" + flag);
             }
         }
+				
+		String sourcePath = RopeUtils.copyFile(AssemblerOptions.sourcePath, false);
+
+		if (userPrefs.getBoolean("convertPlusToAmpersand", true))
+		{
+			convertPlusToAmpInSource(sourcePath);
+		}
 		
-        command.add(AssemblerOptions.sourcePath);
+        command.add(sourcePath);
 		
 		String commandStr = "";
 		for(int idx = 0; idx < command.size(); idx++)
@@ -503,6 +643,10 @@ class Assembler
 		// Wait for the process to complete
 		try { process.waitFor(); }
 		catch(Exception ex) {}
+
+		// Remove the temporary source file
+		File sourceFile = new File(args[args.length - 1]);
+		sourceFile.delete();
 	}
 
 	static void buildTape() throws IOException
@@ -514,6 +658,10 @@ class Assembler
 		// Wait for the process to complete
 		try { process.waitFor(); }
 		catch(Exception ex) {}
+
+		// Remove the temporary source file
+		File sourceFile = new File(tapeArgs[tapeArgs.length - 1]);
+		sourceFile.delete();
 	}
 
 	static void buildDeck() throws IOException
@@ -525,5 +673,9 @@ class Assembler
 		// Wait for the process to complete
 		try { process.waitFor(); }
 		catch(Exception ex) {}
+		
+		// Remove the temporary source file
+		File sourceFile = new File(deckArgs[deckArgs.length - 1]);
+		sourceFile.delete();
 	}
 }

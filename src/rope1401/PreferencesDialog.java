@@ -32,6 +32,7 @@ public class PreferencesDialog extends JDialog implements ActionListener
 	JCheckBox reopenLastPrintoutChk;
     JCheckBox saveBeforeAssemblyChk;
 	JCheckBox useOldConversionChk;
+	JCheckBox convertPlusToAmpersandChk;
     JButton assemblerBrowseBtn;
     JButton simulatorBrowseBtn;
     JButton confirmBtn;
@@ -87,6 +88,7 @@ public class PreferencesDialog extends JDialog implements ActionListener
 		reopenLastEditChk.setSelected(userPrefs.getBoolean("reopenLastSource", true));
 		saveBeforeAssemblyChk.setSelected(userPrefs.getBoolean("saveBeforeAssembly", false));
 		useOldConversionChk.setSelected(userPrefs.getBoolean("useOldConversion", true));
+		convertPlusToAmpersandChk.setSelected(userPrefs.getBoolean("convertPlusToAmpersand", true));
      }
 
     private void jbInit() throws Exception
@@ -101,12 +103,13 @@ public class PreferencesDialog extends JDialog implements ActionListener
 		reopenLastPrintoutChk = new JCheckBox("Reopen last printout");
 		saveBeforeAssemblyChk = new JCheckBox("Save source file before assembling");
 		useOldConversionChk = new JCheckBox("Use Old Conversion option with SimH");
+		convertPlusToAmpersandChk = new JCheckBox("Use '+' instead of '&' in Autocoder source");
 	
 		assemblerBrowseBtn = new JButton("Select...");
 		simulatorBrowseBtn = new JButton("Select...");
 		confirmBtn = new JButton("Confirm");
 		cancelBtn = new JButton("Cancel");
-		resetBtn = new JButton("Reset...");
+		resetBtn = new JButton("Reset Preferences...");
 		
 		JPanel mainPanel = new JPanel();
 		JPanel assemblerPanel = new JPanel();
@@ -148,6 +151,9 @@ public class PreferencesDialog extends JDialog implements ActionListener
                                                GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
                                                new Insets(0, 5, 5, 5), 0, 0));
         checkPanel.add(useOldConversionChk, new GridBagConstraints(0, 4, 1, 1, 1.0, 0.0,
+                                               GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+                                               new Insets(0, 5, 5, 5), 0, 0));
+        checkPanel.add(convertPlusToAmpersandChk, new GridBagConstraints(0, 5, 1, 1, 1.0, 0.0,
                                                GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
                                                new Insets(0, 5, 5, 5), 0, 0));
 
@@ -223,6 +229,7 @@ public class PreferencesDialog extends JDialog implements ActionListener
 			userPrefs.putBoolean("reopenLastSource", reopenLastEditChk.isSelected());
 			userPrefs.putBoolean("saveBeforeAssembly", saveBeforeAssemblyChk.isSelected());
 			userPrefs.putBoolean("useOldConversion", useOldConversionChk.isSelected());
+			userPrefs.putBoolean("convertPlusToAmpersand", convertPlusToAmpersandChk.isSelected());
 			
 			userPrefs.sync();
 			userPrefs.flush();
@@ -237,7 +244,7 @@ public class PreferencesDialog extends JDialog implements ActionListener
 		SimulatorOptions.useOldConversion = useOldConversionChk.isSelected();
 		AssemblerOptions.assemblerPath = assemblerPath.getText();
 		SimulatorOptions.simulatorPath = simulatorPath.getText();
-
+		
 		String var = System.getenv("ROPE_ASSEMBLER");
 		if(var == null || var.isEmpty())
 		{
