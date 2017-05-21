@@ -20,8 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
 
 public class RopeUtils 
 {
@@ -147,7 +145,7 @@ public class RopeUtils
 		return true;
 	}
 	
-	private static void writeFile(String path, String name, String content)
+	public static void writeFile(String path, String name, String content)
 	{
 		try {
 			File file = new File(path + separator + name);
