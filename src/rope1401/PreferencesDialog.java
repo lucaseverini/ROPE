@@ -244,7 +244,7 @@ public class PreferencesDialog extends JDialog implements ActionListener
 		SimulatorOptions.useOldConversion = useOldConversionChk.isSelected();
 		AssemblerOptions.assemblerPath = assemblerPath.getText();
 		SimulatorOptions.simulatorPath = simulatorPath.getText();
-		
+
 		String var = System.getenv("ROPE_ASSEMBLER");
 		if(var == null || var.isEmpty())
 		{

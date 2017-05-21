@@ -57,7 +57,7 @@ class AssemblerOptions
     static boolean store						= false;
     static boolean dump							= false;
     static boolean page							= false;
- 								
+								
     static boolean trace        = false;
     static boolean traceLexer   = false;
     static boolean traceParser  = false;
