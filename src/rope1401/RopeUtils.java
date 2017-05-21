@@ -11,12 +11,17 @@ package rope1401;
 
 // RopeUtils -----------------------------------------------------
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Writer;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 
 public class RopeUtils 
 {
@@ -121,8 +126,8 @@ public class RopeUtils
 	
 	public static boolean renameAndDelete(File file)
 	{
-		String filePath = pathComponent(file.getParent());
-		String fileName = getFileName(file.getParent());
+		String filePath = pathComponent(file.getPath());
+		String fileName = getFileName(file.getPath());
 		String timeStr = "" + System.currentTimeMillis();			
 		String renamed = filePath + removeExtension(fileName) + "_deleted_" + timeStr + "." + getExtension(fileName);
 		File renamedFile = new File(renamed);
@@ -140,5 +145,19 @@ public class RopeUtils
 		}
 		
 		return true;
+	}
+	
+	private static void writeFile(String path, String name, String content)
+	{
+		try {
+			File file = new File(path + separator + name);
+			Writer output = new BufferedWriter(new FileWriter(file));
+			output.write(content);
+			output.close();
+		}
+		catch(Exception ex)
+		{
+			ex.printStackTrace();
+		}
 	}
 }
