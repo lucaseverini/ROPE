@@ -21,6 +21,7 @@ import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.prefs.Preferences;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
@@ -57,7 +58,8 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
     JTextField columnText = new JTextField();
     JScrollPane messageScrollPane = new JScrollPane();
     JList messageList = new JList();
-	
+	Preferences userPrefs = Preferences.userRoot();
+
 	public CompoundUndoManager undoMgr;
     private AssemblerDialog dialog = null;
     private String baseName;
@@ -67,6 +69,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
     private ArrayList messages;
 	private boolean sourceChanged;
 	public String sourcePath;
+	public String sourceName;
 	private Document document;
 	private Action undoAction;
 	private Action redoAction;
@@ -515,6 +518,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
     {
 		if(selectedPath == null)
 		{
+			// env var has the precedence
 			selectedPath = System.getenv("ROPE_SOURCES_DIR");			
 			if(selectedPath != null)
 			{
@@ -529,6 +533,24 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 				else
 				{
 					System.out.println("Source folder path set from ROPE_SOURCES_DIR: " + selectedPath);
+				}
+			}
+			if(selectedPath == null)
+			{
+				selectedPath = userPrefs.get("sourcePath", "");
+				if(selectedPath != null)
+				{
+					File dir = new File(selectedPath);
+					if(!dir.exists() || !dir.isDirectory())
+					{
+						String message = String.format("The sources path set in preferences is not avaliable.\n%s", selectedPath);
+						JOptionPane.showMessageDialog(null, message , "ROPE", JOptionPane.WARNING_MESSAGE);
+						selectedPath = null;
+					}
+					else
+					{
+						System.out.println("Source folder path set from preferences: " + selectedPath);
+					}
 				}
 			}
 			if(selectedPath == null)
@@ -556,6 +578,8 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 			if(loadSourceFile(file))
 			{
 				mainFrame.showExecWindow(baseName);
+				
+				mainFrame.bringEditWindowInFront();
 			}
 	    }
     }
@@ -569,7 +593,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 		BufferedReader sourceFile = null;
 
 		String directoryPath = file.getParent();
-		String sourceName = file.getName();
+		sourceName = file.getName();
 
 		int idx = sourceName.lastIndexOf(".");
 		fileExt = idx == -1 ? "" : sourceName.substring(idx + 1);
@@ -586,6 +610,8 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 		AssemblerOptions.tapePath = basePath + ".tobj";
 		AssemblerOptions.diagnosticPath = basePath + ".diag";
 
+		// Sys env ROPE_MACROS_DIR has precedence on user pref macroPath
+		AssemblerOptions.macroPath = null;
 		String var = System.getenv("ROPE_MACROS_DIR");
 		if(var != null && !var.isEmpty())
 		{
@@ -594,12 +620,17 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 			{
 				AssemblerOptions.macroPath = var;
 			}
-			else
+		}		
+		if(AssemblerOptions.macroPath == null)
+		{
+			String pref = userPrefs.get("macroPath", "");
+			File dir = new File(pref);
+			if(dir.exists() && dir.isDirectory()) 
 			{
-				AssemblerOptions.macroPath = directoryPath;
+				AssemblerOptions.macroPath = pref;
 			}
-		}
-		else
+		}		
+		if(AssemblerOptions.macroPath == null)
 		{
 			AssemblerOptions.macroPath = directoryPath;
 		}

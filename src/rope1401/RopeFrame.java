@@ -265,6 +265,11 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
         execFrame.reset();
     }
 
+	void bringEditWindowInFront()
+    {
+		editFrame.toFront();
+	}
+
     void showPrintoutWindow(String baseName)
     {
 		try 
@@ -656,7 +661,21 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 			}
 		}
 
-		String var = System.getenv("ROPE_SOURCES_DIR");
+		String var = System.getenv("ROPE_MACROS_DIR");
+		if(var != null && !var.isEmpty())
+		{
+			File dir = new File(var);
+			if(!dir.exists() || !dir.isDirectory()) 
+			{
+				String message = String.format("The path to macros folder set in environment variable ROPE_SMACROS_DIR is not available.\n%s",  
+																																			var);
+				System.out.println(message);
+
+				JOptionPane.showMessageDialog(this, message, "ROPE", JOptionPane.ERROR_MESSAGE);
+			}
+		}
+
+		var = System.getenv("ROPE_SOURCES_DIR");
 		if(var != null && !var.isEmpty())
 		{
 			File dir = new File(var);
