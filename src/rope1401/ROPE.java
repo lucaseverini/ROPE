@@ -9,10 +9,14 @@
 
 package rope1401;
 
+import java.awt.AWTEvent;
 import javax.swing.ImageIcon;
 import javax.swing.UIManager;
 import java.lang.reflect.Method;
 import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.event.AWTEventListener;
+import java.awt.event.MouseEvent;
 
 public class ROPE
 {
@@ -77,7 +81,23 @@ public class ROPE
 				Simulator.kill();
 			}
 		});
-		
+/*		
+		Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() 
+		{
+			@Override
+			public void eventDispatched(AWTEvent event) 
+			{
+				if(event instanceof MouseEvent) 
+				{
+					MouseEvent mouseEvent = (MouseEvent)event;
+					if(mouseEvent.getButton() != 0)
+					{
+						System.out.println("Button: " + mouseEvent.getButton());
+					}
+				}
+			}
+		}, AWTEvent.MOUSE_EVENT_MASK);
+*/		
 	    mainFrame = new RopeFrame();
     }
 

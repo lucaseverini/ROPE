@@ -30,6 +30,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Caret;
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.Document;
+import javax.swing.text.JTextComponent;
 import javax.swing.undo.CannotUndoException;
 
 public class EditFrame extends ChildFrame implements ActionListener, CaretListener
@@ -74,6 +75,11 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 	private Action undoAction;
 	private Action redoAction;
 	private String selectedPath;
+	private int caretDot;
+	private int caretMark;
+	private int sourceLength;
+	private int sourceLine;
+	private int sourceColumn;
 
 	public class BoolRef 
 	{ 
@@ -139,6 +145,10 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_V, RopeHelper.modifierMaks), "none");
 		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_A, RopeHelper.modifierMaks), "none");
 		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_L, RopeHelper.modifierMaks), "none");
+		
+		// Add contextual popup menu
+		SourceContextMenu contextMenu = new SourceContextMenu();
+		contextMenu.add(sourceArea);
 
 		// Set custom binding action for tab key
 		String action = "tabKeyAction";
@@ -731,8 +741,6 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
             sourceFile.write(cleanText);
 			
 			setSourceChanged(false);
-			
-			setupMenus();
         }
         catch (Exception ex) 
 		{
@@ -761,7 +769,6 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 		if(sourceChanged != changed)
 		{
 			sourceChanged = changed;
-			setupMenus();
 		}
 	}
 	
@@ -908,6 +915,11 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 		}
 	}
 
+	public void printMenuAction(ActionEvent event)
+	{
+		throw new java.lang.UnsupportedOperationException("Source printing not supported yet.");
+	}
+		
 	private void highlightError(int index)
     {
         String message = (String) messages.get(index);
@@ -1068,11 +1080,67 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
   
         return null;
     }
+
+	@Override
+	public boolean canUndo()
+	{
+		return undoMgr.canUndo();
+	}
+
+	@Override
+	public boolean canRedo()
+	{
+		return undoMgr.canRedo();
+	}
 	
+	@Override
+	public boolean canCopy()
+	{
+		return (caretDot != caretMark);
+	}
+
+	@Override
+	public boolean canCut()
+	{
+		return (caretDot != caretMark);
+	}
+
 	@Override
 	public boolean canPaste()
 	{
-		return mainFrame.clipboardListener != null && mainFrame.clipboardListener.hasValidContent;
+		return mainFrame.clipboardListener.hasValidContent;
+	}
+
+	@Override
+	public boolean canDelete()
+	{
+		return (caretDot != caretMark);
+	}
+	
+	@Override
+	public boolean canSelectAll()
+	{
+		return (sourceLength != 0 && Math.abs(caretMark - caretDot) != sourceLength);
+	}
+
+	@Override
+	public boolean canSelectLine()
+	{
+		try 
+		{
+			if(sourceLength != 0)
+			{
+				int startLine = sourceArea.getLineStartOffset(sourceLine);
+				int endLine = sourceArea.getLineEndOffset(sourceLine);		
+				return(endLine - startLine > 1);
+			}
+		}
+		catch (BadLocationException ex) 
+		{
+			ex.printStackTrace();
+		}
+		
+		return false;
 	}
 
 	@Override
@@ -1105,6 +1173,43 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 		
 		setUndoItem();
 		setRedoItem();
+	}
+	
+	@Override
+	public void updateEditMenu(JMenu editMenu)
+	{
+		System.out.println("#### updateEditMenu " + editMenu.getText());
+/*		
+		JMenuItem item = editMenu.getItem(3);
+		System.out.println("#### item: " + item.getText());
+		System.out.println("#### selected: " + canCut());
+		
+		editMenu.remove(3);
+		//editMenu.insert(item, 3);
+*/						
+		editMenu.getItem(0).setSelected(canUndo());
+		editMenu.getItem(0).revalidate();
+		
+		editMenu.getItem(1).setSelected(canRedo());
+		editMenu.getItem(1).revalidate();
+		
+		editMenu.getItem(3).setSelected(canCut());
+		editMenu.getItem(3).revalidate();
+		
+		editMenu.getItem(4).setSelected(canCopy());
+		editMenu.getItem(4).revalidate();
+		
+		editMenu.getItem(5).setSelected(canPaste());
+		editMenu.getItem(5).revalidate();
+		
+		editMenu.getItem(7).setSelected(canDelete());
+		editMenu.getItem(7).revalidate();
+		
+		editMenu.getItem(9).setSelected(canSelectAll());
+		editMenu.getItem(9).revalidate();
+		
+		editMenu.getItem(10).setSelected(canSelectLine());
+		editMenu.getItem(10).revalidate();
 	}
 	
 	public void undoMenuAction(ActionEvent event)
@@ -1173,61 +1278,17 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 
 	void doCaretUpdate(int dot, int mark)
 	{	
-        if (dot == mark) 
-		{
-            mainFrame.cutItem.setEnabled(false);  
-            mainFrame.copyItem.setEnabled(false);
-            mainFrame.deleteItem.setEnabled(false);
-		}   
-		else
-		{
-            mainFrame.cutItem.setEnabled(true);
-            mainFrame.copyItem.setEnabled(true);
-            mainFrame.deleteItem.setEnabled(true);
-        }
-		
-		int length = sourceArea.getText().length();
-		if(length == 0 || Math.abs(mark - dot) == length)
-		{
-			mainFrame.selectAllItem.setEnabled(false);
-		}
-		else
-		{
-			mainFrame.selectAllItem.setEnabled(true);
-		}
+		caretDot = dot;
+		caretMark = mark;
+		sourceLength = sourceArea.getText().length();
 
-		try 
-		{
-			if(length == 0)
-			{
-				mainFrame.selectLineItem.setEnabled(false);
-			}
-			else
-			{
-				int lineNum = sourceArea.getLineOfOffset(dot);
-				int startLine = sourceArea.getLineStartOffset(lineNum);
-				int endLine = sourceArea.getLineEndOffset(lineNum);
-				if(endLine - startLine <= 1)
-				{
-					mainFrame.selectLineItem.setEnabled(false);
-				}
-				else
-				{
-					mainFrame.selectLineItem.setEnabled(true);
-				}
-			}
-		}
-		catch (BadLocationException ex) 
-		{
-			ex.printStackTrace();
-		}
-		
         try 
 		{
-            int line = sourceArea.getLineOfOffset(dot);
-            lineText.setText(Integer.toString(line + 1));
-            int column = dot - sourceArea.getLineStartOffset(line);
-            columnText.setText(Integer.toString(column + 1));
+			sourceLine = sourceArea.getLineOfOffset(caretDot);
+            sourceColumn = dot - sourceArea.getLineStartOffset(sourceLine);
+			
+            lineText.setText(Integer.toString(sourceLine + 1));
+            columnText.setText(Integer.toString(sourceColumn + 1));
         }
         catch(BadLocationException ex) 
 		{
@@ -1381,5 +1442,216 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 		Date currentDate = Calendar.getInstance(TimeZone.getDefault()).getTime();
 		DateFormat dateFormat = new SimpleDateFormat("MM/dd/yy HH:mm:ss");
         return dateFormat.format(currentDate);
+	}
+
+	public class SourceContextMenu extends JPopupMenu implements ActionListener
+	{
+		private static final long serialVersionUID = 1L;
+		
+		//private Clipboard clipboard;
+		//private UndoManager undoManager;
+
+		private JMenuItem undo;
+		private JMenuItem redo;
+		private JMenuItem cut;
+		private JMenuItem copy;
+		private JMenuItem paste;
+		private JMenuItem delete;
+		private JMenuItem selectAll;
+		private JMenuItem selectLine;
+
+		private JTextComponent textComponent;
+
+		public SourceContextMenu()
+		{
+			// undoManager = new UndoManager();
+			// clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+
+			undo = new JMenuItem("Undo");
+			undo.setEnabled(false);
+			undo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, RopeHelper.modifierMaks));
+			undo.addActionListener(this);
+			add(undo);
+
+			redo = new JMenuItem("Redo");
+			redo.setEnabled(false);
+			redo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, RopeHelper.modifierMaks + InputEvent.SHIFT_MASK));
+			redo.addActionListener(this);
+			add(redo);
+
+			add(new JSeparator());
+
+			cut = new JMenuItem("Cut");
+			cut.setEnabled(false);
+			cut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, RopeHelper.modifierMaks));
+			cut.addActionListener(this);
+			add(cut);
+
+			copy = new JMenuItem("Copy");
+			copy.setEnabled(false);
+			copy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, RopeHelper.modifierMaks));
+			copy.addActionListener(this);
+			add(copy);
+
+			paste = new JMenuItem("Paste");
+			paste.setEnabled(false);
+			paste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, RopeHelper.modifierMaks));
+			paste.addActionListener(this);
+			add(paste);
+
+			delete = new JMenuItem("Delete");
+			delete.setEnabled(false);
+			delete.addActionListener(this);
+			add(delete);
+
+			add(new JSeparator());
+
+			selectAll = new JMenuItem("Select All");
+			selectAll.setEnabled(false);
+			selectAll.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, RopeHelper.modifierMaks));
+			selectAll.addActionListener(this);
+			add(selectAll);
+
+			selectLine = new JMenuItem("Select Line");
+			selectLine.setEnabled(false);
+			selectLine.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, RopeHelper.modifierMaks));
+			selectLine.addActionListener(this);
+			add(selectLine);
+		}
+
+		public void add(JTextComponent txtComponent)
+		{
+/*
+			txtComponent.addKeyListener(new KeyAdapter()
+			{
+				@Override
+				public void keyPressed(KeyEvent pressedEvent)
+				{
+					if ((pressedEvent.getKeyCode() == KeyEvent.VK_Z)
+							&& ((pressedEvent.getModifiers() & KeyEvent.CTRL_MASK) != 0))
+					{
+						if (undoManager.canUndo())
+						{
+							undoManager.undo();
+						}
+					}
+
+					if ((pressedEvent.getKeyCode() == KeyEvent.VK_Y)
+							&& ((pressedEvent.getModifiers() & KeyEvent.CTRL_MASK) != 0))
+					{
+						if (undoManager.canRedo())
+						{
+							undoManager.redo();
+						}
+					}
+				}
+			});
+*/
+			txtComponent.addMouseListener(new MouseAdapter()
+			{
+				@Override
+				public void mouseReleased(MouseEvent releasedEvent)
+				{
+					if (releasedEvent.getButton() == MouseEvent.BUTTON3)
+					{
+						processClick(releasedEvent);
+					}
+				}
+			});
+
+			// txtComponent.getDocument().addUndoableEditListener(event -> undoManager.addEdit(event.getEdit()));
+		}
+
+		private void processClick(MouseEvent event)
+		{
+			textComponent = (JTextComponent) event.getSource();
+			textComponent.requestFocus();
+
+			boolean enableUndo = canUndo();
+			boolean enableRedo = canRedo();
+			boolean enableCut = canCut();
+			boolean enableCopy = canCopy();
+			boolean enablePaste = canPaste();
+			boolean enableDelete = canDelete();
+			boolean enableSelectAll = canSelectAll();
+			boolean enableSelectLine = canSelectLine();
+/*
+			String selectedText = textComponent.getSelectedText();
+			String text = textComponent.getText();
+
+			if (text != null)
+			{
+				if (text.length() > 0)
+				{
+					enableSelectAll = true;
+					enableSelectLine = true;
+				}
+			}
+
+			if (selectedText != null)
+			{
+				if (selectedText.length() > 0)
+				{
+					enableCut = true;
+					enableCopy = true;
+					enableDelete = true;
+				}
+			}
+
+			if (clipboard.isDataFlavorAvailable(DataFlavor.stringFlavor) && textComponent.isEnabled())
+			{
+				enablePaste = true;
+			}
+*/
+			undo.setEnabled(enableUndo);
+			redo.setEnabled(enableRedo);
+			cut.setEnabled(enableCut);
+			copy.setEnabled(enableCopy);
+			paste.setEnabled(enablePaste);
+			delete.setEnabled(enableDelete);
+			selectAll.setEnabled(enableSelectAll);
+			selectLine.setEnabled(enableSelectLine);
+
+			show(textComponent, event.getX(), event.getY());
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent event)
+		{
+			Object menu = event.getSource();
+			
+			if(menu == undo)
+			{
+				undoMenuAction(event);
+			}
+			else if(menu == redo)
+			{
+				redoMenuAction(event);
+			}
+			else if(menu == cut)
+			{
+				cutMenuAction(event);
+			}
+			else if(menu == copy)
+			{
+				copyMenuAction(event);
+			}
+			else if(menu == paste)
+			{
+				pasteMenuAction(event);
+			}
+			else if(menu == delete)
+			{
+				deleteMenuAction(event);
+			}
+			else if(menu == selectAll)
+			{
+				selectAllMenuAction(event);
+			}
+			else if(menu == selectLine)
+			{
+				selectLineMenuAction(event);
+			}
+		}
 	}
 }

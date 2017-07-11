@@ -28,11 +28,6 @@ public class ClipboardListener extends Thread implements ClipboardOwner
 		sysClip = Toolkit.getDefaultToolkit().getSystemClipboard();
 		
 		hasValidContent = checkContent(sysClip.getContents(this));
-		
-		if(mainFrame.currentChildFrame != null && mainFrame.currentChildFrame.canPaste())
-		{
-			mainFrame.pasteItem.setEnabled(hasValidContent);
-		}
 	
 		start();
 	}
@@ -72,11 +67,6 @@ public class ClipboardListener extends Thread implements ClipboardOwner
 		Transferable contents = sysClip.getContents(this);
 		
 		hasValidContent = checkContent(contents);
-		
-		if(mainFrame.currentChildFrame != null && mainFrame.currentChildFrame.canPaste())
-		{
-			mainFrame.pasteItem.setEnabled(hasValidContent);
-		}
 		
 		regainOwnership(contents);  
 	}   

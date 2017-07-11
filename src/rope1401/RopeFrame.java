@@ -24,8 +24,10 @@ import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.swing.*;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 
-public class RopeFrame extends JFrame implements WindowListener, FocusListener
+public class RopeFrame extends JFrame implements WindowListener, FocusListener, MenuListener, EventListener
 {
 	private final boolean askConfirmationToQuit = false;	// This should go in general preferences
 
@@ -81,7 +83,28 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 			
 		addWindowListener(this);
 		addFocusListener(this);
+/*
+		addMouseListener(new MouseAdapter()
+		{
+			@Override
+			public void mouseClicked(MouseEvent e)
+			{
+				System.out.println("mouseClicked");
+			}
 
+			@Override
+			public void mousePressed(MouseEvent e)
+			{
+				System.out.println("mousePressed");
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e)
+			{
+				System.out.println("mouseReleased");
+			}
+		});
+*/
 		// Validate frames that have preset sizes
         // Pack frames that have useful preferred size info, e.g. from their layout
         if (packFrame) 
@@ -92,10 +115,45 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 		{
             this.validate();
         }
-	
-        Dimension frameSize = new Dimension(screenSize.width - 10, screenSize.height - (RopeHelper.isMac ? 80 : 50));
-        this.setSize(frameSize);
-        this.setLocation((screenSize.width - frameSize.width) / 2, 10);
+		
+		// It seems is not possible to place part of a window (or all of it) off-screen, so some of the checks here
+		// are not necessary
+		
+		Dimension minFrameSize = new Dimension(125, 60);
+		
+		Dimension frameSize = new Dimension(screenSize.width - 10, screenSize.height - (RopeHelper.isMac ? 80 : 50));
+		frameSize = RopeHelper.parseDimension(userPrefs.get("mainFrameSize", frameSize.toString()));
+		if(frameSize.width < minFrameSize.width)
+		{
+			frameSize.width = minFrameSize.width;
+		}
+		if(frameSize.height < minFrameSize.height)
+		{
+			frameSize.height = minFrameSize.height;
+		}
+
+		Point frameLocation = new Point((screenSize.width - frameSize.width) / 2, RopeHelper.isMac ? 25 : 5);				
+		frameLocation = RopeHelper.parsePoint(userPrefs.get("mainFrameLocation", frameLocation.toString()));
+		if(frameLocation.x + frameSize.width < 20)
+		{
+			frameLocation.x = -(frameSize.width - 20);
+		}
+		else if(frameLocation.x > screenSize.width - 20)
+		{
+			frameLocation.x = screenSize.width - 20;
+		}
+		if(frameLocation.y < (RopeHelper.isMac ? 25 : 5))
+		{
+			frameLocation.y = RopeHelper.isMac ? 25 : 5;
+		}
+		else if(frameLocation.y > screenSize.height - 20)
+		{
+			frameLocation.y = screenSize.height - 20;
+		}
+		
+        this.setSize(frameSize);	
+        this.setLocation(frameLocation);
+ 		this.setMinimumSize(minFrameSize);
 		
 		String ropeVersion = MessageFormat.format(RopeResources.getString("RopeVersion"), RopeResources.getBuildString("BuildNumber"));
         this.setTitle(MessageFormat.format(RopeResources.getString("RopeFrameTitle"), ropeVersion));
@@ -278,7 +336,8 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 			printoutFrame.setTitle(baseName);
 			printoutFrame.setVisible(true);
 			printoutFrame.initialize();
-			printoutFrame.toFront();
+			
+			// printoutFrame.toFront();
 		
 			commandWindows.add(printoutFrame);
 
@@ -717,6 +776,9 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 		
 		try 
 		{
+			userPrefs.put("mainFrameLocation", this.getLocation().toString());
+			userPrefs.put("mainFrameSize", this.getSize().toString());
+	
 			if(editFrame != null && editFrame.isVisible())
 			{
 				userPrefs.put("editFrameLocation", editFrame.getLocation().toString());
@@ -863,7 +925,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
 		menuBar = new JMenuBar();
 		
         fileMenu = new JMenu("File");
- 
+
 		newItem = new JMenuItem("New...");
         newItem.addActionListener(new ActionListener()
 		{
@@ -1226,4 +1288,60 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener
         dialog.setLocation((screenSize.width - dialogSize.width) / 2, (screenSize.height - dialogSize.height) / 2);
 		dialog.setVisible(true);
 	}
+
+	@Override
+	public void menuSelected(MenuEvent event)
+	{
+		JMenu menu = (JMenu)event.getSource();
+		
+		if(menu == editMenu)
+		{
+			currentChildFrame.updateEditMenu(editMenu);
+		}
+	}
+
+	@Override
+	public void menuDeselected(MenuEvent event)
+	{
+		// throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+	}
+
+	@Override
+	public void menuCanceled(MenuEvent event)
+	{
+		// throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+	}
+/*
+	@Override
+	public void mouseClicked(MouseEvent e)
+	{
+		System.out.println("mouseClicked");
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e)
+	{
+		System.out.println("mousePressed");
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e)
+	{
+		System.out.println("mouseReleased");	
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e)
+	{
+		System.out.println("mouseEntered");
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e)
+	{
+		System.out.println("mouseExited");	
+	}
+*/
 }
+
+

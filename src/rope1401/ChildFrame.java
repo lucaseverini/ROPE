@@ -14,6 +14,7 @@ import java.awt.Point;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import javax.swing.JInternalFrame;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
@@ -62,7 +63,7 @@ public class ChildFrame extends JInternalFrame implements InternalFrameListener,
 	{
 		mainFrame.currentChildFrame = this;
 
-		setupMenus();	// setup menus accordingly
+		// setupMenus();	// setup menus accordingly
 
 		// System.out.println("Activated " + title);
 	}
@@ -232,6 +233,10 @@ public class ChildFrame extends JInternalFrame implements InternalFrameListener,
 	public boolean canPrint()
 	{
 		return false;
+	}
+	
+	public void updateEditMenu(JMenu editMenu)
+	{
 	}
 
 	@Override
