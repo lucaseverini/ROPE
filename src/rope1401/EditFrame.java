@@ -1179,21 +1179,17 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 	public void updateEditMenu(JMenu editMenu)
 	{
 		System.out.println("#### updateEditMenu " + editMenu.getText());
-/*		
-		JMenuItem item = editMenu.getItem(3);
-		System.out.println("#### item: " + item.getText());
-		System.out.println("#### selected: " + canCut());
 		
-		editMenu.remove(3);
-		//editMenu.insert(item, 3);
-*/						
+		System.out.println(editMenu.getItem(10).getText() + " : " + editMenu.getItem(10).isEnabled());
+/*
 		editMenu.getItem(0).setSelected(canUndo());
 		editMenu.getItem(0).revalidate();
 		
 		editMenu.getItem(1).setSelected(canRedo());
 		editMenu.getItem(1).revalidate();
 		
-		editMenu.getItem(3).setSelected(canCut());
+		// editMenu.getItem(3).setSelected(canCut());
+		editMenu.getItem(3).setText(canCut() ? "Cut *" : "Cut");
 		editMenu.getItem(3).revalidate();
 		
 		editMenu.getItem(4).setSelected(canCopy());
@@ -1210,6 +1206,7 @@ public class EditFrame extends ChildFrame implements ActionListener, CaretListen
 		
 		editMenu.getItem(10).setSelected(canSelectLine());
 		editMenu.getItem(10).revalidate();
+*/
 	}
 	
 	public void undoMenuAction(ActionEvent event)

@@ -27,7 +27,7 @@ import javax.swing.*;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
-public class RopeFrame extends JFrame implements WindowListener, FocusListener, MenuListener, EventListener
+public class RopeFrame extends JFrame implements WindowListener, FocusListener, MenuListener, EventListener, MouseListener
 {
 	private final boolean askConfirmationToQuit = false;	// This should go in general preferences
 
@@ -923,6 +923,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener, 
 	private void setupMenus()
 	{
 		menuBar = new JMenuBar();
+		// menuBar.addMouseListener(this);
 		
         fileMenu = new JMenu("File");
 
@@ -1100,6 +1101,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener, 
 		}
 				
         editMenu = new JMenu("Edit");
+		editMenu.addMenuListener(this);
 		
 		undoItem = new JMenuItem("Undo");
 		undoItem.setEnabled(false);
@@ -1311,11 +1313,11 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener, 
 	{
 		// throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 	}
-/*
+
 	@Override
 	public void mouseClicked(MouseEvent e)
 	{
-		System.out.println("mouseClicked");
+		System.out.println("mousePressed");
 	}
 
 	@Override
@@ -1327,21 +1329,20 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener, 
 	@Override
 	public void mouseReleased(MouseEvent e)
 	{
-		System.out.println("mouseReleased");	
+		System.out.println("mousePressed");
 	}
 
 	@Override
 	public void mouseEntered(MouseEvent e)
 	{
-		System.out.println("mouseEntered");
+		System.out.println("mousePressed");
 	}
 
 	@Override
 	public void mouseExited(MouseEvent e)
 	{
-		System.out.println("mouseExited");	
+		System.out.println("mousePressed");
 	}
-*/
 }
 
 

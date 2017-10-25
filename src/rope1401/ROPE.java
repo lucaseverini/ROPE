@@ -10,12 +10,14 @@
 package rope1401;
 
 import java.awt.AWTEvent;
+import java.awt.EventQueue;
 import javax.swing.ImageIcon;
 import javax.swing.UIManager;
 import java.lang.reflect.Method;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.AWTEventListener;
+import java.awt.event.InvocationEvent;
 import java.awt.event.MouseEvent;
 
 public class ROPE
@@ -87,9 +89,14 @@ public class ROPE
 			@Override
 			public void eventDispatched(AWTEvent event) 
 			{
+				System.out.println("Event: " + event);
+								   
 				if(event instanceof MouseEvent) 
 				{
 					MouseEvent mouseEvent = (MouseEvent)event;
+					
+					System.out.println("ID: " + mouseEvent.getID());
+					
 					if(mouseEvent.getButton() != 0)
 					{
 						System.out.println("Button: " + mouseEvent.getButton());
@@ -97,7 +104,11 @@ public class ROPE
 				}
 			}
 		}, AWTEvent.MOUSE_EVENT_MASK);
-*/		
+*/	
+		// InvocationEvent event
+		// EventQueue
+
+
 	    mainFrame = new RopeFrame();
     }
 
