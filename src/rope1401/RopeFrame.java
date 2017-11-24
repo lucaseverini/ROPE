@@ -17,6 +17,7 @@ import java.beans.PropertyVetoException;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URLDecoder;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.logging.Level;
@@ -623,64 +624,12 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener, 
 	}
 	
 	void loadPreferences()
-	{
-		String simulatorPref = "", assemblerPref = "";
-		
-		System.out.println("Current directory: " + System.getProperty("user.dir"));
-		
-		if(RopeHelper.isWindows)
-		{
-			assemblerPref = userPrefs.get("assemblerPath", RopeResources.getString("AutocoderWindowsPath"));
-			simulatorPref = userPrefs.get("simulatorPath", RopeResources.getString("SimhWindowsPath"));
-		}
-		else if(RopeHelper.isMac)
-		{
-			assemblerPref = userPrefs.get("assemblerPath", RopeResources.getString("AutocoderMacPath"));
-			simulatorPref = userPrefs.get("simulatorPath", RopeResources.getString("SimhMacPath"));			
-		}
-		else if(RopeHelper.isUnix)
-		{
-			assemblerPref = userPrefs.get("assemblerPath", RopeResources.getString("AutocoderLinuxPath"));
-			simulatorPref = userPrefs.get("simulatorPath", RopeResources.getString("SimhLinuxPath"));			
-		}
-		
+	{				
 		reopenLastSource = userPrefs.getBoolean("reopenLastSource", true);
 		AssemblerOptions.saveBeforeAssembly = userPrefs.getBoolean("saveBeforeAssembly", false);
-		SimulatorOptions.useOldConversion = userPrefs.getBoolean("useOldConversion", true);
-		
-		if(!assemblerPref.isEmpty())
-		{
-			File file = new File(assemblerPref);
-			if(!file.exists() || file.isDirectory()) 
-			{
-				String message = String.format("The path to Assembler program set in preferences is not available.\n%s", assemblerPref);
-				System.out.println(message);
-
-				JOptionPane.showMessageDialog(this, message, "ROPE", JOptionPane.ERROR_MESSAGE);
-			}
-			else
-			{
-				AssemblerOptions.assemblerPath = assemblerPref;
-			}
-		}
-
-		if(!simulatorPref.isEmpty())
-		{
-			File file = new File(simulatorPref);
-			if(!file.exists() || file.isDirectory()) 
-			{
-				String message = String.format("The path to Simulator program set in preferences is not available.\n%s", simulatorPref);
-				System.out.println(message);
-
-				JOptionPane.showMessageDialog(this, message, "ROPE", JOptionPane.ERROR_MESSAGE);
-			}
-			else
-			{
-				SimulatorOptions.simulatorPath = simulatorPref;
-			}
-		}
-
-		assemblerPref = System.getenv("ROPE_ASSEMBLER");
+		SimulatorOptions.useOldConversion = userPrefs.getBoolean("useOldConversion", true);		
+					
+		String assemblerPref = System.getenv("ROPE_ASSEMBLER");
 		if(assemblerPref != null && !assemblerPref.isEmpty())
 		{
 			File file = new File(assemblerPref);
@@ -700,7 +649,7 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener, 
 			}
 		}
 		
-		simulatorPref = System.getenv("ROPE_SIMULATOR");
+		String simulatorPref = System.getenv("ROPE_SIMULATOR");
 		if(simulatorPref != null && !simulatorPref.isEmpty())
 		{
 			File file = new File(simulatorPref);
@@ -747,7 +696,107 @@ public class RopeFrame extends JFrame implements WindowListener, FocusListener, 
 				JOptionPane.showMessageDialog(this, message, "ROPE", JOptionPane.ERROR_MESSAGE);
 			}
 		}
-		
+			
+		if(AssemblerOptions.assemblerPath == null || AssemblerOptions.assemblerPath.isEmpty())
+		{	
+			// Tries the app folder first, then the current folder, otherwise fails...
+			int attempts = 0;
+			while(true)
+			{
+				if(attempts++ == 0)
+				{
+					assemblerPref = RopeUtils.addPathSeparator(RopeHelper.ropeFolder);
+				}
+				else
+				{
+					assemblerPref = RopeUtils.addPathSeparator(System.getProperty("user.dir"));
+				}
+
+				if(RopeHelper.isWindows)
+				{
+					assemblerPref += userPrefs.get("assemblerPath", RopeResources.getString("AutocoderWindowsPath"));
+				}
+				else if(RopeHelper.isMac)
+				{
+					assemblerPref += userPrefs.get("assemblerPath", RopeResources.getString("AutocoderMacPath"));
+				}
+				else if(RopeHelper.isUnix)
+				{
+					assemblerPref += userPrefs.get("assemblerPath", RopeResources.getString("AutocoderLinuxPath"));
+				}
+
+				File file = new File(assemblerPref);
+				if(!file.exists() || file.isDirectory()) 
+				{
+					if(attempts == 1)
+					{
+						continue;
+					}
+
+					String message = String.format("The path to Assembler program set in preferences is not available.\n%s", assemblerPref);
+					System.out.println(message);
+
+					JOptionPane.showMessageDialog(this, message, "ROPE", JOptionPane.ERROR_MESSAGE);
+				}
+				else
+				{
+					AssemblerOptions.assemblerPath = assemblerPref;
+				}
+				
+				break;
+			}
+		}
+
+		if(SimulatorOptions.simulatorPath == null || SimulatorOptions.simulatorPath.isEmpty())
+		{
+			// Tries the app folder first, then the current folder, otherwise fails...
+			int attempts = 0;
+			while(true)
+			{
+				if(attempts++ == 0)
+				{
+					simulatorPref = RopeUtils.addPathSeparator(RopeHelper.ropeFolder);
+				}
+				else
+				{
+					simulatorPref = RopeUtils.addPathSeparator(System.getProperty("user.dir"));
+				}
+
+				if(RopeHelper.isWindows)
+				{
+					simulatorPref += userPrefs.get("simulatorPath", RopeResources.getString("SimhWindowsPath"));
+				}
+				else if(RopeHelper.isMac)
+				{
+					simulatorPref += userPrefs.get("simulatorPath", RopeResources.getString("SimhMacPath"));			
+				}
+				else if(RopeHelper.isUnix)
+				{
+					simulatorPref += userPrefs.get("simulatorPath", RopeResources.getString("SimhLinuxPath"));			
+				}
+
+				File file = new File(simulatorPref);
+				if(!file.exists() || file.isDirectory()) 
+				{
+					if(attempts == 1)
+					{
+						continue;
+					}
+
+					String message = String.format("The path to Simulator program set in preferences is not available.\n%s", simulatorPref);
+					System.out.println(message);
+
+					JOptionPane.showMessageDialog(this, message, "ROPE", JOptionPane.ERROR_MESSAGE);
+				}
+				else
+				{
+					SimulatorOptions.simulatorPath = simulatorPref;
+				}
+				
+				break;
+			}
+		}
+
 		if(AssemblerOptions.assemblerPath == null || AssemblerOptions.assemblerPath.isEmpty())
 		{
 			String message = "The path to Assembler program is not set."; 

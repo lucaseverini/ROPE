@@ -12,6 +12,8 @@ package rope1401;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Toolkit;
+import java.io.File;
+import java.net.URLDecoder;
 import java.util.Scanner;
 
 // RopeHelper -----------------------------------------------------
@@ -22,6 +24,7 @@ public class RopeHelper
 	public static Boolean isUnix = false;
 	public static Boolean isSolaris = false;
 	public static int modifierMaks = 0;
+	public static String ropeFolder;
 	
 	static 
 	{
@@ -30,6 +33,18 @@ public class RopeHelper
 	
 	public static void init()
 	{
+		// Get the folder containing the executing ROPE
+		try
+		{
+			String path = ROPE.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+			File file = new File(path);
+			ropeFolder = file.getParentFile().getAbsolutePath();
+		}
+		catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }		
+
 		String property = System.getProperty("os.name").toLowerCase();
 		if(property.contains("win"))
 		{
