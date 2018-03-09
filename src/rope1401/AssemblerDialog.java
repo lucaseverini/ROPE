@@ -389,7 +389,7 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
         interleaveCheckBox.setText("Interleave object deck into listing");
         storeCheckBox.setText("Store long literals once");
         dumpCheckBox.setText("Dump the symbol and literal tables");
-		convertTapeForTapeSimulatorBox.setText("Convert tape file for Tape Simulator");
+		convertTapeForTapeSimulatorBox.setText("Convert tape file from Traditional SIMH to Pierce IBM A");
 
         pageCheckBox.setText("Page length:");
         pageText.setText("60");
@@ -539,13 +539,13 @@ public class AssemblerDialog extends JDialog implements ActionListener, ChangeLi
                                                 GridBagConstraints.CENTER,
                                                 GridBagConstraints.NONE,
                                                 new Insets(5, 5, 0, 15), 0, 0));
-/*
+
         optionsPanel.add(convertTapeForTapeSimulatorBox,
-                         new GridBagConstraints(1, 6, 4, 1, 0.0, 0.0,
+                         new GridBagConstraints(0, 6, 4, 1, 0.0, 0.0,
                                                 GridBagConstraints.WEST,
                                                 GridBagConstraints.NONE,
                                                 new Insets(5, 15, 0, 0), 0, 0));
-*/
+
         optionsPanel.add(macroCheckBox,
                          new GridBagConstraints(0, 7, 1, 1, 0.0, 0.0,
                                                 GridBagConstraints.WEST,

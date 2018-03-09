@@ -64,9 +64,13 @@ class Simulator
 			
             simulatorStartTime = System.currentTimeMillis();
 			
-			if(SimulatorOptions.useOldConversion)
+			if(AssemblerOptions.deckEncodingChoice.equals(AssemblerOptions.ENCODING_SIMH))
 			{
 				execute("SET CPU OLDCONVERSIONS");
+			}
+			else
+			{
+				execute("SET CPU NEWCONVERSIONS");
 			}
 
 			return true;

@@ -14,6 +14,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
+import javax.swing.JOptionPane;
 
 class Assembler
 {
@@ -71,34 +72,36 @@ class Assembler
 			RopeUtils.renameAndDelete(listFile);
 			RopeUtils.renameAndDelete(outFile);
 						
-			if(AssemblerOptions.tape && 
+			if(AssemblerOptions.tape /* && 
 			   AssemblerOptions.tapeEncoding && 
-			   !AssemblerOptions.tapeEncodingChoice.equals(AssemblerOptions.deckEncodingChoice))
+			   !AssemblerOptions.tapeEncodingChoice.equals(AssemblerOptions.deckEncodingChoice) */)
 			{
 				// Generate assembly and tape first...
-				buildTape();			
-/*
-				if(AssemblerOptions.tape && AssemblerOptions.convertTapeForTapeSimulator)
+				if(buildTape())		
 				{
-					convertTape(AssemblerOptions.tapePath);
-				}
-*/
-				addRowToTape(AssemblerOptions.tapePath, "~L038I9C~N000~B007~TAPE DCW @TAPE@ ~}");
+					addRowToTape(AssemblerOptions.tapePath, "~L038I9C~N000~B007~TAPE DCW @TAPE@ ~}");
+				
+					if(AssemblerOptions.tape && AssemblerOptions.convertTapeForTapeSimulator)
+					{
+						RopeUtils.convertTape(AssemblerOptions.tapePath, AssemblerOptions.ENCODING_SIMH, AssemblerOptions.ENCODING_A);
+					}
 
-				// ...then generate deck
-				buildDeck();
+					// ...then generate deck
+					buildDeck();
+				}
 			}
 			else
 			{
 				// Generate the assembly 
-				buildAssembly();
-/*				
-				if(AssemblerOptions.tape && AssemblerOptions.convertTapeForTapeSimulator)
+				if(buildAssembly())
 				{
-					convertTape(AssemblerOptions.tapePath);
+					addRowToTape(AssemblerOptions.tapePath, "~L038I9C~N000~B007~TAPE DCW @TAPE@ ~}");
+				
+					if(AssemblerOptions.tape && AssemblerOptions.convertTapeForTapeSimulator)
+					{
+						RopeUtils.convertTape(AssemblerOptions.tapePath, AssemblerOptions.ENCODING_SIMH, AssemblerOptions.ENCODING_A);
+					}
 				}
-*/				
-				addRowToTape(AssemblerOptions.tapePath, "~L038I9C~N000~B007~TAPE DCW @TAPE@ ~}");
 			}
 						
 			// Remove empty files...
@@ -291,40 +294,6 @@ class Assembler
         {
             ex.printStackTrace();
         }				
-	}
-
-	static void convertTape(String tapePath)
-	{
-		try
-		{
-			RandomAccessFile file = new RandomAccessFile(new File(tapePath), "rws");
-			
-			int len = (int)file.length();
-			
-			byte[] buffer = new byte[len];
-			file.readFully(buffer);
-			
-			for (int idx = 0; idx < len; idx++) 
-			{
-				if (buffer[idx] == '(') 
-				{
-					buffer[idx] = '%';
-				}
-				else if (buffer[idx] == '=') 
-				{
-					buffer[idx] = '#';
-				}
-			}
- 
-			file.seek(0);
-			file.write(buffer);
-
-			file.close();
-		}
-        catch(Exception ex)
-        {
-            ex.printStackTrace();
-        }		
 	}
 
 	static void addRowToTape(String tapePath, String rowStr)
@@ -632,9 +601,17 @@ class Assembler
         return command;
     }
 		
-	static void buildAssembly() throws IOException
+	static Boolean buildAssembly() throws IOException
 	{
 		String[] args = AssemblerOptions.command.toArray(new String[0]);
+		
+		if(!RopeUtils.checkBuildArguments(args))
+		{
+			String message = "Assembly command arguments are invalid.\nCheck the lenght of source file path is no more than 110 characters.";
+			JOptionPane.showMessageDialog(null, message, "ROPE", JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+
 		args[0] = AssemblerOptions.assemblerPath;
 		process = Runtime.getRuntime().exec(args);
 		stdout = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -645,12 +622,25 @@ class Assembler
 
 		// Remove the temporary source file
 		File sourceFile = new File(args[args.length - 1]);
-		sourceFile.delete();
+		if(sourceFile != null)
+		{
+			sourceFile.delete();
+		}
+		
+		return true;
 	}
 
-	static void buildTape() throws IOException
+	static Boolean buildTape() throws IOException
 	{
 		String[] tapeArgs = buildCommand(false).toArray(new String[0]);
+		
+		if(!RopeUtils.checkBuildArguments(tapeArgs))
+		{
+			String message = "Build command arguments for tape file are invalid.\nCheck the lenght of source file path is no more than 110 characters.";
+			JOptionPane.showMessageDialog(null, message, "ROPE", JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+		
 		process = Runtime.getRuntime().exec(tapeArgs);
 		stdout = new BufferedReader(new InputStreamReader(process.getInputStream()));
 
@@ -660,12 +650,25 @@ class Assembler
 
 		// Remove the temporary source file
 		File sourceFile = new File(tapeArgs[tapeArgs.length - 1]);
-		sourceFile.delete();
+		if(sourceFile != null)
+		{
+			sourceFile.delete();
+		}
+	
+		return true;
 	}
 
-	static void buildDeck() throws IOException
+	static Boolean buildDeck() throws IOException
 	{
 		String[] deckArgs = buildCommand(true).toArray(new String[0]);
+		
+		if(!RopeUtils.checkBuildArguments(deckArgs))
+		{
+			String message = "Build command arguments for deck file are invalid.\nCheck the lenght of source file path is no more than 110 characters.";
+			JOptionPane.showMessageDialog(null, message, "ROPE", JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+
 		process = Runtime.getRuntime().exec(deckArgs);
 		stdout = new BufferedReader(new InputStreamReader(process.getInputStream()));
 
@@ -675,6 +678,11 @@ class Assembler
 		
 		// Remove the temporary source file
 		File sourceFile = new File(deckArgs[deckArgs.length - 1]);
-		sourceFile.delete();
+		if(sourceFile != null)
+		{
+			sourceFile.delete();
+		}
+		
+		return true;
 	}
 }

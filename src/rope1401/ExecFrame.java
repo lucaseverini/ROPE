@@ -800,7 +800,7 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
             killSimulator();
 			
             dataButton.setEnabled(true);
-       }
+        }
         else 
 		{			
             if(startSimulator())
@@ -906,8 +906,8 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
         dialog.initialize();
         dialog.setVisible(true);
 		
-        killSimulator();
-		
+		killSimulator();
+			
 		mainFrame.resetMemoryFrame();
     }
 
@@ -926,6 +926,17 @@ public class ExecFrame extends ChildFrame implements ActionListener, ChangeListe
 		{
             synchronized(Simulator.class) 
 			{
+/*
+				ADD OPTION TO RECREATE PROGRAM+DATA.cd file every time or just when the data file is selected
+				1) create xxxx_PROG+DATA.cd file
+				2) detach and attach cdr with xxxx_PROG+DATA.cd file
+				3) detach and attach lpt with output xxxx.out
+													 
+				TODO_NEXT: 
+				IMPLEMENT OVERPRINT
+				MAKE POSSIBLE TO BREAK PROGRAM EXECUTION
+*/				
+				// Execute the program
                 Simulator.execute("b cdr");
 				
                 processOutput(false);

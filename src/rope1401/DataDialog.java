@@ -433,13 +433,7 @@ public class DataDialog extends JDialog implements ActionListener
             name1 = name1.substring(0, index);
         }
 
-        index = name2.lastIndexOf(".");
-        if (index != -1) 
-		{
-            name2 = name2.substring(0, index);
-        }
-
-        String inputName = name1 + "_" + name2 + ".cd";
+        String inputName = name1 + "_PROG+DATA" + ".cd";
         File inputFile = new File(DataOptions.directoryPath, inputName);
         String inputPath = inputFile.getPath();
 

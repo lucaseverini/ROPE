@@ -253,7 +253,7 @@ public class PreferencesDialog extends JDialog implements ActionListener
         RopeFileChooser chooser = new RopeFileChooser(DataOptions.directoryPath, filePath, filters, directories, multiple);
 		chooser.setDialogTitle(title);
 		
-		if(filters != null)
+		if(filters != null && !filters.isEmpty())
 		{
 			chooser.setFileFilter(filters.get(0)); 
 		}

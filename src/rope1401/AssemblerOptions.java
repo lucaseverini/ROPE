@@ -45,11 +45,11 @@ class AssemblerOptions
 
     static boolean boot							= true;
     static boolean deckEncoding					= true;
-    static boolean tapeEncoding					= true;
+    static boolean tapeEncoding					= false;
     static boolean listing						= true;
     static boolean object						= true;
     static boolean tape							= true;
- 	static boolean convertTapeForTapeSimulator	= false;
+ 	static boolean convertTapeForTapeSimulator	= true;
     static boolean macro						= true;
     static boolean diagnostic					= false;
     static boolean codeOk						= false;

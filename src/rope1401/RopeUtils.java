@@ -19,7 +19,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.RandomAccessFile;
 import java.io.Writer;
+import static java.lang.System.in;
 
 public class RopeUtils 
 {
@@ -111,7 +113,7 @@ public class RopeUtils
 	{
 		String filePath = addPathSeparator(copyInTmpDir ? tmpDir : pathComponent(source));
 		String fileName = getFileName(source);
-		String timeStr = "" + System.currentTimeMillis();
+		String timeStr = "" + System.currentTimeMillis() / 1000;
 				
 		String dest = filePath + removeExtension(fileName) + "_" + timeStr + "." + getExtension(fileName);
 		
@@ -126,7 +128,7 @@ public class RopeUtils
 	{
 		String filePath = pathComponent(file.getPath());
 		String fileName = getFileName(file.getPath());
-		String timeStr = "" + System.currentTimeMillis();			
+		String timeStr = "" + System.currentTimeMillis() / 1000;			
 		String renamed = filePath + removeExtension(fileName) + "_deleted_" + timeStr + "." + getExtension(fileName);
 		File renamedFile = new File(renamed);
 		file.renameTo(renamedFile);
@@ -157,5 +159,236 @@ public class RopeUtils
 		{
 			ex.printStackTrace();
 		}
+	}
+	
+	public static void convertTape(String tapePath, String fromEncoding, String toEncoding)
+	{
+		try
+		{
+			RandomAccessFile file = new RandomAccessFile(new File(tapePath), "rws");
+			
+			int len = (int)file.length();
+			
+			byte[] buffer = new byte[len];
+			file.readFully(buffer);
+			
+			if(fromEncoding.equals(AssemblerOptions.ENCODING_SIMH) && toEncoding.equals(AssemblerOptions.ENCODING_A))
+			{
+				System.out.print("Converting tape from SIMH to Pierce A...");
+				
+				int totConvs = 0;
+				for (int idx = 0; idx < len; idx++) 
+				{
+					switch(buffer[idx])
+					{
+						case '\'':
+							buffer[idx] = '|';
+							totConvs++;
+							break;
+
+						case '=':
+							buffer[idx] = '~';
+							totConvs++;
+							break;
+
+						case '(':
+							buffer[idx] = '{';
+							totConvs++;
+							break;
+
+						case '+':
+							buffer[idx] = '\"';
+							totConvs++;
+							break;
+
+						case '\"':
+							buffer[idx] = '}';
+							totConvs++;
+							break;
+					}
+				}
+				
+				System.out.println(" " + totConvs + " character(s) converted.");
+			}
+			else if(fromEncoding.equals(AssemblerOptions.ENCODING_SIMH) && toEncoding.equals(AssemblerOptions.ENCODING_H))
+			{
+				for (int idx = 0; idx < len; idx++) 
+				{
+					switch(buffer[idx])
+					{
+						case '&':
+							buffer[idx] = '+';
+							break;
+
+						case '\'':
+							buffer[idx] = '|';
+							break;
+							
+						case '#':
+							buffer[idx] = '=';
+							break;
+							
+						case '@':
+							buffer[idx] = '\'';
+							break;
+
+						case '%':
+							buffer[idx] = '(';
+							break;
+
+						case '=':
+							buffer[idx] = '~';
+							break;
+
+						case '(':
+							buffer[idx] = '{';
+							break;
+
+						case '\"':
+							buffer[idx] = '}';
+							break;
+					}
+				}
+			}
+			else if(fromEncoding.equals(AssemblerOptions.ENCODING_A) && toEncoding.equals(AssemblerOptions.ENCODING_SIMH))
+			{
+				for (int idx = 0; idx < len; idx++) 
+				{
+					switch(buffer[idx])
+					{
+						case '|':
+							buffer[idx] = '\'';
+							break;
+
+						case '~':
+							buffer[idx] = '=';
+							break;
+
+						case '{':
+							buffer[idx] = '(';
+							break;
+
+						case '\"':
+							buffer[idx] = '+';
+							break;
+
+						case '}':
+							buffer[idx] = '\"';
+							break;
+					}
+				}
+			}
+			else if(fromEncoding.equals(AssemblerOptions.ENCODING_A) && toEncoding.equals(AssemblerOptions.ENCODING_H))
+			{
+				for (int idx = 0; idx < len; idx++) 
+				{
+					switch(buffer[idx])
+					{
+						case '&':
+							buffer[idx] = '+';
+							break;
+
+						case '#':
+							buffer[idx] = '=';
+							break;
+
+						case '@':
+							buffer[idx] = '\'';
+							break;
+
+						case '%':
+							buffer[idx] = '(';
+							break;
+					}
+				}
+			}
+			else if(fromEncoding.equals(AssemblerOptions.ENCODING_H) && toEncoding.equals(AssemblerOptions.ENCODING_SIMH))
+			{
+				for (int idx = 0; idx < len; idx++) 
+				{
+					switch(buffer[idx])
+					{
+						case '+':
+							buffer[idx] = '&';
+							break;
+
+						case '|':
+							buffer[idx] = '\'';
+							break;
+							
+						case '=':
+							buffer[idx] = '#';
+							break;
+							
+						case '\'':
+							buffer[idx] = '@';
+							break;
+
+						case '(':
+							buffer[idx] = '%';
+							break;
+
+						case '~':
+							buffer[idx] = '=';
+							break;
+
+						case '{':
+							buffer[idx] = '(';
+							break;
+
+						case '}':
+							buffer[idx] = '\"';
+							break;
+					}
+				}
+			}
+			else if(fromEncoding.equals(AssemblerOptions.ENCODING_H) && toEncoding.equals(AssemblerOptions.ENCODING_A))
+			{
+				for (int idx = 0; idx < len; idx++) 
+				{
+					switch(buffer[idx])
+					{
+						case '+':
+							buffer[idx] = '&';
+							break;
+
+						case '=':
+							buffer[idx] = '#';
+							break;
+
+						case '\'':
+							buffer[idx] = '@';
+							break;
+
+						case '(':
+							buffer[idx] = '%';
+							break;
+					}
+				}
+			}
+ 
+			file.seek(0);
+			file.write(buffer);
+
+			file.close();
+		}
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }		
+	}
+	
+	public static boolean checkBuildArguments(String[] args)
+	{
+		for(String arg: args)
+		{
+			if(arg.length() > 127)
+			{
+				System.out.println("Argument " + "\"" + arg + "\" is longer than 127 characters");
+				return false;
+			}
+		}
+		
+		return true;
 	}
 }
