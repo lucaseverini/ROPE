@@ -116,29 +116,33 @@ public class MemoryFrame extends ChildFrame implements ActionListener, ChangeLis
                 super.paint(g);
 
                 if (barsCheckBox.isSelected()) 
-				{
-                    Dimension size = this.getSize();
-					g.setFont(font);
-					
-					if(!stripesInitialized)
-					{
-						stripesInitialized = true;
-						
-						FontMetrics fm = g.getFontMetrics();				
-						int charWidth = (int)Math.ceil(fm.getStringBounds("0", g).getWidth());
- 					
-						stripeWidth = 10 * charWidth;
-						// Small adjustement to make things looks nicer on ugly Windows...
-						stripe1X = (8 * charWidth) + (RopeHelper.isWindows ? 1 : 0);
-					    stripe2X = stripe1X + (stripeWidth * 2);
-						stripe3X = stripe1X + (stripeWidth * 4);					
-					}
-					
-                    g.setColor(barColor);
+                {
+                    FontMetrics fm = g.getFontMetrics();
+                    int charMaxWidth = fm.charWidth('w');
+                    int width = 10 * charMaxWidth;
+                    int x1 = 8 * charMaxWidth;
+                    int x2 = x1 + 2 * width;
+                    int x3 = x1 + 4 * width;
+
+                    g.setColor(stripeColor);
                     g.setXORMode(Color.BLACK);
-                    g.fillRect(stripe1X, 0, stripeWidth, size.height);
-                    g.fillRect(stripe2X, 0, stripeWidth, size.height);
-                    g.fillRect(stripe3X, 0, stripeWidth, size.height);
+                    
+                    int height = this.getSize().height;
+                    
+                    g.fillRect(x1, 0, width, height);
+                    g.fillRect(x2, 0, width, height);
+                    g.fillRect(x3, 0, width, height);
+        
+                    g.setColor(barColor);
+                    
+                    int barWidth = 10 * charMaxWidth;
+                    int startWidth = 5 * charMaxWidth;
+                    int endWidth = 60 * charMaxWidth;
+                    for (int x = x1 + startWidth; x < endWidth; x += barWidth) 
+                    {
+                        g.drawLine(x, 0, x, height);
+                    }
+        
                     g.setPaintMode();
                 }
             }
