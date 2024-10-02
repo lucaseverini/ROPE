@@ -27,7 +27,6 @@ public class MemoryFrame extends ChildFrame implements ActionListener, ChangeLis
     GridBagLayout gridBagLayout1 = new GridBagLayout();
     JPanel controlPanel = new JPanel();
     JScrollPane scrollPane = new JScrollPane();
-    JTextArea memoryArea = new JTextArea();
     JLabel fromLabel = new JLabel();
     JTextField fromText = new JTextField();
     JLabel toLabel = new JLabel();
@@ -36,11 +35,13 @@ public class MemoryFrame extends ChildFrame implements ActionListener, ChangeLis
     JCheckBox autoCheckBox = new JCheckBox();
     JCheckBox barsCheckBox = new JCheckBox();
 	Font font = new Font("Monospaced", Font.PLAIN, 14);
+	JTextArea memoryArea;
 	boolean stripesInitialized = false;
 	int stripe1X, stripe2X, stripe3X;
 	int stripeWidth;
 
-    private Color barColor = new Color(15, 15, 15);
+    private Color barColor = new Color(75, 75, 75);
+    private Color stripeColor = new Color(15, 15, 15);
 
     public MemoryFrame(RopeFrame parent)
     {
@@ -291,6 +292,10 @@ public class MemoryFrame extends ChildFrame implements ActionListener, ChangeLis
 				while(true) 
 				{
 					String text = Simulator.output();
+                    if(text == null)
+                    {
+                        break;
+                    }
 
 					if(!nothingYet && text.length() == 0)
 					{
