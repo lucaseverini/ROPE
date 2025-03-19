@@ -30,7 +30,7 @@ ToDo list (updated Mar-19-2025 by Luca Severini)
     It could be helpful to be able to change the instruction that is going to be executed.
     If that is not possible it shouldn't be possible to change the current selected row, aka the instruction that will be executed.
 
-13) Typewriter (IBM 1407) support.
+13) Typewriter (IBM Model A) support.
  
 14) Conditional breakpoints.
 
