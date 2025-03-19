@@ -1,4 +1,4 @@
-ToDo list (updated Sep-3-2016 by Luca Severini)
+ToDo list (updated Mar-19-2025 by Luca Severini)
 
 1) Implement environment variable ROPE_MACROS_PATH as requested by Stan. (Done?)
 [DONE]
@@ -14,53 +14,48 @@ ToDo list (updated Sep-3-2016 by Luca Severini)
 7) Unnoticed exception in ClipboardListener.java line 41 "regainOwnership(sysClip.getContents(this));"
  
 8) Impossible to interrupt a simulator operation.
-When your 1401 code goes into a tight loop, the simulator is in a tight loop.
-Kill ROPE and kill the simulator process and everything is OK.
-Does not happen to be very often so I don't think we should worry about it.
+   When your 1401 code goes into a tight loop, the simulator is in a tight loop.
+   Kill ROPE and kill the simulator process and everything is OK.
+   Does not happen very often so I don't think we should worry about it.
 
 9) Improvements to Editing.
-It would be 'nice' if I could get a pop up EDIT window on right click but I can live with going to the edit window at the top.
+   It would be 'nice' if I could get a pop up EDIT window on right click.
  
 10) Find/Replace.
-If I am going to do much editing, I use a Windows editor or even Microsoft Word.
-ROPE is for fixing bugs not global changes to the code.
  
 11) Reload current source.
 [DONE]
    
 12) Should not be possible to change selected row in EXEC window.
-	This goes together with 13.
-	It could be helpful to be able to change the instruction that is going to be executed.
-	If that is not possible it shouldn't be possible to change the current selected row, aka the instruction that will be executed.
+    It could be helpful to be able to change the instruction that is going to be executed.
+    If that is not possible it shouldn't be possible to change the current selected row, aka the instruction that will be executed.
+
+13) Typewriter (IBM 1407) support.
  
 14) Conditional breakpoints.
 
 15) Option to keep content of Output window when simulator is restarted.
-Not required
  
 16) Option to maintain content of Output window between sessions.
-Not required
  
 17) Improvements to error reporting for some Assembly error like when a label or instruction is on wrong column.
-Not required
  
 18) Implement a way to simulate card-deck input (or event tape) with keyboard input.
-This would be cool and helpful.
-I think the same.
-This could be probably done together with the support for the typewriter.
-The handle for the card input is set by Runtime Data Card reader file:
-All we need to do is to be able to set it to STDIN.
+    This would be cool and helpful.
+    This could be probably done together with the support for the typewriter.
+    The handle for the card input is set by Runtime Data Card reader file:
+    All we need to do is to be able to set it to STDIN.
  
 19) In the memory window show the memory changed by last instruction in a different color.
-Kind of cool but not worth the work to do it.
-If you don't know what you are looking for, you should not be using the memory option.
+    Kind of cool but not worth the work to do it.
+    If you don't know what you are looking for, you should not be using the memory option.
  
 20) Output must be showed immediately, not only when the simulator has completed the operation.
  
 21) A Window where is possible to observe the variables and edit their values too.
 
 23) When processing the source file before giving it to Autocoder:
-	1 Remove any JOB card found in the file
+    1 Remove any JOB card found in the file
     2 Always add a JOB card as the first card of the source deck
     3 Add the date and time of assembly to the JOB card
     4 Add the last 5 digits of time since epoch to columns 76-80 of the job card. 
