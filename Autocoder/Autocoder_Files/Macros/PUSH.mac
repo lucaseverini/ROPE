@@ -1,0 +1,6 @@
+     ** PUSH MACRO **
+     ** X2 IS THE STACK POINTER     
+     ** VALUE IN )01 IS COPIED IN STACK
+               MCW  )01, 0+X2
+               SW   15996+X2
+               SBR  X2, 5+X2

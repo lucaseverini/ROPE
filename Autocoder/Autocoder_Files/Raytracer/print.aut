@@ -1,0 +1,54 @@
+               JOB  Print test
+               CTL  3311
+
+               ORG  333
+
+     START     CS   332                 Clear printer area
+               CS
+
+               LCA  SHADES,260
+               W
+               W
+               W
+
+               CS   332                 Clear printer area
+               CS
+               LCA  LARGE,332
+               W
+               W
+               W
+
+     FINIS     H    FINIS
+
+     * .  Worked
+     * ,  Worked
+     * -  Worked
+     * :  Blank
+     * $  Worked
+     * *  Worked
+     * ?  Printed as +
+     * #  Worked
+     * &  Printed as +
+     * @  Worked
+
+     *SHADES    DCW  @.,-:$*?#&@@        The various shades of pixels.
+     SHADES    DCW  @.,-/%$*#&@@
+
+               DCW  @1234567890@
+               DC   @1234567890@
+               DC   @1234567890@
+               DC   @1234567890@
+               DC   @1234567890@
+
+               DC   @1234567890@
+               DC   @1234567890@
+               DC   @1234567890@
+               DC   @1234567890@
+               DC   @1234567890@
+
+               DC   @1234567890@
+               DC   @1234567890@
+               DC   @1234567890@
+     LARGE     DC   @12@
+
+               END  START

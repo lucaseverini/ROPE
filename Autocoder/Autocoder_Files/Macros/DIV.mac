@@ -1,0 +1,16 @@
+     ** DIVISION MACRO **
+     ** )01=DIVISOR, )02=DIVIDEND, )03=QUOTIENT, )04=REMAINDER
+               B    *+17
+               DCW  @00000@                
+               DC   @00000000000@        
+
+               ZA   )02, *-7            *PUT DIVIDEND INTO WORKING BL
+               D    )01, *-19           *DIVIDE
+               MZ   *-22, *-21          *KILL THE ZONE BIT
+               MZ   *-29, *-34          *KILL THE ZONE BIT
+               MCW  *-41, )03           *PICK UP ANSWER
+               SW   *-44                *SO I CAN PICKUP REMAINDER
+               MCW  *-46, )04           *GET REMAINDER
+               CW   *-55                *CLEAR THE WM
+               MZ   )03-1, )03          * CLEANUP QUOTIENT BITZONE
+               MZ   )04-1, )04          * CLEANUP REMAINDER BITZONE

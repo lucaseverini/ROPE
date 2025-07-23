@@ -1,0 +1,9 @@
+*.out
+*.lst
+*.cd
+*.cdr
+*.brk
+*.mt1
+/ray
+test.aut
+NOTES

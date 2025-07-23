@@ -1,0 +1,678 @@
+ CLEAR STORAGE 1     ,008015,022026,030037,044,049,053053N000000N00001026                                         1
+ CLEAR STORAGE 2     L068116,105106,110117B101/I9I#071029C029056B026/B001/0991,001/001117I0?                      2
+ BOOTSTRAP           ,008015,022029,036040,047054,061068,072/061039              ,0010011040                      3
+0                          BIGPRINT15.S 11/18/18 14:15:44                             -9344               PAGE    1
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  101                JOB   BIGPRINT15.S 11/18/18 14:15:44
+  102         *  CTL 6611
+  103         *  BIGPRINT
+  104         *  PROGRAM BY ED THELEN
+  105         *  MODIFIED BY STAN PADDOCK
+  106         *
+  107         CRDBUF EQU   001                                                         0001
+  108         PUNBUF EQU   101                                                         0101
+  109         PRTBUF EQU   201                                                         0201
+  110         *
+  111                ORG   87                                                                 0087
+  112         X1     DSA   0                * INDEX REGISTER 1                      3  0089  000                  4   000
+  113                ORG   92                                                                 0092
+  114         X2     DSA   0                * INDEX REGISTER 2                      3  0094  000                  5   000
+  115                ORG   97                                                                 0097
+  116         X3     DSA   0                * INDEX REGISTER 3                      3  0099  000                  6   000
+  117         *
+  118         *
+  119         * -------------------------------------------------------------
+  120         *
+  121                ORG   340                                                                0340
+  122         X      DCW   @X@                                                      1  0340                       7
+  123         XCNT   DCW   @00000@                                                  5  0345                       7
+  124         XCNT2  DCW   @00000@                                                  5  0350                       7
+  125         X4K    DSA   4000                                                     3  0353  00'                  7  4000
+  126         SPCNT  DCW   00                                                       2  0355                       7
+  127         REV    DCW   @BIGPRINT REV 15.0 GENERATED ON 06/01/2014@             41  0396                       9
+  128         *
+  129         START  CS    CRDBUF+79      * CLEAR WORD MARKS FROM CARD READ         4  0397  / 080                9   080
+  130                CS    PUNBUF+79      * CLEAR PUNCH AREA                        4  0401  / 180                9   180
+  131                SW    CRDBUF         * SET WORD MARK                           4  0405  , 001                9   001
+  132                ZA    NZERO,NZERO    * SET SIGN BITS                           7  0409  ? Z68 Z68            9  1968    1968
+  133                MCW   @000@,X1       * CLEAR X1                                7  0416  M A59 089           10  3159     089
+  134                MCW   X1,X2          * CLEAR X2                                7  0423  M 089 094           10   089     094
+  135                MCW   X1,X3          * CLEAR X3                                7  0430  M 089 099           10   089     099
+  136                MCW   REV,140                                                  7  0437  M 396 140           10   396     140
+  137         *
+  138         * SPECIAL CODE TO SETUP THE ZONE SELECT CODES
+  139         *
+  140                MZ    @A@,ZONE                                                 7  0444  Y A60 Z38           10  3160    1938
+  141                MCW   ZONE,CKAB+7                                              7  0451  M Z38 T12           11  1938    1312
+  142                MZ    @J@,ZONE                                                 7  0458  Y A61 Z38           11  3161    1938
+  143                MCW   ZONE,CKB+7                                               7  0465  M Z38 T04           11  1938    1304
+  144                MZ    @Z@,ZONE                                                 7  0472  Y A62 Z38           11  3162    1938
+  145                MCW   ZONE,CKA+7                                               7  0479  M Z38 S96           11  1938    1296
+  146         *
+  147         ******************************************************************
+1                          BIGPRINT15.S 11/18/18 14:15:44                             -9344               PAGE    2
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  148         *     READ IN AND STORE THE DATE CARD
+  149         ******************************************************************
+  150         *
+  151                R                     * READ DATE CARD                         1  0486  1                   11
+  152                C     @(EOF)@,005     * IS THIS THE EOF CARD                   7  0487  C A67 005           12  3167     005
+  153                BE    NEND            * YES, STOP                              5  0494  B 817 S             12   817
+  154                MCW   010,DATE25      * PUT IT IN A SAFE PLACE                 7  0499  M 010 !41           12   010    2041
+  155         *
+  156         *   SEE WHERE THE END OF THE TEXT IS AND ADD A #
+  157         *
+  158                MA    @000@,X1        * INITIALIZE X1                          7  0506  # A59 089           12  3159     089
+  159         DATECK BCE   DATECA,DATE25-24+X1,                                     8  0513  B 525 !/7           12   525    2017+1
+  160                B     DATECC         * NOT A SPACE                             4  0521  B 533               12   533
+  161         DATECA BCE   DATECX,DATE25-23+X1,                                     8  0525  B 544 !/8           13   544    2018+1
+  162         DATECC MA    @001@,X1        * GO TO TRY AGAIN                        7  0533  # A70 089           13  3170     089
+  163                B     DATECK                                                   4  0540  B 513               13   513
+  164         DATECX MCW   @#@,DATE25-24+X1                                         7  0544  M A71 !/7           13  3171    2017+1
+  165         *
+  166         ******************************************************************
+  167         *     READ IN AND PROCESS GUEST CARDS
+  168         ******************************************************************
+  169         *   PROGRAMS ARE PERFECT
+  170         *   INPUT BY USERS CAN CONTAIN MANY ERRORS
+  171         *   THE FOLLOWING CODE TRIES TO FIX MANY ERRORS SEEN
+  172         *   IN THE 1401 RESTORATION ROOM
+  173         *   LEADING SPACES ARE ELIMINATED
+  174         *   MULTIPLE SPACES BETWEEN THE FIRST AND LAST NAME ARE ELIMINATED
+  175         *   IF ONLY ONE MANE IS GIVEN, THAT IS ALL THAT IS PRINTED
+  176         *   IF THE USER GIVES A NAME LIKE EL AL JARAED
+  177         *   IT WILL BE PRINTED WITH EL AS THE FIRST NAME AND
+  178         *   AL JARAED AS THE SECOND NAME
+  179         *   THE FIRST NAME WILL BE TRUNCSTED TO 11 CHARACTERS AND
+  180         *   THE SECOND NAME TRUNCATED TO 10 CHARACTERS
+  181         *
+  182         READG  R                           * READ GUEST CARD                  1  0551  1                   13
+  183                C     @(EOF)@,005           * IS THIS THE EOF CARD             7  0552  C A76 005           13  3176     005
+  184                BE    NEND                  * YES, STOP                        5  0559  B 817 S             13   817
+  185         *         ELSE
+  186                SS    1                     * SELECT READ STACKER 2            2  0564  K 1                 14
+  187                MCW   @?@,075               * PUT SOMETHING IN THE CARD        7  0566  M A77 075           14  3177     075
+  188                MCW   @000@,X1              * INITIALIZE X1                    7  0573  M A59 089           14  3159     089
+  189                MCW   @000@,X2              * INITIALIZE X2                    7  0580  M A59 094           14  3159     094
+  190                MCW   @01@,SPCNT            * TRICK TO SAY A SPACE             7  0587  M A79 355           14  3179     355
+  191         *                                    * HAS BEEN SEEN
+  192         READH  BCE   FDSP,CRDBUF+X1,       * IS IT A SPACE?                   8  0594  B 613 0'1           14   613     001+1
+  193                MCW   @00@,SPCNT            * THIS IS NOT A SPACE              7  0602  M A81 355           15  3181     355
+  194                B     TAKIT                 * WE ARE GOING TO TAKE IT          4  0609  B 632               15   632
+  195         FDSP   A     @1@,SPCNT             * COUNT THE NUMBER OF SPACES       7  0613  A A82 355           15  3182     355
+  196                C     SPCNT,@01@                                               7  0620  C 355 A79           15   355    3179
+  197                BL    NOTAKE                * IF WE ALREADY HAD A SPACE,       5  0627  B 653 T             15   653
+1                          BIGPRINT15.S 11/18/18 14:15:44                             -9344               PAGE    3
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  198         *                                   * SKIP THIS ONE
+  199         *
+  200         TAKIT  MN    CRDBUF+X1,PUNBUF+X2   * MOVE THE NUMERIC PART            7  0632  D 0'1 1!1           15   001+1   101+2
+  201                MZ    CRDBUF+X1,PUNBUF+X2   * MOVE THE ZONE PART               7  0639  Y 0'1 1!1           16   001+1   101+2
+  202                MA    @001@,X2              * INCREMENT DESTINATION            7  0646  # A70 094           16  3170     094
+  203         NOTAKE MA    @001@,X1              * INCREMENT SOURCE                 7  0653  # A70 089           16  3170     089
+  204                C     X1,@079@              * ARE WE AT THE END?               7  0660  C 089 A85           16   089    3185
+  205                BU    READH                 * GO GET SOME MORE                 5  0667  B 594 /             16   594
+  206                MCW   PUNBUF+80,CRDBUF+80   * MOVE THE DATA BACK               7  0672  M 181 081           17   181     081
+  207                CS    PUNBUF+80             * CLEAR THE PUN BUFFER             4  0679  / 181               17   181
+  208         *
+  209         * NOW WE ARE GOING LOOKING FOR THREE NAMES
+  210         *
+  211                MCW   @000@,X1              * INITIALIZE X1                    7  0683  M A59 089           17  3159     089
+  212                MCW   @00@,SPCNT            * INITIALIZE SPACE COUNT           7  0690  M A81 355           17  3181     355
+  213         SPCK2  BCE   SP2,CRDBUF+X1,        * FIND A SPACE?                    8  0697  B 709 0'1           17   709     001+1
+  214                B     SPNXT                 * GO TO THE NEXT                   4  0705  B 743               17   743
+  215         SP2    BCE   SPX,CRDBUF+1+X1,      * IS THE NEXT A SPACE ALSO?        8  0709  B 766 0'2           18   766     002+1
+  216                A     @01@,SPCNT            * ADD ONE TO SPACE COUNT           7  0717  A A79 355           18  3179     355
+  217                BCE   SPNXT,SPCNT,1         * IF THIS IS THE FIRST,            8  0724  B 743 355 1         18   743     355
+  218         *                                    * LOOK FOR THE SECOND
+  219                MCW   @?@,CRDBUF+X1         * PUT A NON PRINTABLE              7  0732  M A77 0'1           18  3177     001+1
+  220         *                                    * IN PLACE OF SPACE
+  221                B     SPX                   * WE HAVE DONE OUR JOB             4  0739  B 766               18   766
+  222         *
+  223         SPNXT  MA    @001@,X1              * INCREMENT X1                     7  0743  # A70 089           19  3170     089
+  224                C     @079@,X1              * ARE WE AT THE END?               7  0750  C A85 089           19  3185     089
+  225                BE    SPX                   * LETS GET OUT OF HERE             5  0757  B 766 S             19   766
+  226                B     SPCK2                 * TRY NEXT COLUM                   4  0762  B 697               19   697
+  227         SPX    NOP                                                            1  0766  N                   19
+  228         *
+  229         SKIPPU B     BIGPRT          * CALL SUBROUTINE TO PROCESS             4  0767  B 862               19   862
+  230         *                              * GUEST CARD
+  231                MCW   @S@,DOUBLE      * SET FOR SINGLE SIZE BIG PRINT          7  0771  M A86 Z78           19  3186    1978
+  232                MCW   LINE3,WXX       * "VISITED THE COMPUTER#     "           7  0778  M J16 !66           20  2116    2066
+  233                B     PRINTS          * SUBROUTINE CALL                        4  0785  B /39               20  1139
+  234                MCW   LINE4,WXX       * "HISTORY MUSEUM ON#        "           7  0789  M J41 !66           20  2141    2066
+  235                B     PRINTS          * SUBROUTINE CALL                        4  0796  B /39               20  1139
+  236                MCW   DATE25,WXX      * PRINT DATE LINE                        7  0800  M !41 !66           20  2041    2066
+  237                B     PRINTS          * SUBROUTINE CALL                        4  0807  B /39               20  1139
+  238                CC    1               * TOP OF FORM                            2  0811  F 1                 20
+  239         *
+  240         *******************************************************************
+  241         *
+  242         SKIPTX B     READG           * GO AND GET THE NEXT GUEST CARD         4  0813  B 551               21   551
+  243         *
+  244         *
+  245         *******************************************************************
+  246         *
+  247         NEND   H                     * HALT OR I WILL SHOOT                   1  0817  .                   21
+1                          BIGPRINT15.S 11/18/18 14:15:44                             -9344               PAGE    4
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  248                B     START,G         * IF G, GO AGAIN                         5  0818  B 397 G             21   397
+  249                CC    1               * TOP OF FORM                            2  0823  F 1                 21
+  250                CS    332             * CLEAR PRINT STORAGE                    4  0825  / 332               21   332
+  251                CS                    * CLEAR PRINT STORAGE                    1  0829  /                   21
+  252                CS                    * CLEAR PUNCH STORAGE                    1  0830  /                   21
+  253                CS                    * CLEAR READ STORAGE                     1  0831  /                   22
+  254         *
+  255                C     @SHAY@,14007    * WERE WE LOADED WITH THE LOADER?        7  0832  C A90 !0G           22  3190   14007
+  256                BE    14000           * YES WE WERE. TURN CONTROL BACK         5  0839  B !0? S             22 14000
+  257         *                              * TO THE LOAD
+  258         *         OTHERWISE.....
+  259         *
+  260         *         GET READY TO BOOT FROM THE FOLLOWING DECK
+  261         *
+  262                SW    001             * SET WORDMARK IN LOCATION 1             4  0844  , 001               22   001
+  263         NREAD  R                     * READ FIRST CARD OF NEXT                1  0848  1                   22
+  264         *                              * OBJECT DECK
+  265                BCE   001,001,,       * IS IT A COMMA? BRANCH TO               8  0849  B 001 001 ,         22   001     001
+  266         *                              * THE FIRST INSTRUCTION
+  267                B     NREAD           * CHECK THE NEXT ONE                     4  0857  B 848               22   848
+  268                NOP                                                            1  0861  N                   23
+  269         *
+  270         ******************************************************************
+  271         *     BIG PRINT SUBROUTINE
+  272         ******************************************************************
+  273         *
+  274         BIGPRT SBR   BIGPTX+3        * SET RETURN ADDRESS                     4  0862  H /37               23  1137
+  275                MCW   @D@,DOUBLE      * SET SIZE TO DOUBLE                     7  0866  M A91 Z78           23  3191    1978
+  276                MCW   BLANKS,WXX      * BLANK WORK AREA, FOR 1ST NAME          7  0873  M !91 !66           23  2091    2066
+  277                MCW   @000@,PICKUP    * INITIALIZE PICKUP                      7  0880  M A59 ?73           23  3159    3073
+  278                MCW   PICKUP,X1       * START SCAN                             7  0887  M ?73 089           23  3073     089
+  279                MCW   @000@,X2        * START PUTAWAY                          7  0894  M A59 094           24  3159     094
+  280         *
+  281         BIGPTA MCW   1+X1,PCHAR      * MOVE CHAR OF 1ST                       7  0901  M 0'1 Z85           24   001+1  1985
+  282         *NAMETOPCHAR
+  283                MA    @001@,X1         * INCREMENT X1 (GET)                    7  0908  # A70 089           24  3170     089
+  284                BCE   BIGPTB,PCHAR,    * IS THE CHARACTER A BLANK?             8  0915  B 953 Z85           24   953    1985
+  285                MCW   PCHAR,WXX-24+X2  * MOVE PCHAR TO WORK SPACE              7  0923  M Z85 !M2           24  1985    2042+2
+  286                A     @001@,X2         * INCREMENT X2 (PUT)                    7  0930  A A70 094           25  3170     094
+  287                C     @012@,X2         * TOO MANY?                             7  0937  C A94 094           25  3194     094
+  288                BE    BIGPTB           * YES, FIX IT                           5  0944  B 953 S             25   953
+  289                B     BIGPTA           * GO GET ANOTHER                        4  0949  B 901               25   901
+  290         BIGPTB MCW   @#@,WXX-24+X2    * MOVE # TO END OF TEXT                 7  0953  M A71 !M2           25  3171    2042+2
+  291         *                               * IN WORK SPACE
+  292                B     PRINTS          * SUBROUTINE CALL TO PRINT WHAT          4  0960  B /39               25  1139
+  293         *                              * IS IN WORK
+  294         *
+  295         *************************************************************
+  296         * LOOKING FOR FIRST SPACE IN THE NAME CARD
+  297         *************************************************************
+1                          BIGPRINT15.S 11/18/18 14:15:44                             -9344               PAGE    5
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  298         *
+  299                MCW   @000@,X1        * INITIALIZE X1 AT START OF CARD         7  0964  M A59 089           26  3159     089
+  300         FS1    BCE   FC1,1+X1,       * IT IS A SPACE                          8  0971  B '02 0'1           26  1002     001+1
+  301                MA    @001@,X1        * INCREMENT X1                           7  0979  # A70 089           26  3170     089
+  302                C     @070@,X1        * COMPARE SIZE OF X1                     7  0986  C A97 089           26  3197     089
+  303                BE    BIGSN           * GIVE UP                                5  0993  B '36 S             26  1036
+  304                B     FS1             * TRY NEXT                               4  0998  B 971               26   971
+  305         *
+  306         FC1    MA    @001@,X1        * INCREMENT X1                           7  1002  # A70 089           27  3170     089
+  307                C     @070@,X1        * COMPARE SIZE OF X1                     7  1009  C A97 089           27  3197     089
+  308                BE    BIGSN           * GIVE UP                                5  1016  B '36 S             27  1036
+  309                BCE   FC1,1+X1,       * IT IS A SPACE                          8  1021  B '02 0'1           27  1002     001+1
+  310                MCW   X1,PICKUP       * STORE X1 IN PICKUP                     7  1029  M 089 ?73           27   089    3073
+  311         *
+  312         *
+  313         ************ PROCESS SECOND NAME **************************
+  314         *
+  315         BIGSN  MCW   BLANKS,WXX      * BLANK WORK AREA, FOR 2ND NAME          7  1036  M !91 !66           28  2091    2066
+  316                MCW   @ @,BIGLST      * SHOW NO CHARS IN LAST NAME             7  1043  M A98 Z55           28  3198    1955
+  317                MCW   PICKUP,X1       * START SCAN                             7  1050  M ?73 089           28  3073     089
+  318                MCW   @001@,X2        * START PUTAWAY (OVER ONE COLUMN)        7  1057  M A70 094           28  3170     094
+  319         BIGPTC MCW   1+X1,PCHAR      * MOVE 1ST CHAR OF LAST NAME             7  1064  M 0'1 Z85           28   001+1  1985
+  320         *                              * TO PCHAR
+  321                MA    @001@,X1        * INCREMENT X1 (GET)                     7  1071  # A70 089           29  3170     089
+  322                BCE   BIGPTD,PCHAR,   * IS IT A SPACE?                         8  1078  B /16 Z85           29  1116    1985
+  323                MCW   PCHAR,WXX-24+X2  * MOVE PCHAR TO WORK SPACE              7  1086  M Z85 !M2           29  1985    2042+2
+  324                A     @001@,X2        * INCREMENT X2 (PUT)                     7  1093  A A70 094           29  3170     094
+  325                C     @011@,X2        * TOO MANY?                              7  1100  C B01 094           29  3201     094
+  326                BE    BIGPTD          * YES, PRINT                             5  1107  B /16 S             30  1116
+  327                B     BIGPTC          * NO, GO GET ANOTHER                     4  1112  B '64               30  1064
+  328         *
+  329         BIGPTD MCW   @#@,WXX-24+X2   * MOVE # TO END OF TEXT IN               7  1116  M A71 !M2           30  3171    2042+2
+  330         *                              * WORK SPACE
+  331                MCW   X1,PICKUP       * STORE X1 IN PICKUP (WHY)               7  1123  M 089 ?73           30   089    3073
+  332                B     PRINTS          * SUBROUTINE CALL TO PRINT               4  1130  B /39               30  1139
+  333         *                              * LAST NAME
+  334         *
+  335         BIGPTX B     000             * SUBROUTINE RETURN                      4  1134  B 000               30   000
+  336                NOP                   * BACKUP TO BRANCH INSTRUCTION           1  1138  N                   30
+  337         *
+  338         ************************************************************
+  339         *   PRINTS SUBROUTINE
+  340         ***********************************************************
+  341         *
+  342         PRINTS SBR   PRINTX+3        * SET RETURN ADDRESS                     4  1139  H Z12               31  1912
+  343                MCW   @000@,WROW      * INITIALIZE PRINT ROW COUNTER           7  1143  M A59 Z84           31  3159    1984
+  344         PRINT1 MCW   @000@,WCOL      * INITIALIZE WORK CHARACTER PICK UP      7  1150  M A59 Z81           31  3159    1981
+  345                MCW   @000@,PCOL      * INITIALIZE OUTPUT INDEX                7  1157  M A59 Z95           31  3159    1995
+  346                CS    332             * CLEAR PRINTER AREA                     4  1164  / 332               31   332
+  347                CS                                                             1  1168  /                   31
+1                          BIGPRINT15.S 11/18/18 14:15:44                             -9344               PAGE    6
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  348                SW    201                                                      4  1169  , 201               31   201
+  349         *
+  350         PRINT2 MCW   WCOL,X1             * PREPARE TO PICK UP NEXT CHAR       7  1173  M Z81 089           32  1981     089
+  351         *                                  * TO PROCESS
+  352                MCW   WXX-24+X1,PCHAR     * AND GET IT                         7  1180  M !U2 Z85           32  2042+1  1985
+  353                MCW   WXX-23+X1,PCHAR2    * STORE OFF THE NEXT CHARACTER       7  1187  M !U3 Z86           32  2043+1  1986
+  354                A     @001@,WCOL          * INCREMENT COLUMN COUNT             7  1194  A A70 Z81           32  3170    1981
+  355                MCW   @000@,SUM           * INITIALIZE SUM                     7  1201  M A59 Z42           32  3159    1942
+  356                C     @000@,WROW          * ARE WE ON THE FIRST ROW?           7  1208  C A59 Z84           33  3159    1984
+  357                BU    PC4                 * GO GET IT FROM TABLE               5  1215  B V94 /             33  1594
+  358         *
+  359         *****************************************************************
+  360         * THE DATA FOR EACH CHARACTER IS STORED IN A TABLE TITLED CODEA
+  361         * AN INDEX TO THIS TABLE IS TITLED CINDX
+  362         * THE FOLLOWING CODE WILL FIND THE CHARCTER IN CINDX AND SET SUM
+  363         * TO THAT POSITION
+  364         * THE ROUTING CHECKS THE ZONE BITS FIRST AND SETS A
+  365         * BASE OF 0,16,32 OR 48
+  366         * THEN IT USES THE NUMERICAL PORTION TO ADD IN TO THE INDEX
+  367         * THIS DOES NOT WORK WITH SPECIAL CHARACTERS
+  368         * SO THEY ALONG WITH THE ZERO HAVE TO BE PROCESSED SPECIAL
+  369         * THIS ONLY WORKS IF THE NUMBERIAL PORTION IS 0-9
+  370         * A TEST FOR SPECIAL CASES IS DONE ON THE NUMERICAL PORTION
+  371         * FOR OTHER SPECIAL CHARACTERS
+  372         ******************************************************************
+  373         *
+  374                MN    PCHAR,NUM       * MOVE THE NUMERIC PORTION               7  1220  D Z85 Z39           33  1985    1939
+  375                MZ    PCHAR,ZONE      * MOVE THE ZONE                          7  1227  Y Z85 Z38           33  1985    1938
+  376                C     @0@,NUM         * CHECK THE NUMERIC PORTION              7  1234  C B02 Z39           33  3202    1939
+  377                BH    CKA             * GOOD STUFF                             5  1241  B S89 U             33  1289
+  378         *
+  379         * CHECK FOR SPECIAL CHARACTERS
+  380         *
+  381                BCE   AZERO,PCHAR,0   * IT IS A ZERO                           8  1246  B T64 Z85 0         34  1364    1985
+  382                BCE   ACOLON,PCHAR,:  * IT IS A COLON                          8  1254  B T75 Z85 :         34  1375    1985
+  383                BCE   ADASH,PCHAR,-   * IT IS A DASH                           8  1262  B T86 Z85 -         34  1386    1985
+  384                BCE   ACOMMA,PCHAR,,  * IT IS A COMMA                          8  1270  B T97 Z85 ,         34  1397    1985
+  385                MCW   @000@,SUM       * MAKE IT A SPACE                        7  1278  M A59 Z42           34  3159    1942
+  386                B     PC3                                                      4  1285  B U08               35  1408
+  387         *
+  388         CKA    BCE   ZA,ZONE,A                                                8  1289  B T17 Z38 A         35  1317    1938
+  389         CKB    BCE   ZB,ZONE,B                                                8  1297  B T28 Z38 B         35  1328    1938
+  390         CKAB   BCE   ZAB,ZONE,C                                               8  1305  B T39 Z38 C         35  1339    1938
+  391                B     NUMA                                                     4  1313  B T46               35  1346
+  392         ZA     A     @32@,SUM                                                 7  1317  A B04 Z42           35  3204    1942
+  393                B     NUMA                                                     4  1324  B T46               36  1346
+  394         ZB     A     @16@,SUM                                                 7  1328  A B06 Z42           36  3206    1942
+  395                B     NUMA                                                     4  1335  B T46               36  1346
+  396         ZAB    A     @48@,SUM                                                 7  1339  A B08 Z42           36  3208    1942
+  397         *                       ADD THE NUMERIC PORTION TO THE SUM
+1                          BIGPRINT15.S 11/18/18 14:15:44                             -9344               PAGE    7
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  398         NUMA   A     NUM,SUM                                                  7  1346  A Z39 Z42           36  1939    1942
+  399         *
+  400         END    MZ    @0@,SUM                                                  7  1353  Y B02 Z42           36  3202    1942
+  401                B     PC3                                                      4  1360  B U08               37  1408
+  402         *
+  403         ************************************************************
+  404         AZERO  ZA    @10@,SUM                                                 7  1364  ? B10 Z42           37  3210    1942
+  405                B     PC3                                                      4  1371  B U08               37  1408
+  406         ACOLON ZA    @13@,SUM                                                 7  1375  ? B12 Z42           37  3212    1942
+  407                B     PC3                                                      4  1382  B U08               37  1408
+  408         ADASH  ZA    @16@,SUM                                                 7  1386  ? B06 Z42           37  3206    1942
+  409                B     PC3                                                      4  1393  B U08               37  1408
+  410         ACOMMA ZA    @43@,SUM                                                 7  1397  ? B14 Z42           38  3214    1942
+  411                B     PC3                                                      4  1404  B U08               38  1408
+  412         ************************************************************
+  413         PC3    MCW   X1,X1HOLD       * STORE OFF THE CURRENT VALUE OF X1      7  1408  M 089 Z54           38   089    1954
+  414                MCW   @000@,X1        * INITIALIZE X1                          7  1415  M A59 089           38  3159     089
+  415                MA    WCOL,X1         * PUT IN THE COLUMN INTO X1              7  1422  # Z81 089           38  1981     089
+  416                MA    WCOL,X1         * PUT IN THE COLUMN INTO X1              7  1429  # Z81 089           38  1981     089
+  417                MA    WCOL,X1         * PUT IN THE COLUMN INTO X1              7  1436  # Z81 089           39  1981     089
+  418                ZA    @0@,BL          * START MPY BY 14                        7  1443  ? B02 Z65           39  3202    1965
+  419                ZA    @14@,BH         * LOAD MULTIPLIER (14) TO HIGH B         7  1450  ? B16 Z61           39  3216    1961
+  420         *          M    SUM,BL         * MULTIPLY BY SUM
+  421                MCW   @000@,SUM2      *INITALIZE SUM2                          7  1457  M A59 Z45           39  3159    1945
+  422                A     SUM,SUM2        *ADD IN PLACE OF MULTIPLY                7  1464  A Z42 Z45           39  1942    1945
+  423                A     SUM,SUM2        *ADD IN PLACE OF MULTIPLY                7  1471  A Z42 Z45           40  1942    1945
+  424                A     SUM,SUM2        *ADD IN PLACE OF MULTIPLY                7  1478  A Z42 Z45           40  1942    1945
+  425                A     SUM,SUM2        *ADD IN PLACE OF MULTIPLY                7  1485  A Z42 Z45           40  1942    1945
+  426                A     SUM,SUM2        *ADD IN PLACE OF MULTIPLY                7  1492  A Z42 Z45           40  1942    1945
+  427                A     SUM,SUM2        *ADD IN PLACE OF MULTIPLY                7  1499  A Z42 Z45           40  1942    1945
+  428                A     SUM,SUM2        *ADD IN PLACE OF MULTIPLY                7  1506  A Z42 Z45           41  1942    1945
+  429                A     SUM,SUM2        *ADD IN PLACE OF MULTIPLY                7  1513  A Z42 Z45           41  1942    1945
+  430                A     SUM,SUM2        *ADD IN PLACE OF MULTIPLY                7  1520  A Z42 Z45           41  1942    1945
+  431                A     SUM,SUM2        *ADD IN PLACE OF MULTIPLY                7  1527  A Z42 Z45           41  1942    1945
+  432                A     SUM,SUM2        *ADD IN PLACE OF MULTIPLY                7  1534  A Z42 Z45           41  1942    1945
+  433                A     SUM,SUM2        *ADD IN PLACE OF MULTIPLY                7  1541  A Z42 Z45           42  1942    1945
+  434                A     SUM,SUM2        *ADD IN PLACE OF MULTIPLY                7  1548  A Z42 Z45           42  1942    1945
+  435                A     SUM,SUM2        *ADD IN PLACE OF MULTIPLY                7  1555  A Z42 Z45           42  1942    1945
+  436         *
+  437         *          ZA   BL,SUM         * BACK INTO POSITION
+  438                MCW   SUM2,SUM                                                 7  1562  M Z45 Z42           42  1945    1942
+  439                MZ    @0@,SUM         * CLEAR THE ZONE BITS                    7  1569  Y B02 Z42           42  3202    1942
+  440                MCW   SUM,PATNUM+X1   * STORE THE NUMBER FOR THIS COLUMN       7  1576  M Z42 ?Y1           43  1942    3081+1
+  441                MCW   X1HOLD,X1       * RESTORE X1                             7  1583  M Z54 089           43  1954     089
+  442                B     PC5             * GET ON WITH IT                         4  1590  B W47               43  1647
+  443         ************************************************************
+  444         PC4    MCW   X1,X1HOLD       * STORE OFF THE CURRENT VALUE OF X1      7  1594  M 089 Z54           43   089    1954
+  445                MCW   @000@,X1        * INITIALIZE X1                          7  1601  M A59 089           43  3159     089
+  446                MA    WCOL,X1         * PUT IN THE COLUMN INTO X1              7  1608  # Z81 089           43  1981     089
+  447                MA    WCOL,X1         * PUT IN THE COLUMN INTO X1              7  1615  # Z81 089           44  1981     089
+1                          BIGPRINT15.S 11/18/18 14:15:44                             -9344               PAGE    8
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  448                MA    WCOL,X1         * PUT IN THE COLUMN INTO X1              7  1622  # Z81 089           44  1981     089
+  449                MCW   PATNUM+X1,SUM   * RETRIVE THE NUMBER FOR                 7  1629  M ?Y1 Z42           44  3081+1  1942
+  450         *                              * THIS COLUMN
+  451                MCW   X1HOLD,X1       * RESTORE X1                             7  1636  M Z54 089           44  1954     089
+  452                B     PC5             * GET ON WITH IT                         4  1643  B W47               44  1647
+  453         *
+  454         * AT THIS POINT WE HAVE THE TABLE ENTRY FOR THE PATTERN TO PRINT
+  455         *
+  456         PC5    MZ    @0@,SUM         * CLEAR THE ZONE BITS                    7  1647  Y B02 Z42           44  3202    1942
+  457         *
+  458                A     WROW,SUM        * MAKE INDEX+(2*WROW)                    7  1654  A Z84 Z42           45  1984    1942
+  459                A     WROW,SUM        * MAKE INDEX+(2*WROW)                    7  1661  A Z84 Z42           45  1984    1942
+  460                A     @002@,SUM       * ADD ELEMENT SIZE                       7  1668  A B19 Z42           45  3219    1942
+  461         *                              * PREPARE TO OUTPUT
+  462                MCW   PCOL,X3         * OUTPUT COLUMN                          7  1675  M Z95 099           45  1995     099
+  463                MCW   SUM,X1          * PICKUP PROPER MASK                     7  1682  M Z42 089           45  1942     089
+  464                MCW   CODEA+X1,MASK2  *                                        7  1689  M JU1 Z89           46  2141+1  1989
+  465         *
+  466                MCW   @000@,X2          * SET UP BIT SELECT INDEX              7  1696  M A59 094           46  3159     094
+  467         LOOP1  C     BITSEL+X2,MASK2   * DO COMPARE                           7  1703  C !!6 Z89           46  2006+2  1989
+  468                BL    L2                                                       5  1710  B X47 T             46  1747
+  469                MCW   PCHAR,WCHAR       * YES, PRINT SPECIAL                   7  1715  M Z85 Z87           46  1985    1987
+  470                S     BITSEL+X2,MASK2   * FIX MASK                             7  1722  S !!6 Z89           47  2006+2  1989
+  471                MN    MASK2,NOZONE                                             7  1729  D Z89 !03           47  1989    2003
+  472                MCW   NOZONE,MASK2                                             7  1736  M !03 Z89           47  2003    1989
+  473                B     L3                                                       4  1743  B X54               47  1754
+  474         L2     MCW   @ @,WCHAR                                                7  1747  M A98 Z87           47  3198    1987
+  475         L3     A     @002@,X2        * GO TO NEXT BIT                         7  1754  A B19 094           47  3219     094
+  476                MCW   WCHAR,PRTBUF+X3  * PRINT PROPER CHARACTER                7  1761  M Z87 2?1           48  1987     201+3
+  477                A     @001@,X3                                                 7  1768  A A70 099           48  3170     099
+  478                BCE   L4,DOUBLE,S     * ARE WE GOING SINGLE?                   8  1775  B X97 Z78 S         48  1797    1978
+  479                MCW   WCHAR,PRTBUF+X3  * PRINT PROPER CHARACTER                7  1783  M Z87 2?1           48  1987     201+3
+  480                A     @001@,X3                                                 7  1790  A A70 099           48  3170     099
+  481         L4     C     @009@,X2                                                 7  1797  C B22 094           49  3222     094
+  482                BL    LOOP1                                                    5  1804  B X03 T             49  1703
+  483                A     @001@,X3                                                 7  1809  A A70 099           49  3170     099
+  484                BCE   L5,DOUBLE,S     * ARE WE DOING SINGLE?                   8  1816  B Y31 Z78 S         49  1831    1978
+  485                A     @001@,X3                                                 7  1824  A A70 099           49  3170     099
+  486         L5     MCW   X3,PCOL         * SAVE COLUMN POINTER                    7  1831  M 099 Z95           50   099    1995
+  487                BCE   L55,PCHAR2,#    * IF #, LAST CHARACTER IN ROW            8  1838  B Y58 Z86 #         50  1858    1986
+  488                C     @132@,X3        *                                        7  1846  C B25 099           50  3225     099
+  489                BL    PRINT2                                                   5  1853  B /73 T             50  1173
+  490         L55    BCE   L555,DOUBLE,S   * ARE WE DOING SINGLE?                   8  1858  B Y68 Z78 S         50  1868    1978
+  491                W                     * WRITE THE PRINT AREA TO                1  1866  2                   50
+  492         *                              * THE PRINTER NO SPACE
+  493                DC    @S@                                                      1  1867                      50
+  494         L555   W                     * WRITE THE PRINT AREA TO                1  1868  2                   50
+  495         *                              * THE PRINTER
+  496                BCE   L6,DOUBLE,S     * ARE WE DOING SINGLE?                   8  1869  B Y80 Z78 S         51  1880    1978
+  497                W                     * WRITE THE PRINT AREA TO                1  1877  2                   51
+1                          BIGPRINT15.S 11/18/18 14:15:44                             -9344               PAGE    9
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  498         *                              * THE PRINTER NO SPACE
+  499                DC    @S@                                                      1  1878                      51
+  500                W                     * WRITE THE PRINT AREA TO                1  1879  2                   51
+  501         *                              * THE PRINTER
+  502         L6     A     @001@,WROW      * INCREMENT ROW COUNTER                  7  1880  A A70 Z84           51  3170    1984
+  503                C     @007@,WROW                                               7  1887  C B28 Z84           51  3228    1984
+  504                BL    PRINT1          * DO ANOTHER ROW                         5  1894  B /50 T             51  1150
+  505                CS    332             * CLEAR PRINTER AREA                     4  1899  / 332               51   332
+  506                CS                                                             1  1903  /                   52
+  507                SW    201                                                      4  1904  , 201               52   201
+  508                W                     * WRITE THE PRINT AREA TO                1  1908  2                   52
+  509         *                              * THE PRINTER -
+  510         PRINTX B     0               * RETURN TO CALL                         4  1909  B 000               52   000
+  511                NOP                   * BACK UP BRANCH                         1  1913  N                   52
+  512         *
+  513         *         THE FOLLOWING ROUTINE IS DESIGNED TO TERMINATE
+  514         *          THE PROCESSING
+  515         *         OF THE PRINT LINE IF THE # WAS FOUND
+  516         *
+  517         PRTX   W                     * WRITE THE PRINT AREA TO                1  1914  2                   52
+  518         *                              * THE PRINTER -
+  519                BCE   L7,DOUBLE,S     * ARE WE DOING SINGLE?                   8  1915  B Z24 Z78 S         52  1924    1978
+  520                W                     * WRITE THE PRINT AREA TO                1  1923  2                   53
+  521         *                              * THE PRINTER
+  522         L7     CS    332             * CLEAR PRINTER AREA                     4  1924  / 332               53   332
+  523                CS                                                             1  1928  /                   53
+  524                SW    201                                                      4  1929  , 201               53   201
+  525                W                     * WRITE THE PRINT AREA TO                1  1933  2                   53
+  526         *                              * THE PRINTER -
+  527                B     PRINTX                                                   4  1934  B Z09               53  1909
+  528         *
+  529         *******************************************************
+  530         *
+  531         *         LTORG
+  532         ZONE   DCW   @1@                                                      1  1938                      53
+  533         NUM    DCW   0                                                        1  1939                      54
+  534         SUM    DCW   000                                                      3  1942                      54
+  535         SUM2   DCW   000              * SED TO ADD SUM INSTEAD OF             3  1945                      54
+  536         *                               * MULTIPLYING SUM
+  537         BITSUM DCW   000                                                      3  1948                      54
+  538         CHRCNT DCW   000             * CHARACTER COUNTER                      3  1951                      54
+  539         X1HOLD DCW   000             * PLACE TO HOLD X1                       3  1954                      54
+  540         BIGLST DCW   1                                                        1  1955                      54
+  541         LMINUS DCW   @-   @          * END OF FILE CARD                       4  1959                      55
+  542         BH     DCW   @00@                                                     2  1961                      55
+  543         BL     DC    @0000@          * WHERE THE ANSWER APPEARS               4  1965                      55
+  544         *
+  545         NZERO  DCW   000             * A NUMERICAL ZERO                       3  1968                      55
+  546         NONE   DCW   001             * A NUMERICAL ONE                        3  1971                      55
+  547         TXLIM  DCW   000             * TEXT INDEX LIMIT                       3  1974                      55
+1                          BIGPRINT15.S 11/18/18 14:15:44                             -9344               PAGE   10
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  548         TXLCNT DCW   000             * TEMP LINE COUNT                        3  1977                      55
+  549         DOUBLE DCW   @S@             * S PRINTS SINGLE SIZE                   1  1978                      55
+  550         *                              * WORK AREAS FOR PRINTS
+  551         WCOL   DCW   000             * PICKUP INDEX FROM INPUT AREA           3  1981                      56
+  552         WROW   DCW   000                                                      3  1984                      56
+  553         PCHAR  DCW   0                                                        1  1985                      56
+  554         PCHAR2 DCW   0                                                        1  1986                      56
+  555         WCHAR  DCW   0                                                        1  1987                      56
+  556         MASK2  DCW   @00@            * 2 CHARACTER MASK                       2  1989                      56
+  557         WORK3  DCW   000                                                      3  1992                      56
+  558         PCOL   DCW   000                                                      3  1995                      57
+  559                DCW   @@000@@                                                  5  2000                      57
+  560         ONE2   DCW   01                                                       2  2002                      57
+  561         NOZONE DCW   0                                                        1  2003                      57
+  562         DOLSW  DCW   0                                                        1  2004                      57
+  563         BITSEL DCW   16                                                       2  2006                      57
+  564                DCW   08                                                       2  2008                      57
+  565                DCW   04                                                       2  2010                      58
+  566                DCW   02                                                       2  2012                      58
+  567                DCW   01                                                       2  2014                      58
+  568                DCW   00                                                       2  2016                      58
+  569         *
+  570         DATE25 DCW   @0000000000000000000000000@    * SAVE DATE  25 LONG     25  2041                      58
+  571         *
+  572         WXX    DCW   @0000000000000000000000000@                             25  2066                      59
+  573         * WORK AREA FOR STRING  25 LONG
+  574         *
+  575         BLANKS DCW   @                         @    * SET WORK TO BLANKS     25  2091                      60
+  576         LINE3  DCW   @VISITED THE COMPUTER#    @                             25  2116                      61
+  577         LINE4  DCW   @HISTORY MUSEUM ON#       @                             25  2141                      62
+  578         *
+  579         *  MASK IS 14 CHR
+  580         *
+  581         * THINK 5X7 MATRIX
+  582         * FOR REFERENCE/CLARIFICATION HERE IS A "1"
+  583         * DC @04120404040414@
+  584         * 04 000100
+  585         * 12 001100 (4 + 8)
+  586         * 04 000100
+  587         * 04 000100
+  588         * 04 000100
+  589         * 04 000100
+  590         * 14 001110   (2 + 4 + 8)
+  591         *
+  592         * FOR REFERENCE/CLARIFICATION HERE IS A "2"
+  593         * DC @14170102020431@
+  594         * 14 01110
+  595         * 17 10001
+  596         * 01 00001
+  597         * 02 00010
+1                          BIGPRINT15.S 11/18/18 14:15:44                             -9344               PAGE   11
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  598         * 02 00010
+  599         * 04 00100
+  600         * 31 11111
+  601         CODEA  DS    0                                                           2141
+  602                DC    @00000000000000@   *  BLANK                             14  2155                      62
+  603                DC    @04120404040414@   *  1                                 14  2169                      63
+  604                DC    @14170101020431@   *  2                                 14  2183                      63
+  605                DC    @31020402010114@   *  3                                 14  2197                      64
+  606                DC    @02061018310202@   *  4                                 14  2211                      64
+  607                DC    @31163001011714@   *  5                                 14  2225                      65
+  608                DC    @06081630171714@   *  6                                 14  2239                      65
+  609                DC    @31010204080808@   *  7                                 14  2253                      66
+  610                DC    @14171714171714@   *  8                                 14  2267                      66
+  611                DC    @14171715010212@   *  9                                 14  2281                      67
+  612                DC    @14171921251714@   *  0                                 14  2295                      67
+  613                DC    @00000000000000@   *  #                                 14  2309                      68
+  614                DC    @00000000000000@   *  (AT SIGN)                         14  2323                      68
+  615                DC    @30303000303030@   *  :                                 14  2337                      69
+  616                DC    @00000000000000@   *  >                                 14  2351                      69
+  617                DC    @00000000000000@   *  (TAPE MARK)                       14  2365                      70
+  618         * 0 TO 15 ABOVE
+  619                DC    @00000031000000@   *  -                                 14  2379                      70
+  620                DC    @07020202021812@   *  J                                 14  2393                      71
+  621                DC    @17182224221817@   *  K                                 14  2407                      71
+  622                DC    @16161616161631@   *  L                                 14  2421                      72
+  623                DC    @17272121171717@   *  M                                 14  2435                      72
+  624                DC    @17172521191717@   *  N                                 14  2449                      73
+  625                DC    @14171717171714@   *  O                                 14  2463                      73
+  626                DC    @30171730161616@   *  P                                 14  2477                      74
+  627                DC    @14171717212213@   *  Q                                 14  2491                      74
+  628                DC    @30171730201817@   *  R                                 14  2505                      75
+  629                DC    @00000000000000@   *  !                                 14  2519                      75
+  630                DC    @00000000000000@   *  $                                 14  2533                      76
+  631                DC    @00000000000000@   *  *                                 14  2547                      76
+  632                DC    @00000000000000@   *  )                                 14  2561                      77
+  633                DC    @00000000000000@   *  ;                                 14  2575                      77
+  634                DC    @00000000000000@   *  (DELTA)                           14  2589                      78
+  635         * 16 TO 31 ABOVE
+  636                DC    @00000000000000@   *  (CENT)                            14  2603                      78
+  637                DC    @00010204081600@   *  /                                 14  2617                      79
+  638                DC    @15161614010130@   *  S                                 14  2631                      79
+  639                DC    @31040404040404@   *  T                                 14  2645                      80
+  640                DC    @17171717171714@   *  U                                 14  2659                      80
+  641                DC    @17171717171004@   *  V                                 14  2673                      81
+  642                DC    @17171721212110@   *  W                                 14  2687                      81
+  643                DC    @17171004101717@   *  X                                 14  2701                      82
+  644                DC    @17171710040404@   *  Y                                 14  2715                      82
+  645                DC    @31010204081631@   *  Z                                 14  2729                      83
+  646                DC    @00000000000000@   *  (REC MRK)                         14  2743                      83
+  647                DC    @00000000120408@   *  ,                                 14  2757                      84
+1                          BIGPRINT15.S 11/18/18 14:15:44                             -9344               PAGE   12
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  648                DC    @00000000000000@   *  %                                 14  2771                      84
+  649                DC    @00000000000000@   *  =                                 14  2785                      85
+  650                DC    @00000000000000@   *  '                                 14  2799                      85
+  651                DC    @00000000000000@   *  "                                 14  2813                      86
+  652         * 32 TO 47 ABOVE
+  653                DC    @00000000000000@   *  &                                 14  2827                      86
+  654                DC    @14171717311717@   *  A                                 14  2841                      87
+  655                DC    @30171730171730@   *  B                                 14  2855                      87
+  656                DC    @14171616161714@   *  C                                 14  2869                      88
+  657                DC    @24181717171824@   *  D                                 14  2883                      88
+  658                DC    @31161630161631@   *  E                                 14  2897                      89
+  659                DC    @31161630161616@   *  F                                 14  2911                      89
+  660                DC    @14171623171715@   *  G                                 14  2925                      90
+  661                DC    @17171731171717@   *  H                                 14  2939                      90
+  662                DC    @14040404040414@   *  I                                 14  2953                      91
+  663                DC    @00000000000000@   *  ?                                 14  2967                      91
+  664                DC    @00000000000000@   *  .                                 14  2981                      92
+  665                DC    @00000000000000@   *  (LOZGEN)                          14  2995                      92
+  666                DC    @00000000000000@   *  (                                 14  3009                      93
+  667                DC    @00000000000000@   *  <                                 14  3023                      93
+  668                DC    @00000000000000@   *  (GRP MARK)                        14  3037                      94
+  669         * 48 TO 63 ABOVE
+  670                DCW   @123456789012345678901234567890@                        30  3067                      95
+  671                DCW   @123@                                                    3  3070                      95
+  672         PICKUP DCW   000                                                      3  3073                      95
+  673                DCW   @START@                                                  5  3078                      96
+  674         PATERN DA    25X3                                                        3079   3153               96
+  675         * STOREAGE FOR CHARACTER INDEX NUMBERS
+  700         PATNUM       1,3           * ELEMENT IN PATTERN ARRAY                    3081              FIELD
+  701                DCW   @END@                                                    3  3156                     104
+                     DCW   @000@                                                    3  3159              LIT    104
+                     DCW   @A@                                                      1  3160              LIT    104
+                     DCW   @J@                                                      1  3161              LIT    104
+                     DCW   @Z@                                                      1  3162              LIT    104
+                     DCW   @(EOF)@                                                  5  3167              LIT    105
+                     DCW   @001@                                                    3  3170              LIT    105
+                     DCW   @#@                                                      1  3171              LIT    105
+                     DCW   @(EOF)@                                                  5  3176              LIT    105
+                     DCW   @?@                                                      1  3177              LIT    105
+                     DCW   @01@                                                     2  3179              LIT    105
+                     DCW   @00@                                                     2  3181              LIT    105
+                     DCW   @1@                                                      1  3182              LIT    106
+                     DCW   @079@                                                    3  3185              LIT    106
+                     DCW   @S@                                                      1  3186              LIT    106
+                     DCW   @SHAY@                                                   4  3190              LIT    106
+                     DCW   @D@                                                      1  3191              LIT    106
+                     DCW   @012@                                                    3  3194              LIT    106
+                     DCW   @070@                                                    3  3197              LIT    106
+                     DCW   @ @                                                      1  3198              LIT    107
+                     DCW   @011@                                                    3  3201              LIT    107
+1                          BIGPRINT15.S 11/18/18 14:15:44                             -9344               PAGE   13
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+                     DCW   @0@                                                      1  3202              LIT    107
+                     DCW   @32@                                                     2  3204              LIT    107
+                     DCW   @16@                                                     2  3206              LIT    107
+                     DCW   @48@                                                     2  3208              LIT    107
+                     DCW   @10@                                                     2  3210              LIT    107
+                     DCW   @13@                                                     2  3212              LIT    108
+                     DCW   @43@                                                     2  3214              LIT    108
+                     DCW   @14@                                                     2  3216              LIT    108
+                     DCW   @002@                                                    3  3219              LIT    108
+                     DCW   @009@                                                    3  3222              LIT    108
+                     DCW   @132@                                                    3  3225              LIT    108
+                     DCW   @007@                                                    3  3228              LIT    108
+  702                END   START   * LAST CARD IN DECK, TRANSFER ADDRESS                     / 397 080                397
+1                                                                                                         PAGE   14
+0SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS
+
+ ACOLON   1375: 0    ACOMMA   1397: 0    ADASH    1386: 0    AZERO    1364: 0    BH       1961: 0    BIGLST   1955: 0   
+ BIGPRT   0862: 0    BIGPTA   0901: 0    BIGPTB   0953: 0    BIGPTC   1064: 0    BIGPTD   1116: 0    BIGPTX   1134: 0   
+ BIGSN    1036: 0    BITSEL   2006: 0    BITSUM   1948: 0    BL       1965: 0    BLANKS   2091: 0    CHRCNT   1951: 0   
+ CKA      1289: 0    CKAB     1305: 0    CKB      1297: 0    CODEA    2141: 0    CRDBUF   0001: 0    DATE25   2041: 0   
+ DATECA   0525: 0    DATECC   0533: 0    DATECK   0513: 0    DATECX   0544: 0    DOLSW    2004: 0    DOUBLE   1978: 0   
+ END      1353: 0    FC1      1002: 0    FDSP     0613: 0    FS1      0971: 0    L2       1747: 0    L3       1754: 0   
+ L4       1797: 0    L5       1831: 0    L55      1858: 0    L555     1868: 0    L6       1880: 0    L7       1924: 0   
+ LINE3    2116: 0    LINE4    2141: 0    LMINUS   1959: 0    LOOP1    1703: 0    MASK2    1989: 0    NEND     0817: 0   
+ NONE     1971: 0    NOTAKE   0653: 0    NOZONE   2003: 0    NREAD    0848: 0    NUM      1939: 0    NUMA     1346: 0   
+ NZERO    1968: 0    ONE2     2002: 0    PATERN   3079: 0    PATNUM   3081: 0    PC3      1408: 0    PC4      1594: 0   
+ PC5      1647: 0    PCHAR    1985: 0    PCHAR2   1986: 0    PCOL     1995: 0    PICKUP   3073: 0    PRINT1   1150: 0   
+ PRINT2   1173: 0    PRINTS   1139: 0    PRINTX   1909: 0    PRTBUF   0201: 0    PRTX     1914: 0    PUNBUF   0101: 0   
+ READG    0551: 0    READH    0594: 0    REV      0396: 0    SKIPPU   0767: 0    SKIPTX   0813: 0    SP2      0709: 0   
+ SPCK2    0697: 0    SPCNT    0355: 0    SPNXT    0743: 0    SPX      0766: 0    START    0397: 0    SUM      1942: 0   
+ SUM2     1945: 0    TAKIT    0632: 0    TXLCNT   1977: 0    TXLIM    1974: 0    WCHAR    1987: 0    WCOL     1981: 0   
+ WORK3    1992: 0    WROW     1984: 0    WXX      2066: 0    X        0340: 0    X1       0089: 0    X1HOLD   1954: 0   
+ X2       0094: 0    X3       0099: 0    X4K      0353: 0    XCNT     0345: 0    XCNT2    0350: 0    ZA       1317: 0   
+ ZAB      1339: 0    ZB       1328: 0    ZONE     1938: 0   
+
+0UNREFERENCED SYMBOLS
+
+ BITSUM CHRCNT DOLSW  END    LMINUS NONE   ONE2   PATERN PRTX   SKIPPU SKIPTX TXLCNT TXLIM  WORK3  X      X4K    XCNT
+ XCNT2

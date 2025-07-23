@@ -1,0 +1,92 @@
+ CLEAR STORAGE 1     ,008015,022026,030037,044,049,053053N000000N00001026                                         1
+ CLEAR STORAGE 2     L068116,105106,110117B101/I9I#071029C029056B026/B001/0991,001/001117I0?                      2
+ BOOTSTRAP           ,008015,022029,036040,047054,061068,072/061039              ,0010011040                      3
+0                          ALLCHARACTERS.S 04/06/17 23:04:26                          -5066               PAGE    1
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  101                JOB   ALLCHARACTERS.S 04/06/17 23:04:26
+  102                HEAD                                                                                MACRO
+              *>>>>>>>>>                                                                                 GEN  
+  103         .READ  EQU   001                                                         0001              GEN
+  104         .PUNCH EQU   101                                                         0101              GEN
+  105         .PRINT EQU   201                                                         0201              GEN
+  106                ORG   87                                                                 0087
+  107         X1     DSA   0                * INDEX REGISTER 1                      3  0089  000         GEN      4   000
+  108                ORG   92                                                                 0092
+  109         X2     DSA   0                * INDEX REGISTER 2                      3  0094  000         GEN      5   000
+  110                ORG   97                                                                 0097
+  111         X3     DSA   0                * INDEX REGISTER 3                      3  0099  000         GEN      6   000
+              *                                                                                          GEN  
+  112                ORG   340              *ORG JUST AFTER PRINT BUFFER                      0340
+              *<<<<<<<<<                                                                                 GEN  
+  113         NOZONE DCW   @ 1234567890#@:>(@     *NO ZONE  SIMH ENCODING          16  0355                       7
+  114         AZONE  DCW   @^/STUVWXYZ',%=\+@     * A ZONE                         16  0371                       7
+  115         BZONE  DCW   @-JKLMNOPQR!$*];_@     * B ZONE                         16  0387                       8
+  116         ABZONE DCW   @&ABCDEFGHI?.)[<"@     *AB ZONE                         16  0403                       8
+  117         START  H                                                              1  0404  .                    8
+  118                MZ    AZONE-1,AZONE          *FIX BECAUSE + GETS CHANGED T     7  0405  Y 370 371            9   370     371
+  119                MN    BZONE,AZONE            *FIX BECAUSE + GETS CHANGED T     7  0412  D 387 371            9   387     371
+  120                MCW   @THIRD PROGRAM@,215                                      7  0419  M 636 215            9   636     215
+  121                W                                                              1  0426  2                    9
+  122                CS    299                    *CLEAR PRINT STORAGE              4  0427  / 299                9   299
+  123                MCW   NOZONE,216                                               7  0431  M 355 216            9   355     216
+  124                W                                                              1  0438  2                    9
+  125                MCW   @000@,X1                                                 7  0439  M 639 089           10   639     089
+  126         TAG1   MZ    @ @,201+X1                                               7  0446  Y 640 2|1           10   640     201+1
+  127                MA    @001@,X1                                                 7  0453  # 643 089           10   643     089
+  128                C     X1,@016@                                                 7  0460  C 089 646           10   089     646
+  129                BH    TAG1                                                     5  0467  B 446 U             10   446
+  130                W                                                              1  0472  2                   10
+  131                CS    299                                                      4  0473  / 299               10   299
+  132                W                                                              1  0477  2                   11
+  133                MCW   AZONE,216                                                7  0478  M 371 216           11   371     216
+  134                W                                                              1  0485  2                   11
+  135                MCW   @000@,X1                                                 7  0486  M 639 089           11   639     089
+  136         TAG2   MZ    @ @,201+X1                                               7  0493  Y 640 2|1           11   640     201+1
+  137                MA    @001@,X1                                                 7  0500  # 643 089           11   643     089
+  138                C     X1,@016@                                                 7  0507  C 089 646           11   089     646
+  139                BH    TAG2                                                     5  0514  B 493 U             12   493
+  140                W                                                              1  0519  2                   12
+  141                CS    299                                                      4  0520  / 299               12   299
+  142                W                                                              1  0524  2                   12
+  143                MCW   BZONE,216                                                7  0525  M 387 216           12   387     216
+  144                W                                                              1  0532  2                   12
+1                          ALLCHARACTERS.S 04/06/17 23:04:26                          -5066               PAGE    2
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  145                MCW   @000@,X1                                                 7  0533  M 639 089           12   639     089
+  146         TAG3   MZ    @ @,201+X1                                               7  0540  Y 640 2|1           13   640     201+1
+  147                MA    @001@,X1                                                 7  0547  # 643 089           13   643     089
+  148                C     X1,@016@                                                 7  0554  C 089 646           13   089     646
+  149                BH    TAG3                                                     5  0561  B 540 U             13   540
+  150                W                                                              1  0566  2                   13
+  151                CS    299                                                      4  0567  / 299               13   299
+  152                W                                                              1  0571  2                   13
+  153                MCW   ABZONE,216                                               7  0572  M 403 216           14   403     216
+  154                W                                                              1  0579  2                   14
+  155                MCW   @000@,X1                                                 7  0580  M 639 089           14   639     089
+  156         TAG4   MZ    @ @,201+X1                                               7  0587  Y 640 2|1           14   640     201+1
+  157                MA    @001@,X1                                                 7  0594  # 643 089           14   643     089
+  158                C     X1,@016@                                                 7  0601  C 089 646           14   089     646
+  159                BH    TAG4                                                     5  0608  B 587 U             15   587
+  160                W                                                              1  0613  2                   15
+  161                CS    299                                                      4  0614  / 299               15   299
+  162                W                                                              1  0618  2                   15
+  163                B     START                                                    4  0619  B 404               15   404
+  164                NOP                                                            1  0623  N                   15
+                     DCW   @THIRD PROGRAM@                                         13  0636              LIT     15
+                     DCW   @000@                                                    3  0639              LIT     16
+                     DCW   @ @                                                      1  0640              LIT     16
+                     DCW   @001@                                                    3  0643              LIT     16
+                     DCW   @016@                                                    3  0646              LIT     16
+  165                END   START                                                             / 404 080                404
+1                                                                                                         PAGE    3
+0SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS
+
+ .PRINT   0201: 0    .PUNCH   0101: 0    .READ    0001: 0    ABZONE   0403: 0    AZONE    0371: 0    BZONE    0387: 0   
+ NOZONE   0355: 0    START    0404: 0    TAG1     0446: 0    TAG2     0493: 0    TAG3     0540: 0    TAG4     0587: 0   
+ X1       0089: 0    X2       0094: 0    X3       0099: 0   
+
+0UNREFERENCED SYMBOLS
+
+ .PRINT .PUNCH .READ  X2     X3

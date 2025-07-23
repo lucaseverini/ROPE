@@ -1,0 +1,22 @@
+PPPPPPPPPPPPPPPPPPPPSVVVVVVVVVVVXXXXXXXSBSBSBSBSBSBSBSBSBSBSCCCCCCCCCCCCCCCCCCCC
+ ,   ,   ,   ,  0.   00012345678                  123,456.78ZERO & COMMA PROCESS
+ ,   ,   ,   ,   .   00012345678                  123,456.78NO  ZERO SUP PROCESS
+ ,   ,   ,   ,  0.   00000000008                         .08ZERO & COMMA PROCESS
+$,   ,   ,   ,  0.   00012345678       $          123,456.78ADD $ 
+   ,   ,   ,  0.  CR 00012345678                123,456.78  CR PROCESSING
+   ,   ,   ,  0.  CR-00012345678                123,456.78CRCR PROCESSING
+    ,   ,   ,  0.  - 00012345678                123,456.78  - PROCESSING
+    ,   ,   ,  0.  --00012345678                123,456.78- - PROCESSING
+ ,   ,   ,   , $0.   00012345678                 $123,456.78FLOATING $ 
+ ,   ,   ,   , $0.   00000000169                       $1.69FLOATING $ 
+ ,   ,   ,   , $0.   00000000001                        $.01FLOATING $
+ ,   ,   ,   , *0.   00012345678        **********123,456.78* PROTECTION 
+ ,   ,   ,   , *0.   00000000169        ****************1.69* PROTECTION  
+ ,   ,   ,   , *0.   00000000001        *****************.01* PROTECTION 
+CR   ,   ,   ,  0.   00012345678                123,456.78  LEFT CR PROCESSING
+CR   ,   ,   ,  0.  -00012345678        CR      123,456.78  LEFT CR PROCESSING
+-    ,   ,   ,  0.   00012345678                123,456.78  LEFT - PROCESSING
+-    ,   ,   ,  0.  -00012345678        -       123,456.78  LEFT - PROCESSING
+ ,   ,   ,   ,   .0  00012345678                123,456.78  DECIMAL CONTROL
+ ,   ,   ,   ,   .0  00000000000                            DECIMAL CONTROL
+EOF                                    END OF CARDS

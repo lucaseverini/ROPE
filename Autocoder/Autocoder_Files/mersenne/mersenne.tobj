@@ -1,0 +1,32 @@
+~B024 ~.~L%U1020R~B001L~.020~B056L~/000~H032~V0291001~L060005~B007~U%U1B~B020~ CLR&BOOT                          ~MERSN~}
+~L040086~N000~B007~0001:             DCW  @0001: @    STA  MERSN~}
+~L037089~N000~B007~G07               DSA  NUMBER-1    INI  MERSN~}
+~L035090~N000~B007~2                 W                PRI  MERSN~}
+~L038094~N000~B007~)0|1              CW   1&X1        CLE  MERSN~}
+~L038098~N000~B007~L198              LCA  ONE         DO   MERSN~}
+~L038102~N000~B007~H089              SBR  X1          HIG  MERSN~}
+~L042110~N000~B007~V131G37K          BWZ  DONE,NDOUBL,K    MERSN~}
+~L041117~N000~B007~S198G37           S    ONE,NDOUBL       MERSN~}
+~L038121~N000~B007~AG08              A    NUMBER      DOU  MERSN~}
+~L039126~N000~B007~B091Z             BAV  OVFL        OVE  MERSN~}
+~L038130~N000~B007~B103              B    INNER       NO   MERSN~}
+~L041137~N000~B007~S198G08           S    ONE,NUMBER  PUT  MERSN~}
+~L041144~N000~B007~Y198G08           MZ   ONE,NUMBER  CLE  MERSN~}
+~L038148~N000~B007~,207              SW   207              MERSN~}
+~L038152~N000~B007~L086              LCA  WHAT             MERSN~}
+~L041159~N000~B007~H0891|0           SBR  X1,100&X1   BUM  MERSN~}
+~L041166~N000~B007~Z084204           MCS  WHAT-2,204  IND  MERSN~}
+~L041173~N000~B007~A198082           A    ONE,WHAT-4  ADD  MERSN~}
+~L041180~N000~B007~M0|0306           MCW  0&X1,306    NEX  MERSN~}
+~L035181~N000~B007~2                 W                PRI  MERSN~}
+~L042189~N000~B007~B194306           BCE  FINIS,306,  DON  MERSN~}
+~L038193~N000~B007~B153              B    PLOOP       PRI  MERSN~}
+~L038197~N000~B007~.194              H    FINIS       HAL  MERSN~}
+~L035198~N000~B007~1                 DCW  1                MERSN~}
+~L066232~N000~B007~23RD MERSENNE PRIME # 2**11213 -        MERSN~}
+~L036234~)233~B007~ 1                DCW  @23RD MERSENNE   MERSN~}
+~,333333~B007~                                            MERSN~}
+~L035G08~N000~B007~6                 DCW  6           LOW  MERSN~}
+~L058G32~)G09~B007~                                        MERSN~}
+~L039G37~N000~B007~11208             DCW  11208       EXP  MERSN~}
+~/090080~                                                MERSN~}

@@ -1,0 +1,20 @@
+     EXIT      CS   332             *CLEAR PRINT STORAGE
+               CS                   *CLEAR PRINT STORAGE
+               CS                   *CLEAR PUNCH STORAGE
+               CS                   *CLEAR READ STORAGE
+     *         
+               C    @SHAY@,14007    *WERE WE LOADED WITH THE LOADER?
+               BE   14000           *YES WE WERE. TURN CONTROL 
+     *         OTHERWISE.....       *BACK TO THE LOADER
+               NOP  999,999         *LOAD THE A AND B REGISTERS
+               H                    *HALT OR I WILL SHOOT
+     *
+     *         GET READY TO BOOT FROM THE FOLLOWING DECK
+     *   
+               SW   001             *SET WORDMARK IN LOCATION 1
+     EXRED     R                    *READ FIRST CARD OF NEXT  DECK
+               BCE  001,001,,       *IS IT A COMMA? 
+     *                              *BRANCH TO THE FIRST INSTRUCTION
+               B    EXRED           *CHECK THE NEXT ONE
+               NOP
+               END  START

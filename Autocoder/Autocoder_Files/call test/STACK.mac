@@ -1,0 +1,14 @@
+     ********************* START MACRO ******************
+     stack     headr          *stack for calls
+     stack     dsa  *+3       *index for stack
+               dcw  000       *stack location
+               dcw  000       *stack location
+               dcw  000       *stack location
+               dcw  000       *stack location
+               dcw  000       *stack location
+               dcw  000       *stack location
+               dcw  000       *stack location
+               dcw  000       *stack location
+               dcw  000       *stack location
+               dcw  000       *stack location
+     *************************END MACRO ******************

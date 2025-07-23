@@ -1,0 +1,47 @@
+ CLEAR STORAGE 1     ,008015,022026,030037,044,049,053053N000000N00001026                                         1
+ CLEAR STORAGE 2     L068116,105106,110117B101/I9I#071029C029056B026/B001/0991,001/001117I0?                      2
+ BOOTSTRAP           ,008015,022029,036040,047054,061068,072/061039              ,0010011040                      3
+0                                                                                                         PAGE    1
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  101         * TEST_OVERWRITE_ERROR.S
+  102         * TEST PROGRAM TO CHECK A SIMULATOR ERROR REPORTED BY STAN PADDOCK:
+  103         * OVERWRITE OF MEMORY LOCATION 202 WHEN THE SECOND CONSECUTIVE W IS EXECUTE
+  104         * BY LUCA SEVERINI LUCASEVERINI@MAC.COM
+  105         * LAST EDIT: 4-4-2014
+  106         *
+  107                ORG   400               PUT NEXT INSTRUCTIONS IN 100                     0400
+  108         R1     DSA   0                 CREATE REGISTER R1                     3  0402  000                  4   000
+  109         *
+  110         START  MCW   VALUE,R1                                                 7  0403  M 443 402            4   443     402
+  111                MCW   @ABCDEFGH@,208    STORE ABCDEFGH IN WRITE AREA (201)     7  0410  M 451 208            4   451     208
+  112         *
+  113         LOOP   W                       PRINT IT                               1  0417  2                    4
+  114                S     @1@,R1            R1--                                   7  0418  S 452 402            4   452     402
+  115                C     @00?@,R1          IF R1 > 0                              7  0425  C 455 402            4   455     402
+  116                BH    LOOP              THEN LOOP                              5  0432  B 417 U              4   417
+  117         *
+  118                H     *-3               HALT AND BRANCH TO SELF TO BE SAFE     4  0437  . 437                5   437
+  119                NOP                     INSURES A WM AFTER THE HALT            1  0441  N                    5
+  120         *
+  121         VALUE  DCW   10                NUMBER OF LINES TO PRINT               2  0443                       5
+  122         *
+                     DCW   @ABCDEFGH@                                               8  0451              LIT      5
+                     DCW   @1@                                                      1  0452              LIT      5
+                     DCW   @00?@                                                    3  0455              LIT      5
+  123                END   START                                                             / 403 080                403
+1                                                                                                         PAGE    2
+0SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS
+
+ LOOP     0417: 0    R1       0402: 0    START    0403: 0    VALUE    0443: 0   
+1CLEAR STORAGE 1     ,008015,022026,030037,044,049,053053N000000N00001026                                         1
+ CLEAR STORAGE 2     L068116,105106,110117B101/I9I#071029C029056B026/B001/0991,001/001117I0?                      2
+ BOOTSTRAP           ,008015,022029,036040,047054,061068,072/061039              ,0010011040                      3
+0                                                                                                         PAGE    1
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  101         *
+  102         *
+1                                                                                                         PAGE    2
+0SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS
+

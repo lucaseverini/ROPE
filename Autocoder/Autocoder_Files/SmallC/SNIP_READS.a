@@ -1,0 +1,53 @@
+     ****************************************************************
+     ** READS - Read then copy the data in read area to string whose pointer 
+     **        is on stack until the end of the string or the read area
+     **        Argument passed on stack: String pointer and String Max Length        
+     ****************************************************************
+     
+     $MAIN     SBR  READS3+3           * Setup return address
+ 
+               R                       * Read a card
+     
+               MCW  X1, READS4         * Save index registers...
+               MCW  X3, READS5
+ 
+               POPI READS8             * Max length in LEN
+               POPA READS7             * String address in X1
+     
+               C    @000@, READS7      * Check for null pointer
+               BE   READS9             * If null, bail out
+               
+               MZ   READS8-1, READS8   * Remove bit-zone to get a real decimal number
+               C    @000@, READS8      * Check string max length
+               BE   READS9             * If LEN == 0 then bail out
+     
+               MCW  @000@, READS6
+     
+               SBR  X3, READ
+               MCW  X1, READS7
+
+     READS1    C    READS6, READS8     * Check if max num of chars has been read
+               BE   READS2             * If it is then jump over
+     
+               MCW  0+X3, 0+X1
+     
+               SBR  X3, 1+X3
+               SBR  X1, 1+X1
+               
+               A    @1@, READS6        * Increment TOTRD
+               B    READS1             * Do it again...
+     
+     READS2    MCW  EOS, 0+X1
+    
+     READS9    MCW  READS4, X1         * Restore index registers...
+               MCW  READS5, X3
+
+     READS3    B    000                * Jump back
+ 
+     READS4    DCW  000
+     READS5    DCW  000
+     READS6    DCW  000
+     READS8    DCW  000
+     READS7    DCW  000
+    
+     ****************************************************************  

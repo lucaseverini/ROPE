@@ -1,0 +1,20 @@
+     *************************** START OF HEAD MACRO **************************
+SSSSS**********OPER-OPERANDS----------------------------------------------------     
+     **********|****|***********************************************************
+               JOB  AUTOCODER PROGRAM
+               CTL  6611  *6=16,000C;6=16,000T;1=OBJDECK;,1=MODADD     
+     *
+     READ      EQU  001
+     PUNCH     EQU  101
+     PRINT     EQU  201 
+     * 
+               ORG  85
+               DCW  @X1@      *IDENTIFING FILLER
+     X1        DCW  000       *INDEX REGISTER 1
+               DCW  @X2@      *IDENTIFING FILLER
+     X2        DCW  000       *INDEX REGISTER 2
+               DCW  @X3@      *IDENTIFING FILLER
+     X3        DCW  000       *INDEX REGISTER 3
+     *
+               ORG  340       *ORG JUST AFTER PRINT BUFFER
+     ****************************** END OF HEAD MACRO **************************

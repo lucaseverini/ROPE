@@ -1,0 +1,7 @@
+     ** PEEK MACRO **
+     ** X2 IS THE STACK POINTER
+     ** VALUE IN STACK IS COPIED IN )01 WITHOUT TO CHANGE THE STACK POINTER
+               MCW  15995+X2, )01
+     * SHOULD THE WM BE SET?
+     *         SW   )01-4
+  

@@ -1,0 +1,661 @@
+\documentclass[12pt,twoside]{article}
+
+\textheight 8.9in
+\topmargin -0.5in
+\textwidth 6.5in
+\oddsidemargin 0in
+\evensidemargin 0in
+
+\usepackage{longtable}
+
+\newcommand\defnum[1]{
+\ifx#1\undefined
+  \def#1{0}
+\else
+  \ifx#1\relax
+    \def#1{0}
+  \fi
+\fi
+}
+
+% If \pdfoutput is undefined (not running pdflatex), define it to be zero
+% (output is not PDF)
+\defnum{\pdfoutput}
+
+\ifnum\pdfoutput>0
+  \usepackage[pdftex,plainpages,hyperindex=true,pdfpagelabels]{hyperref}
+  \hypersetup{%
+    hypertexnames=false,%
+    colorlinks=true,%
+    linkcolor=blue,%
+    pagecolor=blue,%
+    urlcolor=blue,%
+    linktocpage=true,%
+  }
+  % Specify the driver for the color package, which package is included
+  % by the J3 document class using a RequirePackage command.
+  \ExecuteOptions{pdftex}
+\else
+  % Not running PDFTeX, or PDFTeX with DVI output
+  \usepackage[hypertex,plainpages,hyperindex=true]{hyperref}
+  \hypersetup{%
+    hypertexnames=false%
+  }
+  % Specify the driver for the color package, which package is included
+  % by the J3 document class using a RequirePackage command.
+  \ExecuteOptions{dvips}
+  %\ExecuteOptions{xdvi}
+\fi
+
+% So now we set it up again, independent of output-type.  Huh?
+
+\hypersetup{%
+  hypertexnames=false,%
+  plainpages=false,%
+  linktocpage=true,%
+  a4paper=false,%
+  letterpaper=true
+}
+
+\begin{document}
+
+\parindent 0pt
+\parskip 4.5pt
+
+\newcommand{\DATE}{2011 November 14}
+\makeatletter
+\newcommand{\ps@footer}{%
+  \renewcommand{\@oddhead}{}%
+  \renewcommand{\@evenhead}{}%
+  \renewcommand{\@oddfoot}{1401 cross-development tools\hfill %
+    \DATE\hfill\thepage~of \pageref{lastpage}}%
+  \renewcommand{\@evenfoot}{\thepage~of \pageref{lastpage}\hfill%
+    \DATE\hfill 1401 cross-development tools}%
+}%
+\makeatother
+
+% Indented paragraph
+\newcommand\inp[1]{\hangindent=#1\hangafter=0\relax}
+
+\pagestyle{footer}
+
+\renewcommand{\thefootnote}{}
+\begin{centering}
+\Large\bfseries\sffamily
+1401 cross-development tools\\
+\footnote{\makeatletter\parindent 0pt\\[-5pt]
+Copyright \copyright\ 2011 Van Snyder $<${\tt van.snyder@sbcglobal.net}$>$.
+\\
+Copying and distribution permitted if the copyright notice appears.
+}
+\end{centering}
+
+\newcommand{\bits}[1]{http://www.bitsavers.org/pdf/ibm/14#1x/}
+\newcommand{\AUT}{1401-AU-037}
+\newcommand{\REF}[2]{\hyperref{\bits{0}#1}{}{}{{\tt #2}}}
+\newcommand{\AU}{\REF{C24-3319-0_1401_tapeAutocod.pdf}{\AUT}}
+\newcommand{\IV}[2]{\hyperref{\bits{4}#1}{}{}{{\tt #2}}} % for 1440 references
+
+\section{Autocoder}
+
+Autocoder is very much like Tape Autocoder, \AU, described in
+\REF{C24-3319-0_1401_tapeAutocod.pdf}{C24-3319}.  Every statement allowed
+by \AU\ is accepted, but {\tt CTL}, {\tt DELET}, {\tt INSER}, {\tt PRINT}
+and {\tt PUNCH} are ignored.  {\tt HEADR} is allowed and ignored in a
+macro file.
+
+The listing is slightly different in that address constants, and the A-
+and B-address fields of instructions, are printed in decimal.  There was a
+modification of \AU, by A. B. Platt from Endicott, that did this.  As with
+\AU, negative addresses are replaced by their absolute values.  Unlike the
+Platt modification, they are printed as negative in the decimal A- and
+B-address fields of the listing, to alert the reader to the possibility of
+a mistake.  \AU\ and Autocoder \emph{do not} replace negative addresses by
+16000 less the amount of the negative address, e.g., -1 is \emph{not}
+replaced by 15999.
+
+The format of the symbol table is different, and it is printed after the
+listing instead of before.
+
+Object files can be produced in the same format as decks or tapes
+produced by \AU, and several other formats as well.
+
+\subsection{Usage}
+
+The command line for Autocoder is
+
+\inp{0.25in}{{\tt autocoder} [\emph{options}] [\emph{input-file}]}
+
+where square brackets indicate optional items.  The options are \\[0pt]
+
+\begin{longtable}{lp{4.5in}}
+{\tt -a}         & Code in columns 1--80 does not result in an error
+                   message. \\
+{\tt -b[ ]X[\#]} & Select boot loader for ``card deck'' output: \\
+ & X = {\tt I} means the same boot loader as provided by IBM in tape
+               Autocoder, program \AU, where {\tt \#} is the core size
+               selector:\\
+ & \inp{0.25in}{0~$\Rightarrow$~Boot, no clear, sequence numbers start
+    at 3.}\\
+ & \inp{0.25in}{1~$\Rightarrow$~1400, 2~$\Rightarrow$~2000,
+  4~$\Rightarrow$~4000, 8~$\Rightarrow$~8000, {\tt v}~$\Rightarrow$~12000,
+  {\tt x}~$\Rightarrow$~16000.  The default is 16000.} \\
+ & X = {\tt N} means no boot loader. \\
+ & X = {\tt B} means Van's favorite one-card boot without clearing core. \\
+ & X = {\tt V} means Van's favorite two-card boot with clearing core. \\
+{\tt -d[ ]}\emph{file-name} & Produce a ``diagnostic-format object deck''
+               in file \emph{file-name}. \\
+{\tt -e[ ]X[ ][}\emph{codes}{\tt ]} & Specify encoding.  The default is
+               {\tt A}. \\
+ & X = A specifies Paul Pierce's primary (IBM A) encoding. \\
+ & X = H specifies Paul Pierce's alternative (IBM H) encoding. \\
+ & X = S specifies traditional SIMH encoding. \\
+ & X = I specifies Icelandic encoding. \\
+ & X = * specifies explicit encoding.  The \emph{codes} field
+   must be 63 characters, in BCD order, 1 \dots\ GM.  Blank is
+   assumed to be first (BCD zero). \\
+ & X = ? prints the built-in encodings and stops. \\
+ & {\emph{codes} cannot appear if X is not *.} \\
+{\tt -I[ ]}\emph{path} & Specify a path to search for macros.  The first
+               path is always the current directory.  Any number of {\tt
+               -I} options can appear.  Paths are searched in the order
+               specified.  INCLD and CALL file names are the first three
+               letters of the included or called macro.  File names of
+               inlined macros are all five letters.  Macro file names are
+               either all upper case or all lower case. \\
+{\tt -i} & Interleave ``object deck'' into listing, as would be produced
+               by \AU\ on tape unit 3 if 1 had been punched in column 25
+               of the {\tt CTL} card.  Needs the {\tt -o} and {\tt -l}
+               options. \\
+{\tt -l[ ]}\emph{file-name} & Prepare a listing in file \emph{file-name}. \\
+{\tt -L} & Store long literals once (an extension to \AU). \\
+{\tt -M} & MA is a macro in file {\tt ma} or {\tt MA}. \\
+{\tt -m[ ]}\emph{ext} & Add .\emph{ext} to the list of extensions to use
+               when searching for macro files.  Macros are searched in lower
+               case first (including extensions), then upper case.
+               Any number of {\tt -m} options can be specified.  The path
+               loop is inside the extension loop.  Macro files are always
+               searched first without an extension. \\
+{\tt -o[ ]}\emph{file-name} & Prepare an ``object deck'' in file
+               \emph{file-name}. \\
+{\tt -p[ ]}\emph{number} & Set page length in lines to \emph{number}.
+              The default is 53. \\
+              & Vertical format control is the same as for Fortran, using
+                the first column: 1 means skip to head of form, 0 means
+                double space, blank means single space.  A program {\tt
+                ansi.c} is provided to convert to using ASCII line-feed
+                or form-feed characters. \\
+{\tt -r[ ]}\emph{file-name} & Prepare relocatable output in file
+               \emph{file-name}. See sections \ref{reloc} and
+                \ref{reloc-cmd}.\\
+{\tt -s} & Dump the symbol and literal tables (for debugging). \\
+{\tt -t[ ]}\emph{file-name} & Prepare an ``object tape'' in file
+               \emph{file-name}. \\
+{\tt -T[ ]}\emph{letters} & Trace operation of components of the program
+               (for debugging).  {\tt l}~$\Rightarrow$ Lexer,
+               {\tt p}~$\Rightarrow$ parser, {\tt M}~$\Rightarrow$ macro
+               processing, {\tt P}~$\Rightarrow$ {\tt PROCESS\_LTORG}. \\
+{\tt -V} & Print version information and stop. \\
+{\tt -1440} & Enable 1440 op codes (see section \ref{1440}). \\
+{\tt -X[ ]}\emph{flags} & Set flags for extensions (sum them if
+               necessary): \\
+               & \inp{0.25in}{1~$\Rightarrow$ Quick {\tt EX/XFR}
+               (branch replaces {\tt 1040} in current ``card'').} \\
+               & \inp{0.25in}{2~$\Rightarrow$ Quick {\tt END}
+               {\tt /nnn080} replaces one of the ``set word mark''
+               instructions in the current ``card'').} \\
+               & \inp{0.25in}{4~$\Rightarrow$ Queue ``set word mark''
+               instructions (saves them up to emit later, to allow filling
+               more of columns 1--39).} \\
+               & \inp{0.25in}{8~$\Rightarrow$ No reloader after
+               {\tt EX/XFR}.} \\
+{\tt -h} & or any other option not understood, results in printing this
+          information and stopping. \\
+\multicolumn{2}{l}{If \emph{input-file} does not appear, input is taken from
+standard input.} \\
+\end{longtable}
+
+
+\subsection{Extensions to Autocoder \AU}\label{more}
+
+\subsubsection{Diagnostic-format object file}
+
+The object file can be produced in the same format as diagnostic decks. 
+That is, loading instructions are in columns 1--11, and the loaded field
+(one field per card) begins in column 12.
+
+\subsubsection{1440 instructions}\label{1440}
+
+For 1440 support, the following instructions change (or are provided),
+all using the {\tt M} operation code:
+
+\begin{longtable}{llllll}
+Operation & First       & Second    & A address      &          &             \\
+Mnemonic  & operand     & operand   & field          & D        & Description \\
+\hline
+{\tt R}   & unit number & B address & \%G\emph{unit} & {\tt R}  & Read a card \\
+{\tt PS}  & unit number & B address & \%G\emph{unit} & {\tt P}  & Punch and stop \\
+{\tt P}   & unit number & B address & \%G\emph{unit} & {\tt G}  & Punch and feed \\
+{\tt PSK} & unit number & amount    & \%G\emph{unit} & {\tt C}  & Skip B punch columns \\
+{\tt W}   & B address   & none      & \%Y1           & {\tt W}  & Print \\
+{\tt WS}  & B address   & none      & \%Y1           & {\tt S}  & Print and suppress spacing \\
+{\tt WCP} & B address   & none      & \&T0           & {\tt W}  & Write to 1447 console \\
+{\tt RCP} & B address   & none      & \&T0           & {\tt R}  & Read from 1447 console \\
+\end{longtable}
+
+The second operand is required for {\tt R}, {\tt PS}, and {\tt P}
+operation codes, and specifies the high-order character of the data
+field.  It is required for the {\tt PSK} operation code, and specifies the
+number of columns to skip (not the address of the number of columns to
+skip).  The D modifier is provided automatically for all operation codes;
+it is not specified in the program.  See
+\IV{N24-0219_Misc_IO_Instructions_Jun64.pdf}{N24-0219} and
+\IV{A24-3116-0_1440ref_1963.pdf}{A24-3116}.
+
+\subsubsection{External or global labels}
+
+A label can be declared to be global by putting an asterisk in column 12.
+
+A reference to a global label needs no special annotation.
+
+\subsubsection{Location counters}\label{reloc}
+
+The Autocoder cross-assembler provides the capability for more than one
+location counter.
+
+Ten location counters are available, numbered 0, \dots, 9.  The number
+of them could be easily changed.
+
+Location counter 0 is absolute.  Other location counters can be absolute
+or relocatable.  Once a location counter is established to be either
+absolute or relocatable, it cannot be changed.
+
+An absolute ORG statement, or an ORG statement that specifies a global
+label or a label within a different location counter, is not allowed
+within a relocatable location counter.  ORG statements with asterisk
+addresses or labels in the same location counter, with or without offsets,
+are allowed.  Addresses within relocatable location counters begin at
+zero.
+
+Relocatable location counters can be specified to be relocated at a
+multiple of 100 $\pm$ an offset, or to be relocated to an external symbol
+$\pm$ an offset.
+
+To specify a location counter, write {\tt LC} in the operation field,
+columns 16-20, and the location counter number (a constant, not a label)
+as the first operand, starting in column 21.
+
+The location counter is absolute if there is no second operand.  Location
+counter zero is absolute, and by default begins at 333.  Other absolute
+location counters by default begin at zero.
+
+If the second operand appears it must be {\tt R} or {\tt X}, and the
+location counter is relocatable.
+
+If the second operand is {\tt R}, an optional third operand, consisting of
+{\tt X00} with an optional numeric offset preceded by a sign, specifies it
+is to be relocated to a multiple of 100, with the specified offset if any.
+
+If the second operand is {\tt X}, the third operand must consist of a
+label and an optional numeric offset preceded by a sign; it specifies
+that the location counter is to be relocated to the label, with the
+specified offset if any.
+
+If no location counter is specified, or before any location counter is
+specified, location counter zero is in effect.  If a location counter is
+specified, and then a different one is specified, the first location
+counter can be specified again.  Code is assembled in the most-recently
+specified location counter, starting where assembly left off when the
+location counter was previously used.
+
+If a location counter has been established to be relocatable and code has
+been generated in it, when it is re-established only the second operand
+can be specified, and it must be {\tt R} or {\tt X}.
+
+A label on an {\tt LC} command is ignored.
+
+\subsubsection{Examples of location counter specifications}
+
+{\tt\begin{verbatim}
+....5...10...15...20...25...30...35...40...45...50...55...60...65...70..
+               LC   0            The default location counter
+               LC   1            A different absolute location counter
+               LC   4,R          Relocatable to an arbitrary address
+               LC   6,R,X00&6    Relocatable to a multiple of 100 + 6
+               LC   8,X,OTHER&6  Relocatable to the external label
+                                 OTHER + 6
+\end{verbatim}}
+
+\subsubsection{Command-line option for relocatable output}\label{reloc-cmd}
+
+A command-line option {\tt -r[ ]}\emph{file-name} specifies the file upon
+which to write output of a relocatable assembly.  The format of this file
+is different from the format of an ``object deck'' or an Autocoder-format
+tape:
+
+\begin{longtable}{lll}
+           & Field & \\
+Columns    & Name  & Contents of field \\
+\hline
+  1   & What    & A to skip area of width FIELD(7:12) at ADR in LOC\\
+      &         & C to clear field of width FIELD(7:12) at ADR in LOC\\
+      &         & D for definition of LABEL as ADR in LOC\\
+      &         & E for END to LABEL + ADR in LOC or ADR in LOC\\
+      &         & F for a FIELD of LEN at ADR in LOC\\
+      &         & L for org LC to LABEL\\
+      &         & Q for A EQU B+LOC+IX and B is undefined,\\
+      &         &   or A is global; field might be \%xx\\
+      &         & R if ADR in LOC is a reference to LABEL with\\
+      &         &   offset FIELD(7:12) in decimal and index IX\\
+      &         & X for EX or XFR to LABEL + ADR in LOC or ADR in LOC\\
+      &         & 0 for org LC to X00+ADR\\
+2:7   & Label   & Label\\
+8:12  & Adr     & Decimal address\\
+13:14 & Loc     & Location counter in decimal\\
+15    & R       & R if ADR in LOC needs relocation\\
+16    & IX      & Index in decimal, 0..3\\
+17:21 & Line    & Sequence number in assembly listing produced using the \\
+      &         & {\tt -l} command-line option\\
+22:23 & Len     & Length of field, might be zero if WM from DA\\
+24:77 & Field   & Usually an instruction or DC/DCW/DSA contents\\
+78    & WM      & W If FIELD needs WM\\
+79:80 & FR(2)   & Starting positions in FIELD needing relocation, 1,2,5\\
+      &         & (two fields of one column each) \\
+81:84 & LCR(2)  & Location counters to use where FR is nonzero\\
+      &         & (two fields of two columns each) \\
+85:104&  Text   & Line(16:35) of source, for output to tape or \\
+      &         & ``diagnostic-format deck''\\
+\end{longtable}
+
+If the {\tt -r} option appears, undefined symbols are not diagnosed as
+errors.  Address constants and the address fields of instructions that
+reference them appear in the listing as {\tt \#\#\#}, and their
+addresses are shown in the symbol table as {\tt UNDEF}.
+\raggedbottom
+
+\section{Linker}
+
+The linker is used to collect together several independently-assembled
+Autocoder program units, while satisfying external references and
+relocating relocatable location counters.
+
+\subsection{Linker control file syntax}
+
+Operation of the linker is controlled by specifications in a file.
+
+The structure of the file is described by the following grammar.  Terms
+in \emph{italic} face are syntax rule names.  Ellipses {\dots} mean
+``zero or more repetitions of the previous item.''  Items described
+within square brackets are optional; the brackets are not part of the
+syntax.  Each command begins on a new line.  Lines cannot be continued. 
+The maximum line length is 2047 characters, but this could easily be
+changed. Keywords are not case sensitive.
+
+Lines are free format; no column requirements are imposed.  Blank lines
+are ignored.  Lines on which the first nonblank character is {\tt *} or
+{\tt !} are comments.  Text on a {\tt SEG} or {\tt END} command after {\tt
+!} is a comment.
+
+\newcommand{\pro}{::= }
+\newcommand{\R}{{\bf or }}
+\newcommand{\X}[1]{\vskip -0.25in \hspace*{1in}\parbox{5.5in}{#1}}
+
+\begin{tabbing}
+\emph{control} \pro \= \emph{early} [ \emph{early} \dots\ ]\\
+\> \emph{segment} [ \emph{segment} \dots ] \\
+\> END [ \emph{label} ]
+\end{tabbing}
+
+The \emph{label} on the END statement is the entry to the program.  It
+overrides an entry taken from an END statement in a program unit.  If it
+does not appear, the entry is specified by the last END statement in a
+program unit that specified an entry.
+
+\begin{tabbing}
+\emph{early} \= \pro \= ID [ \emph{deck-id} ] \\
+\> \R \> SKIP \emph{number}
+\end{tabbing}
+
+The first five characters of \emph{deck-id} are emitted into columns
+76--80 of ``card deck'' and Autocoder-format ``tape'' records.
+
+The SKIP command specifies to skip the first \emph{number} of core
+locations, even if code has been allocated to them, in records after the
+first one on a bootable core-format ``tape.''  This was put in place for
+the special purpose of skipping initialization of the phase name at
+locations 101--110 in the Fortran II compiler,
+\REF{C24-1455-2_Fortran_Specifications_and_Operating_Procedures_Apr65.pdf}{1401-FO-050}.
+
+\begin{tabbing}
+\emph{segment} \pro \= \emph{seg}\\
+\> \emph{in} [ \emph{in} \dots ] \\
+\end{tabbing}
+
+\begin{tabbing}
+\emph{seg} \= \pro \= SEG \emph{declared-name} [ [+]\emph{number} ] \\
+\end{tabbing}
+
+\X{Start relocatable location counters in the segment named
+\emph{declared-name} at the maximum of \emph{number} (taken to be zero if
+\emph{number} does not appear) and one more than the maximum absolute
+address in the segment, including global labels declared only by EQU.}
+
+\begin{tabbing}
+\phantom{\emph{seg}}
+ \= \R \= SEG \emph{declared-name} $-$\emph{number} \\
+\end{tabbing}
+
+\X{End relocatable location counters in the segment named
+\emph{declared-name} at \emph{number}.}
+
+\begin{tabbing}
+\phantom{\emph{seg}}
+ \= \R \= SEG \emph{declared-name} *\emph{label} \\
+\end{tabbing}
+
+\X{Start relocatable location counters in the segment named
+\emph{declared-name} at \emph{label}, which must be declared to be a
+global label in some program unit.}
+
+\begin{tabbing}
+\phantom{\emph{seg}}
+ \= \R \= SEG \emph{declared-name} \emph{referenced-name}
+ [ \emph{referenced-name} \dots ] \\
+\end{tabbing}
+
+\X{Start relocatable location counters in the segment named
+\emph{declared-name} at the maximum of the beginning addresses of
+relocatable location counters in all of the \emph{referenced-name}
+segments.  Each \emph{referenced-name} shall appear as a
+\emph{declared-name} in some other SEG command.}
+
+\begin{tabbing}
+\phantom{\emph{seg}}
+ \= \R \= SEG \emph{declared-name} ( \emph{referenced-name}
+ [ \emph{referenced-name} \dots ] ) \\
+\end{tabbing}
+
+\X{Start relocatable location counters in the segment named
+\emph{declared-name} at one more than the maximum of the ending addresses
+of absolute or relocatable location counters in all of the
+\emph{referenced-name} segments.  Each \emph{referenced-name} shall appear
+as a \emph{declared-name} in some other SEG command.}
+
+\begin{tabbing}
+\emph{in} \= \pro \= IN \emph{file-name} [ \emph{file-name} \dots ] \\
+\end{tabbing}
+
+\X{Include the contents of each \emph{file-name}, in the order specified,
+in the segment.  The contents of each \emph{file-name} must have been
+produced using the {\tt -r} command-line option of the Autocoder
+assembler.}
+
+\begin{tabbing}
+\phantom{\emph{in}}
+ \= \R \= DATA \emph{file-name} [ \emph{file-name} \dots ] \\
+\end{tabbing}
+
+\X{Copy the contents of each \emph{file-name}, in the order specified, to
+the output.}
+
+\begin{tabbing}
+\phantom{\emph{in}}
+ \= \R \= SEQDATA \emph{file-name} [ \emph{file-name} \dots ] \\
+\end{tabbing}
+
+\X{Copy the contents of each \emph{file-name}, in the order specified, to
+the output.  Emit the first five characters of the \emph{deck-id} from
+the ID command, if any, into columns 76--80.  Emit a sequence number into
+columns 72--75 of output ``card deck'' files.}
+
+\vspace*{10pt}
+IN, DATA, and SEQDATA commands within each segment are processed in the
+order they appear.
+
+\subsection{Linker command line}
+
+The linker command line is
+
+\hspace*{0.25in}{\tt link} [\emph{options}] \emph{command-file-name}
+
+The options are \\[0pt]
+
+\begin{longtable}{lp{4.5in}}
+{\tt -a} & Annotate outputs with segment and IN file names, but not DATA
+          or SEQDATA file names.  The annotation is executable, but does
+          not load anything into core.  For example, in a ``card deck''
+          file, the annotation would be in columns 1--39, and columns
+          40--71 would be {\tt N000000N000000N000000N0000001040}.\\
+{\tt -A} & Annotate outputs with segment and IN file names, DATA file
+           names, and SEQDATA file names.  The annotation is executable,
+           but does not load anything into core. \\
+{\tt -b[ ]X[\#]} & Select boot loader for ``card deck'' output: \\
+ & X = {\tt I} means the same boot loader as provided by IBM in tape
+               Autocoder, program \AU, where {\tt \#} is the core size
+               selector:\\
+ & \inp{0.25in}{0~$\Rightarrow$~Boot, no clear, sequence numbers start
+    at 3.}\\
+ & \inp{0.25in}{1~$\Rightarrow$~1400, 2~$\Rightarrow$~2000,
+  4~$\Rightarrow$~4000, 8~$\Rightarrow$~8000, {\tt v}~$\Rightarrow$~12000,}
+  \\
+ & \inp{0.25in}{{\tt x} $\Rightarrow$ 16000.  The default is 16000.} \\
+ & X = {\tt N} means no boot loader. \\
+ & X = {\tt B} means Van's favorite one-card boot without clearing core. \\
+ & X = {\tt V} means Van's favorite two-card boot with clearing core. \\
+{\tt -c[ ]}\emph{file-name} & Specify the name of a file to receive a
+          bootable core-image ``tape.''  Each non-empty segment, and each
+          EX or XFR statement within an Autocoder file, results in a
+          separate record. \\
+{\tt -d[ ]}\emph{file-name} & Specify the name of a file to receive a
+          ``diagnostic deck.''  This has one field per card, with load
+          instructions in columns 1--11, and the loaded field (one field
+          per ``card'') beginning in column 12.  This is slightly
+          different from the format of diagnostic ``decks'' provided by
+          IBM, in that the sequence number is in columns 72--75 and the
+          deck id is in columns 76--80, instead of having a sequence
+          number in 79--80.\\
+{\tt -l} & List the control file.\\
+{\tt -n[ ]}\emph{id} & Deck id for output, overridden by an ID command in
+          the control file.\\
+{\tt -o[ ]}\emph{file-name} & Specify the name of a file to receive
+          an Autocoder-format ``object deck.''\\
+{\tt -S} & The symbol table list shows the absolute and relocatable address,
+          location counter number, file name, and segment name, for each
+          label.  The default is to show only the label and its absolute
+          address. \\
+{\tt -t[ ]}\emph{file-name} & Specify the name of a file to receive an
+          Autocoder-format ``object tape.'' \\
+{\tt -V} & Print version information and stop.\\
+{\tt -h} & or any other option not understood, results in printing this
+          information and stopping. \\
+\end{longtable}
+
+\subsection{Example of a linker control file}
+
+The following is part of a linker control file for a revision of program
+\REF{C24-1455-2_1401_fortran.pdf}{1401-FO-050}, the Fortran II compiler.
+
+{\tt\begin{verbatim}
+! Linker control script for 1401 Fortran compiler
+! 1401-FO-050, V4M0
+
+ID V4M0
+seg P0-1         ! Phases 0 and 1
+  in LowCore.r Snapshot.r Monitor.r Param.r Startup.r
+seg P2 *strtup   ! Phase 2,  starts at label STRTUP
+  in Loader.r
+seg P3 P2        ! Phase 3,  starts at beginning of P2
+  in Scanner.r
+seg P4 P3        ! Phase 4,  starts at beginning of P3
+  in Sort1.r
+seg P5 *strt04   ! Phase 5,  starts at label STRT04
+  in Sort2.r
+seg P6 *strt04   ! Phase 6,  starts at label STRT04
+  in Sort3.r
+seg P7 *strtup   ! Phase 7,  starts at label STRTUP
+  in Gmark.r
+seg P8 *strtup   ! Phase 8,  starts at label STRTUP
+  in Squoze.r
+seg P9 *strtup   ! Phase 9,  starts at label STRTUP
+  in Dimen1.r
+seg P10 *strt09  ! Phase 10, starts at label STRT09
+  in Equiv1.r
+seg P11 *strt10  ! Phase 11, starts at label STRT10
+  in Equiv2.r
+seg P12 *strtup  ! Phase 12, starts at label STRTUP
+  in Dimen2.r
+seg P13 *strtup  ! Phase 13, starts at label STRTUP
+  in Varbl1.r
+...
+end strtup       ! All done, start at STRTUP in P0-1
+\end{verbatim}}
+
+\section{Converting Autocoder tapes for use with SimH}
+
+SimH wants its tapes in one of a few formats, none of which are directly
+output by Autocoder, which simply outputs text.
+
+The program {\tt to\_e11} copies a text file to one in SimH's E11
+format.  It depends upon a quirk of essentially all Fortran I/O
+libraries:  E11 format has a little-endian four-byte count field before
+and after each record, which happens to be exactly what essentially all
+Fortran I/O libraries use for unformatted files on little-endian
+processors.
+
+The {\tt to\_e11} command line is
+
+\hspace*{0.25in}{\tt to\_e11} \emph{input-file-name output-file-name}
+
+The program has no options.
+
+\section{Dumping SimH-format tapes}
+
+SimH can read and write four formats of tapes.
+
+The program {\tt tpdump} can dump tapes in two of those formats: SimH
+default format, or E11 format.
+
+The command line for {\tt tpdump} is
+
+\hspace*{0.25in}{\tt tpdump} [\emph{options}] \emph{tape-file-name}
+
+The options are \\[0pt]
+
+\begin{longtable}{lp{4.5in}}
+{\tt -w}  & Print word marks on a separate line \\
+{\tt -}\emph{number} & Print \emph{number} files, default 1 \\
+{\tt -a}  & Print all of each record, including blank lines, which are
+            otherwise suppressed (except for the last one) \\
+{\tt -b}  & use {\tt b} for blank, default is blank \\
+{\tt -c}  & use circumflex ({\tt $\hat{\phantom{.}}$}) for blank, default
+            is blank \\
+{\tt -e}  & Use E11 format, i.e., don't require even-length records \\
+{\tt -h}  & Use the Pierce {\tt H} (Fortran) print arrangement (default
+            Pierce {\tt A}) \\
+{\tt -o}  & Use the ``old SimH'' print arrangement (default Pierce {\tt A}) \\
+{\tt -r[ ]}\emph{number} & Print \emph{number} characters per line, max
+            100, default 100 \\
+\end{longtable}
+
+\label{lastpage}
+\end{document}

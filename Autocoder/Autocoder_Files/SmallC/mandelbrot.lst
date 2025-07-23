@@ -1,0 +1,2122 @@
+ CLEAR STORAGE 1     ,008015,022026,030037,044,049,053053N000000N00001026                                         1
+ CLEAR STORAGE 2     L068116,105106,110117B101/I9I#071029C029056B026/B001/0991,001/001117I0?                      2
+ BOOTSTRAP           ,008015,022029,036040,047054,061068,072/061039              ,0010011040                      3
+0                                                                                                         PAGE    1
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  101         ****************************************************************
+  102         READ   EQU   001               *  READ AREA                              0001
+  103         PUNCH  EQU   101               *  PUNCH AREA                             0101
+  104         PRINT  EQU   201               *  PRINT AREA                             0201
+  105         PRCPOS DCW   000               *  CHAR POSITION IN PRINT AREA         3  0335                       4
+  106         PUCPOS DCW   000               *  CHAR POSITION IN PUNCH AREA         3  0338                       4
+  107         PUNSIZ DCW   @080@             *  SIZE OF PUNCH AREA                  3  0341                       4
+  108         PRTSIZ DCW   @132@             *  SIZE OF PRINT AREA                  3  0344                       4
+  109         EOS    DCW   @'@               *  END OF STRING CHAR                  1  0345                       4
+  110         EOL    DCW   @;@               *  END OF LINE CHAR                    1  0346                       4
+  111                ORG   87                                                                 0087
+  112         X1     DSA   0                 *  INDEX REGISTER 1                    3  0089  000                  5   000
+  113                ORG   92                                                                 0092
+  114         X2     DSA   0                 *  INDEX REGISTER 2 (STACK POINTER     3  0094  000                  6   000
+  115                ORG   97                                                                 0097
+  116         X3     DSA   0                 *  INDEX REGISTER 3 (STACK FRAME P     3  0099  000                  7   000
+  117         ****************************************************************
+  118         * GLOBAL/STATIC DATA AND VARIABLES
+  119                ORG   2000              * SEED                                           2000
+  120                DCW   @69105@                                                  5  2004                       8
+  121                ORG   2005              * CONST_STR_LITERAL_1                            2005
+  122                DCW   @0@                                                      1  2005                       8
+  123                DCW   @1@                                                      1  2006                       8
+  124                DCW   @2@                                                      1  2007                       8
+  125                DCW   @3@                                                      1  2008                       8
+  126                DCW   @4@                                                      1  2009                       8
+  127                DCW   @5@                                                      1  2010                       8
+  128                DCW   @6@                                                      1  2011                       9
+  129                DCW   @7@                                                      1  2012                       9
+  130                DCW   @8@                                                      1  2013                       9
+  131                DCW   @9@                                                      1  2014                       9
+  132                DCW   @A@                                                      1  2015                       9
+  133                DCW   @B@                                                      1  2016                       9
+  134                DCW   @C@                                                      1  2017                       9
+  135                DCW   @D@                                                      1  2018                      10
+  136                DCW   @E@                                                      1  2019                      10
+  137                DCW   @F@                                                      1  2020                      10
+  138                DCW   @'@                                                      1  2021                      10
+  139                ORG   2022              * __PUTCHAR_POS                                  2022
+  140                DCW   @201@                                                    3  2024                      10
+  141                ORG   2025              * __PUTCHAR_LAST                                 2025
+  142                DCW   @200@                                                    3  2027                      10
+  143                ORG   2028              * __GETCHARPOSITION                              2028
+  144                DCW   @081@                                                    3  2030                      10
+  145                ORG   2031              * ZA                                             2031
+  146                DCW   @00000@                                                  5  2035                      11
+  147                ORG   2036              * ZB                                             2036
+1                                                                                                         PAGE    2
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  148                DCW   @00000@                                                  5  2040                      11
+  149         * START POSITION OF PROGRAM CODE
+  150                ORG   2041                                                               2041
+  151         * SET X2 TO BE THE STACK POINTER (STACK GROWS UPWARD)
+  152         START  SBR   X2,399            * SET X2 TO STACK POINTER VALUE        7  2041  H 094 399           11   094     399
+  153                MCW   X2,X3             * COPY STACK POINTER IN X3             7  2048  M 094 099           11   094     099
+  154                B     START             * JUMP TO FUNCTION MAIN LYDAAA         4  2055  B !41               11  2041
+  155                H                       * PROGRAM EXECUTED. SYSTEM HALTS       1  2059  .                   11
+  156         ***************************************************************************
+  157         * FUNCTION : ESCAPE
+  158         ***************************************************************************
+  159         LSDAAA SBR   3&X3              * SAVE RETURN ADDRESS IN REGISTER      4  2060  H 0?3               11   003+3
+  160         * SET THE RIGHT WM AND CLEAR THE WRONG ONES
+  161                SW    1&X3              * SET WM AT 1&X3                       4  2064  , 0?1               12   001+3
+  162                CW    2&X3              * CLEAR WM AT 2&X3                     4  2068  ) 0?2               12   002+3
+  163                CW    3&X3              * CLEAR WM AT 3&X3                     4  2072  ) 0?3               12   003+3
+  164         ***************************************
+  165         * BEGIN [BLOCK ENDING AT LTDAAA]
+  166         * PUSH (28)
+  167                MA    LYFAAA,X2         * ADD 28 TO STACK POINTER              7  2076  # 79L 094           12  8793     094
+  168         * IF [IF ((TIMEOUT == 0) THEN [BLOCK ENDING AT LUDAAA]]
+  169         * EQUAL (TIMEOUT == 0)
+  170         * PARAMETER VARIABLE (TIMEOUT : 15987+X3)
+  171         * PUSH (15987+X3:5)
+  172                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  2083  # 76Q 094           12  8768     094
+  173                LCA   15987&X3,0&X2     * LOAD MEMORY 15987&X3 IN STACK        7  2090  L IHG 0!0           12 15987+3   000+2
+  174                B     CLNNMN            * JUMP TO SNIPPET CLEAN_NUMBER         4  2097  B 07L               12  8073
+  175         * CONSTANT (0 : @00000@)
+  176         * PUSH (@00000@:5)
+  177                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  2101  # 76Q 094           13  8768     094
+  178                LCA   LAGAAA,0&X2       * LOAD DATA @00000@ IN STACK           7  2108  L 74M 0!0           13  8744     000+2
+  179                B     CLNNMN            * JUMP TO SNIPPET CLEAN_NUMBER         4  2115  B 07L               13  8073
+  180                C     0&X2,15995&X2     * COMPARE STACK TO STACK AT -5         7  2119  C 0!0 IRE           13   000+2 15995+2
+  181         * POP (5)
+  182                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  2126  # 78K 094           13  8782     094
+  183         * POP (5)
+  184                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  2133  # 78K 094           13  8782     094
+  185         * PUSH (@00000@:5)
+  186                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  2140  # 76Q 094           14  8768     094
+  187                LCA   LAGAAA,0&X2       * LOAD DATA @00000@ IN STACK           7  2147  L 74M 0!0           14  8744     000+2
+  188                BE    LIEAAA            * JUMP IF EQUAL                        5  2154  B J63 S             14  2163
+  189                B     LJEAAA            * JUMP TO END                          4  2159  B J70               14  2170
+  190         LIEAAA MCW   LCGAAA,0&X2       * MOVE 1 IN STACK                      7  2163  M 75L 0!0           14  8753     000+2
+  191         LJEAAA MCS   0&X2,0&X2         * CLEAR WM IN STACK                    7  2170  Z 0!0 0!0           14   000+2   000+2
+  192         * POP (5)
+  193                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  2177  # 78K 094           15  8782     094
+  194                BCE   LVDAAA,5&X2,      * JUMP WHEN FALSE                      8  2184  B K24 0!5           15  2224     005+2
+  195         ***************************************
+  196         * BEGIN [BLOCK ENDING AT LUDAAA]
+  197         * RETURN TO LTDAAA WITH RETURN VALUE 0
+1                                                                                                         PAGE    3
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  198         * PUT ON STACK RETURN VALUE (0)
+  199         * CONSTANT (0 : @00000@)
+  200         * PUSH (@00000@:5)
+  201                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  2192  # 76Q 094           15  8768     094
+  202                LCA   LAGAAA,0&X2       * LOAD DATA @00000@ IN STACK           7  2199  L 74M 0!0           15  8744     000+2
+  203         * POP (15982+X3:5)
+  204                LCA   0&X2,15982&X3     * LOAD STACK IN 15982&X3               7  2206  L 0!0 IHB           15   000+2 15982+3
+  205                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  2213  # 78K 094           16  8782     094
+  206                B     LTDAAA            * JUMP TO END OF FUNCTION BLOCK        4  2220  B I13               16  3913
+  207         * END [BLOCK ENDING AT LUDAAA]
+  208         ***************************************
+  209         * END IF [IF ((TIMEOUT == 0) THEN [BLOCK ENDING AT LUDAAA]]
+  210         * IF [IF (((((A < 0) || (A > 128)) || (B < 0)) || (B > 64)) THEN [BLOCK END
+  211         * OR (||) ((((A < 0) || (A > 128)) || (B < 0)) || (B > 64))
+  212         * PUSH (@00000@:5)
+  213         LVDAAA MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  2224  # 76Q 094           16  8768     094
+  214                LCA   LAGAAA,0&X2       * LOAD DATA @00000@ IN STACK           7  2231  L 74M 0!0           16  8744     000+2
+  215         * OR (||) (((A < 0) || (A > 128)) || (B < 0))
+  216         * PUSH (@00000@:5)
+  217                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  2238  # 76Q 094           16  8768     094
+  218                LCA   LAGAAA,0&X2       * LOAD DATA @00000@ IN STACK           7  2245  L 74M 0!0           16  8744     000+2
+  219         * OR (||) ((A < 0) || (A > 128))
+  220         * PUSH (@00000@:5)
+  221                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  2252  # 76Q 094           17  8768     094
+  222                LCA   LAGAAA,0&X2       * LOAD DATA @00000@ IN STACK           7  2259  L 74M 0!0           17  8744     000+2
+  223         * LESS (A < 0)
+  224         * PARAMETER VARIABLE (A : 15997+X3)
+  225         * PUSH (15997+X3:5)
+  226                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  2266  # 76Q 094           17  8768     094
+  227                LCA   15997&X3,0&X2     * LOAD MEMORY 15997&X3 IN STACK        7  2273  L IIG 0!0           17 15997+3   000+2
+  228                B     CLNNMN            * JUMP TO SNIPPET CLEAN_NUMBER         4  2280  B 07L               17  8073
+  229         * CONSTANT (0 : @00000@)
+  230         * PUSH (@00000@:5)
+  231                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  2284  # 76Q 094           17  8768     094
+  232                LCA   LAGAAA,0&X2       * LOAD DATA @00000@ IN STACK           7  2291  L 74M 0!0           18  8744     000+2
+  233                B     CLNNMN            * JUMP TO SNIPPET CLEAN_NUMBER         4  2298  B 07L               18  8073
+  234                C     0&X2,15995&X2     * COMPARE STACK TO STACK AT -5         7  2302  C 0!0 IRE           18   000+2 15995+2
+  235         * POP (5)
+  236                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  2309  # 78K 094           18  8782     094
+  237                MCW   LAGAAA,0&X2       * MOVE 0 IN STACK                      7  2316  M 74M 0!0           18  8744     000+2
+  238                BL    LQEAAA            * JUMP IF LESS                         5  2323  B L32 T             18  2332
+  239                B     LREAAA            * JUMP TO END                          4  2328  B L39               19  2339
+  240         LQEAAA MCW   LCGAAA,0&X2       * MOVE 1 IN STACK                      7  2332  M 75L 0!0           19  8753     000+2
+  241         LREAAA MCS   0&X2,0&X2         * CLEAR WM IN STACK                    7  2339  Z 0!0 0!0           19   000+2   000+2
+  242         * POP (5)
+  243                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  2346  # 78K 094           19  8782     094
+  244                BCE   LOEAAA,5&X2,      * JUMP TO SECOND IF EQUAL TO STACK     8  2353  B L72 0!5           19  2372     005+2
+  245                MCW   LCGAAA,0&X2       * MOVE 1 IN STACK                      7  2361  M 75L 0!0           20  8753     000+2
+  246                B     LPEAAA            * JUMP TO END                          4  2368  B M74               20  2474
+  247         * GREATER (A > 128)
+1                                                                                                         PAGE    4
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  248         * PARAMETER VARIABLE (A : 15997+X3)
+  249         * PUSH (15997+X3:5)
+  250         LOEAAA MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  2372  # 76Q 094           20  8768     094
+  251                LCA   15997&X3,0&X2     * LOAD MEMORY 15997&X3 IN STACK        7  2379  L IIG 0!0           20 15997+3   000+2
+  252                B     CLNNMN            * JUMP TO SNIPPET CLEAN_NUMBER         4  2386  B 07L               20  8073
+  253         * CONSTANT (128 : @00128@)
+  254         * PUSH (@00128@:5)
+  255                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  2390  # 76Q 094           20  8768     094
+  256                LCA   LDGAAA,0&X2       * LOAD DATA @00128@ IN STACK           7  2397  L 66M 0!0           21  8664     000+2
+  257                B     CLNNMN            * JUMP TO SNIPPET CLEAN_NUMBER         4  2404  B 07L               21  8073
+  258                C     0&X2,15995&X2     * COMPARE STACK TO STACK AT -5         7  2408  C 0!0 IRE           21   000+2 15995+2
+  259         * POP (5)
+  260                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  2415  # 78K 094           21  8782     094
+  261                MCW   LAGAAA,0&X2       * MOVE 0 IN STACK                      7  2422  M 74M 0!0           21  8744     000+2
+  262                BH    LSEAAA            * JUMP IF GREATER                      5  2429  B M38 U             21  2438
+  263                B     LTEAAA            * JUMP TO END                          4  2434  B M45               22  2445
+  264         LSEAAA MCW   LCGAAA,0&X2       * MOVE 1 IN STACK                      7  2438  M 75L 0!0           22  8753     000+2
+  265         LTEAAA MCS   0&X2,0&X2         * CLEAR WM IN STACK                    7  2445  Z 0!0 0!0           22   000+2   000+2
+  266         * POP (5)
+  267                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  2452  # 78K 094           22  8782     094
+  268                BCE   LPEAAA,5&X2,      * JUMP TO END IF EQUAL TO STACK AT     8  2459  B M74 0!5           22  2474     005+2
+  269                MCW   LCGAAA,0&X2       * MOVE 1 IN STACK                      7  2467  M 75L 0!0           23  8753     000+2
+  270         LPEAAA MCS   0&X2,0&X2         * CLEAR WM IN STACK                    7  2474  Z 0!0 0!0           23   000+2   000+2
+  271         * POP (5)
+  272                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  2481  # 78K 094           23  8782     094
+  273                BCE   LMEAAA,5&X2,      * JUMP TO SECOND IF EQUAL TO STACK     8  2488  B N07 0!5           23  2507     005+2
+  274                MCW   LCGAAA,0&X2       * MOVE 1 IN STACK                      7  2496  M 75L 0!0           23  8753     000+2
+  275                B     LNEAAA            * JUMP TO END                          4  2503  B O09               24  2609
+  276         * LESS (B < 0)
+  277         * PARAMETER VARIABLE (B : 15992+X3)
+  278         * PUSH (15992+X3:5)
+  279         LMEAAA MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  2507  # 76Q 094           24  8768     094
+  280                LCA   15992&X3,0&X2     * LOAD MEMORY 15992&X3 IN STACK        7  2514  L IIB 0!0           24 15992+3   000+2
+  281                B     CLNNMN            * JUMP TO SNIPPET CLEAN_NUMBER         4  2521  B 07L               24  8073
+  282         * CONSTANT (0 : @00000@)
+  283         * PUSH (@00000@:5)
+  284                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  2525  # 76Q 094           24  8768     094
+  285                LCA   LAGAAA,0&X2       * LOAD DATA @00000@ IN STACK           7  2532  L 74M 0!0           24  8744     000+2
+  286                B     CLNNMN            * JUMP TO SNIPPET CLEAN_NUMBER         4  2539  B 07L               25  8073
+  287                C     0&X2,15995&X2     * COMPARE STACK TO STACK AT -5         7  2543  C 0!0 IRE           25   000+2 15995+2
+  288         * POP (5)
+  289                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  2550  # 78K 094           25  8782     094
+  290                MCW   LAGAAA,0&X2       * MOVE 0 IN STACK                      7  2557  M 74M 0!0           25  8744     000+2
+  291                BL    LUEAAA            * JUMP IF LESS                         5  2564  B N73 T             25  2573
+  292                B     LVEAAA            * JUMP TO END                          4  2569  B N80               25  2580
+  293         LUEAAA MCW   LCGAAA,0&X2       * MOVE 1 IN STACK                      7  2573  M 75L 0!0           26  8753     000+2
+  294         LVEAAA MCS   0&X2,0&X2         * CLEAR WM IN STACK                    7  2580  Z 0!0 0!0           26   000+2   000+2
+  295         * POP (5)
+  296                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  2587  # 78K 094           26  8782     094
+  297                BCE   LNEAAA,5&X2,      * JUMP TO END IF EQUAL TO STACK AT     8  2594  B O09 0!5           26  2609     005+2
+1                                                                                                         PAGE    5
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  298                MCW   LCGAAA,0&X2       * MOVE 1 IN STACK                      7  2602  M 75L 0!0           26  8753     000+2
+  299         LNEAAA MCS   0&X2,0&X2         * CLEAR WM IN STACK                    7  2609  Z 0!0 0!0           27   000+2   000+2
+  300         * POP (5)
+  301                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  2616  # 78K 094           27  8782     094
+  302                BCE   LKEAAA,5&X2,      * JUMP TO SECOND IF EQUAL TO STACK     8  2623  B O42 0!5           27  2642     005+2
+  303                MCW   LCGAAA,0&X2       * MOVE 1 IN STACK                      7  2631  M 75L 0!0           27  8753     000+2
+  304                B     LLEAAA            * JUMP TO END                          4  2638  B P44               27  2744
+  305         * GREATER (B > 64)
+  306         * PARAMETER VARIABLE (B : 15992+X3)
+  307         * PUSH (15992+X3:5)
+  308         LKEAAA MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  2642  # 76Q 094           28  8768     094
+  309                LCA   15992&X3,0&X2     * LOAD MEMORY 15992&X3 IN STACK        7  2649  L IIB 0!0           28 15992+3   000+2
+  310                B     CLNNMN            * JUMP TO SNIPPET CLEAN_NUMBER         4  2656  B 07L               28  8073
+  311         * CONSTANT (64 : @00064@)
+  312         * PUSH (@00064@:5)
+  313                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  2660  # 76Q 094           28  8768     094
+  314                LCA   LEGAAA,0&X2       * LOAD DATA @00064@ IN STACK           7  2667  L 73! 0!0           28  8730     000+2
+  315                B     CLNNMN            * JUMP TO SNIPPET CLEAN_NUMBER         4  2674  B 07L               28  8073
+  316                C     0&X2,15995&X2     * COMPARE STACK TO STACK AT -5         7  2678  C 0!0 IRE           29   000+2 15995+2
+  317         * POP (5)
+  318                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  2685  # 78K 094           29  8782     094
+  319                MCW   LAGAAA,0&X2       * MOVE 0 IN STACK                      7  2692  M 74M 0!0           29  8744     000+2
+  320                BH    LWEAAA            * JUMP IF GREATER                      5  2699  B P08 U             29  2708
+  321                B     LXEAAA            * JUMP TO END                          4  2704  B P15               29  2715
+  322         LWEAAA MCW   LCGAAA,0&X2       * MOVE 1 IN STACK                      7  2708  M 75L 0!0           29  8753     000+2
+  323         LXEAAA MCS   0&X2,0&X2         * CLEAR WM IN STACK                    7  2715  Z 0!0 0!0           30   000+2   000+2
+  324         * POP (5)
+  325                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  2722  # 78K 094           30  8782     094
+  326                BCE   LLEAAA,5&X2,      * JUMP TO END IF EQUAL TO STACK AT     8  2729  B P44 0!5           30  2744     005+2
+  327                MCW   LCGAAA,0&X2       * MOVE 1 IN STACK                      7  2737  M 75L 0!0           30  8753     000+2
+  328         LLEAAA MCS   0&X2,0&X2         * CLEAR WM IN STACK                    7  2744  Z 0!0 0!0           30   000+2   000+2
+  329         * POP (5)
+  330                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  2751  # 78K 094           31  8782     094
+  331                BCE   LXDAAA,5&X2,      * JUMP WHEN FALSE                      8  2758  B P98 0!5           31  2798     005+2
+  332         ***************************************
+  333         * BEGIN [BLOCK ENDING AT LWDAAA]
+  334         * RETURN TO LTDAAA WITH RETURN VALUE 1
+  335         * PUT ON STACK RETURN VALUE (1)
+  336         * CONSTANT (1 : @00001@)
+  337         * PUSH (@00001@:5)
+  338                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  2766  # 76Q 094           31  8768     094
+  339                LCA   LCGAAA,0&X2       * LOAD DATA @00001@ IN STACK           7  2773  L 75L 0!0           31  8753     000+2
+  340         * POP (15982+X3:5)
+  341                LCA   0&X2,15982&X3     * LOAD STACK IN 15982&X3               7  2780  L 0!0 IHB           31   000+2 15982+3
+  342                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  2787  # 78K 094           32  8782     094
+  343                B     LTDAAA            * JUMP TO END OF FUNCTION BLOCK        4  2794  B I13               32  3913
+  344         * END [BLOCK ENDING AT LWDAAA]
+  345         ***************************************
+  346         * END IF [IF (((((A < 0) || (A > 128)) || (B < 0)) || (B > 64)) THEN [BLOCK
+  347         * ADDITION ((((A * A) / 32) - (4 * A)) + 128)
+1                                                                                                         PAGE    6
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  348         * SUBTRACT (((A * A) / 32) - (4 * A))
+  349         * DIVIDE ((A * A) / 32)
+  350         * CONSTANT (32 : @00032@)
+  351         * PUSH (@00032@:5)
+  352         LXDAAA MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  2798  # 76Q 094           32  8768     094
+  353                LCA   LFGAAA,0&X2       * LOAD DATA @00032@ IN STACK           7  2805  L 77R 0!0           32  8779     000+2
+  354         * MULTIPLY (A * A)
+  355         * PARAMETER VARIABLE (A : 15997+X3)
+  356         * PUSH (15997+X3:5)
+  357                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  2812  # 76Q 094           32  8768     094
+  358                LCA   15997&X3,0&X2     * LOAD MEMORY 15997&X3 IN STACK        7  2819  L IIG 0!0           32 15997+3   000+2
+  359         * PARAMETER VARIABLE (A : 15997+X3)
+  360         * PUSH (15997+X3:5)
+  361                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  2826  # 76Q 094           33  8768     094
+  362                LCA   15997&X3,0&X2     * LOAD MEMORY 15997&X3 IN STACK        7  2833  L IIG 0!0           33 15997+3   000+2
+  363                M     15995&X2,6&X2     * MULTIPLY STACK AT -5 TO STACK AT     7  2840  @ IRE 0!6           33 15995+2   006+2
+  364                SW    2&X2              * SET WM IN STACK AT 2                 4  2847  , 0!2               33   002+2
+  365                LCA   6&X2,15995&X2     * LOAD STACK AT 6 TO STACK AT -5       7  2851  L 0!6 IRE           33   006+2 15995+2
+  366         * POP (5)
+  367                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  2858  # 78K 094           33  8782     094
+  368                B     SNPDIV            * JUMP TO SNIPPET SNIP_DIV             4  2865  B 10M               34  8104
+  369                MCW   0&X2,15995&X2     * MOVE STACK IN STACK AT -5            7  2869  M 0!0 IRE           34   000+2 15995+2
+  370         * POP (5)
+  371                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  2876  # 78K 094           34  8782     094
+  372         * MULTIPLY (4 * A)
+  373         * CONSTANT (4 : @00004@)
+  374         * PUSH (@00004@:5)
+  375                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  2883  # 76Q 094           34  8768     094
+  376                LCA   LGGAAA,0&X2       * LOAD DATA @00004@ IN STACK           7  2890  L 69O 0!0           34  8696     000+2
+  377         * PARAMETER VARIABLE (A : 15997+X3)
+  378         * PUSH (15997+X3:5)
+  379                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  2897  # 76Q 094           34  8768     094
+  380                LCA   15997&X3,0&X2     * LOAD MEMORY 15997&X3 IN STACK        7  2904  L IIG 0!0           35 15997+3   000+2
+  381                M     15995&X2,6&X2     * MULTIPLY STACK AT -5 TO STACK AT     7  2911  @ IRE 0!6           35 15995+2   006+2
+  382                SW    2&X2              * SET WM IN STACK AT 2                 4  2918  , 0!2               35   002+2
+  383                LCA   6&X2,15995&X2     * LOAD STACK AT 6 TO STACK AT -5       7  2922  L 0!6 IRE           35   006+2 15995+2
+  384         * POP (5)
+  385                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  2929  # 78K 094           35  8782     094
+  386                S     0&X2,15995&X2     * SUBTRACT STACK TO STACK AT -5        7  2936  S 0!0 IRE           35   000+2 15995+2
+  387         * POP (5)
+  388                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  2943  # 78K 094           36  8782     094
+  389         * CONSTANT (128 : @00128@)
+  390         * PUSH (@00128@:5)
+  391                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  2950  # 76Q 094           36  8768     094
+  392                LCA   LDGAAA,0&X2       * LOAD DATA @00128@ IN STACK           7  2957  L 66M 0!0           36  8664     000+2
+  393                A     0&X2,15995&X2     * ADD STACK TO STACK AT -5             7  2964  A 0!0 IRE           36   000+2 15995+2
+  394         * POP (5)
+  395                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  2971  # 78K 094           36  8782     094
+  396         * PUSH (@008@:3)
+  397                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  2978  # 76N 094           37  8765     094
+1                                                                                                         PAGE    7
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  398                LCA   LIGAAA,0&X2       * LOAD DATA @008@ IN STACK             7  2985  L 71Q 0!0           37  8718     000+2
+  399                MA    X3,0&X2           * ADD X3 TO STACK                      7  2992  # 099 0!0           37   099     000+2
+  400         * ASSIGNMENT (A2 = ((((A * A) / 32) - (4 * A)) + 128))
+  401         * POP (X1:3)
+  402                LCA   0&X2,X1           * LOAD STACK IN X1                     7  2999  L 0!0 089           37   000+2   089
+  403                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  3006  # 66Q 094           37  8668     094
+  404         * POP (0+X1:5)
+  405                LCA   0&X2,0&X1         * LOAD STACK IN 0&X1                   7  3013  L 0!0 0'0           38   000+2   000+1
+  406                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  3020  # 78K 094           38  8782     094
+  407         * END ASSIGNMENT (A2 = ((((A * A) / 32) - (4 * A)) + 128))
+  408         * ADDITION ((((B * B) / 32) - (2 * B)) + 32)
+  409         * SUBTRACT (((B * B) / 32) - (2 * B))
+  410         * DIVIDE ((B * B) / 32)
+  411         * CONSTANT (32 : @00032@)
+  412         * PUSH (@00032@:5)
+  413                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  3027  # 76Q 094           38  8768     094
+  414                LCA   LFGAAA,0&X2       * LOAD DATA @00032@ IN STACK           7  3034  L 77R 0!0           38  8779     000+2
+  415         * MULTIPLY (B * B)
+  416         * PARAMETER VARIABLE (B : 15992+X3)
+  417         * PUSH (15992+X3:5)
+  418                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  3041  # 76Q 094           38  8768     094
+  419                LCA   15992&X3,0&X2     * LOAD MEMORY 15992&X3 IN STACK        7  3048  L IIB 0!0           39 15992+3   000+2
+  420         * PARAMETER VARIABLE (B : 15992+X3)
+  421         * PUSH (15992+X3:5)
+  422                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  3055  # 76Q 094           39  8768     094
+  423                LCA   15992&X3,0&X2     * LOAD MEMORY 15992&X3 IN STACK        7  3062  L IIB 0!0           39 15992+3   000+2
+  424                M     15995&X2,6&X2     * MULTIPLY STACK AT -5 TO STACK AT     7  3069  @ IRE 0!6           39 15995+2   006+2
+  425                SW    2&X2              * SET WM IN STACK AT 2                 4  3076  , 0!2               39   002+2
+  426                LCA   6&X2,15995&X2     * LOAD STACK AT 6 TO STACK AT -5       7  3080  L 0!6 IRE           39   006+2 15995+2
+  427         * POP (5)
+  428                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  3087  # 78K 094           40  8782     094
+  429                B     SNPDIV            * JUMP TO SNIPPET SNIP_DIV             4  3094  B 10M               40  8104
+  430                MCW   0&X2,15995&X2     * MOVE STACK IN STACK AT -5            7  3098  M 0!0 IRE           40   000+2 15995+2
+  431         * POP (5)
+  432                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  3105  # 78K 094           40  8782     094
+  433         * MULTIPLY (2 * B)
+  434         * CONSTANT (2 : @00002@)
+  435         * PUSH (@00002@:5)
+  436                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  3112  # 76Q 094           40  8768     094
+  437                LCA   LKGAAA,0&X2       * LOAD DATA @00002@ IN STACK           7  3119  L 70J 0!0           40  8701     000+2
+  438         * PARAMETER VARIABLE (B : 15992+X3)
+  439         * PUSH (15992+X3:5)
+  440                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  3126  # 76Q 094           41  8768     094
+  441                LCA   15992&X3,0&X2     * LOAD MEMORY 15992&X3 IN STACK        7  3133  L IIB 0!0           41 15992+3   000+2
+  442                M     15995&X2,6&X2     * MULTIPLY STACK AT -5 TO STACK AT     7  3140  @ IRE 0!6           41 15995+2   006+2
+  443                SW    2&X2              * SET WM IN STACK AT 2                 4  3147  , 0!2               41   002+2
+  444                LCA   6&X2,15995&X2     * LOAD STACK AT 6 TO STACK AT -5       7  3151  L 0!6 IRE           41   006+2 15995+2
+  445         * POP (5)
+  446                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  3158  # 78K 094           41  8782     094
+  447                S     0&X2,15995&X2     * SUBTRACT STACK TO STACK AT -5        7  3165  S 0!0 IRE           42   000+2 15995+2
+1                                                                                                         PAGE    8
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  448         * POP (5)
+  449                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  3172  # 78K 094           42  8782     094
+  450         * CONSTANT (32 : @00032@)
+  451         * PUSH (@00032@:5)
+  452                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  3179  # 76Q 094           42  8768     094
+  453                LCA   LFGAAA,0&X2       * LOAD DATA @00032@ IN STACK           7  3186  L 77R 0!0           42  8779     000+2
+  454                A     0&X2,15995&X2     * ADD STACK TO STACK AT -5             7  3193  A 0!0 IRE           42   000+2 15995+2
+  455         * POP (5)
+  456                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  3200  # 78K 094           43  8782     094
+  457         * PUSH (@013@:3)
+  458                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  3207  # 76N 094           43  8765     094
+  459                LCA   LLGAAA,0&X2       * LOAD DATA @013@ IN STACK             7  3214  L 73L 0!0           43  8733     000+2
+  460                MA    X3,0&X2           * ADD X3 TO STACK                      7  3221  # 099 0!0           43   099     000+2
+  461         * ASSIGNMENT (B2 = ((((B * B) / 32) - (2 * B)) + 32))
+  462         * POP (X1:3)
+  463                LCA   0&X2,X1           * LOAD STACK IN X1                     7  3228  L 0!0 089           43   000+2   089
+  464                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  3235  # 66Q 094           44  8668     094
+  465         * POP (0+X1:5)
+  466                LCA   0&X2,0&X1         * LOAD STACK IN 0&X1                   7  3242  L 0!0 0'0           44   000+2   000+1
+  467                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  3249  # 78K 094           44  8782     094
+  468         * END ASSIGNMENT (B2 = ((((B * B) / 32) - (2 * B)) + 32))
+  469         * ADDITION (((((A * B) / 32) - (2 * B)) - A) + 64)
+  470         * SUBTRACT ((((A * B) / 32) - (2 * B)) - A)
+  471         * SUBTRACT (((A * B) / 32) - (2 * B))
+  472         * DIVIDE ((A * B) / 32)
+  473         * CONSTANT (32 : @00032@)
+  474         * PUSH (@00032@:5)
+  475                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  3256  # 76Q 094           44  8768     094
+  476                LCA   LFGAAA,0&X2       * LOAD DATA @00032@ IN STACK           7  3263  L 77R 0!0           44  8779     000+2
+  477         * MULTIPLY (A * B)
+  478         * PARAMETER VARIABLE (A : 15997+X3)
+  479         * PUSH (15997+X3:5)
+  480                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  3270  # 76Q 094           45  8768     094
+  481                LCA   15997&X3,0&X2     * LOAD MEMORY 15997&X3 IN STACK        7  3277  L IIG 0!0           45 15997+3   000+2
+  482         * PARAMETER VARIABLE (B : 15992+X3)
+  483         * PUSH (15992+X3:5)
+  484                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  3284  # 76Q 094           45  8768     094
+  485                LCA   15992&X3,0&X2     * LOAD MEMORY 15992&X3 IN STACK        7  3291  L IIB 0!0           45 15992+3   000+2
+  486                M     15995&X2,6&X2     * MULTIPLY STACK AT -5 TO STACK AT     7  3298  @ IRE 0!6           45 15995+2   006+2
+  487                SW    2&X2              * SET WM IN STACK AT 2                 4  3305  , 0!2               45   002+2
+  488                LCA   6&X2,15995&X2     * LOAD STACK AT 6 TO STACK AT -5       7  3309  L 0!6 IRE           46   006+2 15995+2
+  489         * POP (5)
+  490                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  3316  # 78K 094           46  8782     094
+  491                B     SNPDIV            * JUMP TO SNIPPET SNIP_DIV             4  3323  B 10M               46  8104
+  492                MCW   0&X2,15995&X2     * MOVE STACK IN STACK AT -5            7  3327  M 0!0 IRE           46   000+2 15995+2
+  493         * POP (5)
+  494                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  3334  # 78K 094           46  8782     094
+  495         * MULTIPLY (2 * B)
+  496         * CONSTANT (2 : @00002@)
+  497         * PUSH (@00002@:5)
+1                                                                                                         PAGE    9
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  498                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  3341  # 76Q 094           46  8768     094
+  499                LCA   LKGAAA,0&X2       * LOAD DATA @00002@ IN STACK           7  3348  L 70J 0!0           47  8701     000+2
+  500         * PARAMETER VARIABLE (B : 15992+X3)
+  501         * PUSH (15992+X3:5)
+  502                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  3355  # 76Q 094           47  8768     094
+  503                LCA   15992&X3,0&X2     * LOAD MEMORY 15992&X3 IN STACK        7  3362  L IIB 0!0           47 15992+3   000+2
+  504                M     15995&X2,6&X2     * MULTIPLY STACK AT -5 TO STACK AT     7  3369  @ IRE 0!6           47 15995+2   006+2
+  505                SW    2&X2              * SET WM IN STACK AT 2                 4  3376  , 0!2               47   002+2
+  506                LCA   6&X2,15995&X2     * LOAD STACK AT 6 TO STACK AT -5       7  3380  L 0!6 IRE           47   006+2 15995+2
+  507         * POP (5)
+  508                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  3387  # 78K 094           48  8782     094
+  509                S     0&X2,15995&X2     * SUBTRACT STACK TO STACK AT -5        7  3394  S 0!0 IRE           48   000+2 15995+2
+  510         * POP (5)
+  511                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  3401  # 78K 094           48  8782     094
+  512         * PARAMETER VARIABLE (A : 15997+X3)
+  513         * PUSH (15997+X3:5)
+  514                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  3408  # 76Q 094           48  8768     094
+  515                LCA   15997&X3,0&X2     * LOAD MEMORY 15997&X3 IN STACK        7  3415  L IIG 0!0           48 15997+3   000+2
+  516                S     0&X2,15995&X2     * SUBTRACT STACK TO STACK AT -5        7  3422  S 0!0 IRE           49   000+2 15995+2
+  517         * POP (5)
+  518                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  3429  # 78K 094           49  8782     094
+  519         * CONSTANT (64 : @00064@)
+  520         * PUSH (@00064@:5)
+  521                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  3436  # 76Q 094           49  8768     094
+  522                LCA   LEGAAA,0&X2       * LOAD DATA @00064@ IN STACK           7  3443  L 73! 0!0           49  8730     000+2
+  523                A     0&X2,15995&X2     * ADD STACK TO STACK AT -5             7  3450  A 0!0 IRE           49   000+2 15995+2
+  524         * POP (5)
+  525                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  3457  # 78K 094           50  8782     094
+  526         * PUSH (@018@:3)
+  527                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  3464  # 76N 094           50  8765     094
+  528                LCA   LMGAAA,0&X2       * LOAD DATA @018@ IN STACK             7  3471  L 75O 0!0           50  8756     000+2
+  529                MA    X3,0&X2           * ADD X3 TO STACK                      7  3478  # 099 0!0           50   099     000+2
+  530         * ASSIGNMENT (AB = (((((A * B) / 32) - (2 * B)) - A) + 64))
+  531         * POP (X1:3)
+  532                LCA   0&X2,X1           * LOAD STACK IN X1                     7  3485  L 0!0 089           50   000+2   089
+  533                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  3492  # 66Q 094           51  8668     094
+  534         * POP (0+X1:5)
+  535                LCA   0&X2,0&X1         * LOAD STACK IN 0&X1                   7  3499  L 0!0 0'0           51   000+2   000+1
+  536                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  3506  # 78K 094           51  8782     094
+  537         * END ASSIGNMENT (AB = (((((A * B) / 32) - (2 * B)) - A) + 64))
+  538         * ADDITION ((A2 - B2) + ZA)
+  539         * SUBTRACT (A2 - B2)
+  540         * LOCAL VARIABLE (A2 : 8+X3)
+  541         * PUSH (8+X3:5)
+  542                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  3513  # 76Q 094           51  8768     094
+  543                LCA   8&X3,0&X2         * LOAD MEMORY 8&X3 IN STACK            7  3520  L 0?8 0!0           51   008+3   000+2
+  544         * LOCAL VARIABLE (B2 : 13+X3)
+  545         * PUSH (13+X3:5)
+  546                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  3527  # 76Q 094           52  8768     094
+  547                LCA   13&X3,0&X2        * LOAD MEMORY 13&X3 IN STACK           7  3534  L 0A3 0!0           52   013+3   000+2
+1                                                                                                         PAGE   10
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  548                S     0&X2,15995&X2     * SUBTRACT STACK TO STACK AT -5        7  3541  S 0!0 IRE           52   000+2 15995+2
+  549         * POP (5)
+  550                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  3548  # 78K 094           52  8782     094
+  551         * STATIC VARIABLE (ZA : 2035)
+  552         * PUSH (2035:5)
+  553                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  3555  # 76Q 094           52  8768     094
+  554                LCA   2035,0&X2         * LOAD MEMORY 2035 IN STACK            7  3562  L !35 0!0           53  2035     000+2
+  555                A     0&X2,15995&X2     * ADD STACK TO STACK AT -5             7  3569  A 0!0 IRE           53   000+2 15995+2
+  556         * POP (5)
+  557                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  3576  # 78K 094           53  8782     094
+  558         * PUSH (@023@:3)
+  559                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  3583  # 76N 094           53  8765     094
+  560                LCA   LNGAAA,0&X2       * LOAD DATA @023@ IN STACK             7  3590  L 72K 0!0           53  8722     000+2
+  561                MA    X3,0&X2           * ADD X3 TO STACK                      7  3597  # 099 0!0           54   099     000+2
+  562         * ASSIGNMENT (NEW_A = ((A2 - B2) + ZA))
+  563         * POP (X1:3)
+  564                LCA   0&X2,X1           * LOAD STACK IN X1                     7  3604  L 0!0 089           54   000+2   089
+  565                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  3611  # 66Q 094           54  8668     094
+  566         * POP (0+X1:5)
+  567                LCA   0&X2,0&X1         * LOAD STACK IN 0&X1                   7  3618  L 0!0 0'0           54   000+2   000+1
+  568                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  3625  # 78K 094           54  8782     094
+  569         * END ASSIGNMENT (NEW_A = ((A2 - B2) + ZA))
+  570         * ADDITION ((2 * AB) + ZB)
+  571         * MULTIPLY (2 * AB)
+  572         * CONSTANT (2 : @00002@)
+  573         * PUSH (@00002@:5)
+  574                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  3632  # 76Q 094           55  8768     094
+  575                LCA   LKGAAA,0&X2       * LOAD DATA @00002@ IN STACK           7  3639  L 70J 0!0           55  8701     000+2
+  576         * LOCAL VARIABLE (AB : 18+X3)
+  577         * PUSH (18+X3:5)
+  578                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  3646  # 76Q 094           55  8768     094
+  579                LCA   18&X3,0&X2        * LOAD MEMORY 18&X3 IN STACK           7  3653  L 0A8 0!0           55   018+3   000+2
+  580                M     15995&X2,6&X2     * MULTIPLY STACK AT -5 TO STACK AT     7  3660  @ IRE 0!6           55 15995+2   006+2
+  581                SW    2&X2              * SET WM IN STACK AT 2                 4  3667  , 0!2               55   002+2
+  582                LCA   6&X2,15995&X2     * LOAD STACK AT 6 TO STACK AT -5       7  3671  L 0!6 IRE           56   006+2 15995+2
+  583         * POP (5)
+  584                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  3678  # 78K 094           56  8782     094
+  585         * STATIC VARIABLE (ZB : 2040)
+  586         * PUSH (2040:5)
+  587                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  3685  # 76Q 094           56  8768     094
+  588                LCA   2040,0&X2         * LOAD MEMORY 2040 IN STACK            7  3692  L !40 0!0           56  2040     000+2
+  589                A     0&X2,15995&X2     * ADD STACK TO STACK AT -5             7  3699  A 0!0 IRE           56   000+2 15995+2
+  590         * POP (5)
+  591                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  3706  # 78K 094           57  8782     094
+  592         * PUSH (@028@:3)
+  593                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  3713  # 76N 094           57  8765     094
+  594                LCA   LYFAAA,0&X2       * LOAD DATA @028@ IN STACK             7  3720  L 79L 0!0           57  8793     000+2
+  595                MA    X3,0&X2           * ADD X3 TO STACK                      7  3727  # 099 0!0           57   099     000+2
+  596         * ASSIGNMENT (NEW_B = ((2 * AB) + ZB))
+  597         * POP (X1:3)
+1                                                                                                         PAGE   11
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  598                LCA   0&X2,X1           * LOAD STACK IN X1                     7  3734  L 0!0 089           57   000+2   089
+  599                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  3741  # 66Q 094           58  8668     094
+  600         * POP (0+X1:5)
+  601                LCA   0&X2,0&X1         * LOAD STACK IN 0&X1                   7  3748  L 0!0 0'0           58   000+2   000+1
+  602                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  3755  # 78K 094           58  8782     094
+  603         * END ASSIGNMENT (NEW_B = ((2 * AB) + ZB))
+  604         * PUT ON STACK RETURN VALUE (ESCAPE(NEW_A, NEW_B, (TIMEOUT - 1)))
+  605         * FUNCTION CALL ESCAPE(NEW_A, NEW_B, (TIMEOUT - 1))
+  606         * PUSH (5)
+  607                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  3762  # 76Q 094           58  8768     094
+  608         * SUBTRACT (TIMEOUT - 1)
+  609         * PARAMETER VARIABLE (TIMEOUT : 15987+X3)
+  610         * PUSH (15987+X3:5)
+  611                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  3769  # 76Q 094           58  8768     094
+  612                LCA   15987&X3,0&X2     * LOAD MEMORY 15987&X3 IN STACK        7  3776  L IHG 0!0           59 15987+3   000+2
+  613         * CONSTANT (1 : @00001@)
+  614         * PUSH (@00001@:5)
+  615                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  3783  # 76Q 094           59  8768     094
+  616                LCA   LCGAAA,0&X2       * LOAD DATA @00001@ IN STACK           7  3790  L 75L 0!0           59  8753     000+2
+  617                S     0&X2,15995&X2     * SUBTRACT STACK TO STACK AT -5        7  3797  S 0!0 IRE           59   000+2 15995+2
+  618         * POP (5)
+  619                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  3804  # 78K 094           59  8782     094
+  620         * LOCAL VARIABLE (NEW_B : 28+X3)
+  621         * PUSH (28+X3:5)
+  622                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  3811  # 76Q 094           60  8768     094
+  623                LCA   28&X3,0&X2        * LOAD MEMORY 28&X3 IN STACK           7  3818  L 0B8 0!0           60   028+3   000+2
+  624         * LOCAL VARIABLE (NEW_A : 23+X3)
+  625         * PUSH (23+X3:5)
+  626                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  3825  # 76Q 094           60  8768     094
+  627                LCA   23&X3,0&X2        * LOAD MEMORY 23&X3 IN STACK           7  3832  L 0B3 0!0           60   023+3   000+2
+  628         * CREATE A STACK FRAME WITH X3 POINTER TO IT
+  629         * PUSH (X3:3)
+  630                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  3839  # 76N 094           60  8765     094
+  631                LCA   X3,0&X2           * LOAD X3 IN STACK                     7  3846  L 099 0!0           61   099     000+2
+  632                MCW   X2,X3             * MOVE X2 IN X3                        7  3853  M 094 099           61   094     099
+  633                B     LSDAAA            * JUMP TO FUNCTION ESCAPE              4  3860  B !60               61  2060
+  634         * POP (X3:3)
+  635                LCA   0&X2,X3           * LOAD STACK IN X3                     7  3864  L 0!0 099           61   000+2   099
+  636                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  3871  # 66Q 094           61  8668     094
+  637         * POP (5)
+  638                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  3878  # 78K 094           61  8782     094
+  639         * POP (5)
+  640                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  3885  # 78K 094           62  8782     094
+  641         * POP (5)
+  642                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  3892  # 78K 094           62  8782     094
+  643         * END FUNCTION CALL ESCAPE(NEW_A, NEW_B, (TIMEOUT - 1))
+  644         * POP (15982+X3:5)
+  645                LCA   0&X2,15982&X3     * LOAD STACK IN 15982&X3               7  3899  L 0!0 IHB           62   000+2 15982+3
+  646                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  3906  # 78K 094           62  8782     094
+  647         * POP (28)
+1                                                                                                         PAGE   12
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  648         LTDAAA MA    LOGAAA,X2         * ADD -28 TO STACK POINTER             7  3913  # 77J 094           62  8771     094
+  649         * END [BLOCK ENDING AT LTDAAA]
+  650         ***************************************
+  651                LCA   3&X3,X1           * LOAD RETURN ADDRESS IN X1            7  3920  L 0?3 089           63   003+3   089
+  652                B     0&X1              * JUMP BACK TO CALLER IN X1            4  3927  B 0'0               63   000+1
+  653         ***************************************************************************
+  654         * END FUNCTION : ESCAPE
+  655         ***************************************************************************
+  656         ***************************************************************************
+  657         * FUNCTION : GENRAND
+  658         ***************************************************************************
+  659         LBAAAA SBR   3&X3              * SAVE RETURN ADDRESS IN REGISTER      4  3931  H 0?3               63   003+3
+  660         * SET THE RIGHT WM AND CLEAR THE WRONG ONES
+  661                SW    1&X3              * SET WM AT 1&X3                       4  3935  , 0?1               63   001+3
+  662                CW    2&X3              * CLEAR WM AT 2&X3                     4  3939  ) 0?2               63   002+3
+  663                CW    3&X3              * CLEAR WM AT 3&X3                     4  3943  ) 0?3               63   003+3
+  664         ***************************************
+  665         * BEGIN [BLOCK ENDING AT LCAAAA]
+  666         * PUSH (3)
+  667                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  3947  # 76N 094           63  8765     094
+  668         * MODULO (%) (((42 * SEED) + 19) % 100000)
+  669         * CONSTANT (100000 : @100000@)
+  670         * PUSH (@100000@:5)
+  671                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  3954  # 76Q 094           64  8768     094
+  672                LCA   LPGAAA,0&X2       * LOAD DATA @100000@ IN STACK          7  3961  L 67R 0!0           64  8679     000+2
+  673         * ADDITION ((42 * SEED) + 19)
+  674         * MULTIPLY (42 * SEED)
+  675         * CONSTANT (42 : @00042@)
+  676         * PUSH (@00042@:5)
+  677                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  3968  # 76Q 094           64  8768     094
+  678                LCA   LQGAAA,0&X2       * LOAD DATA @00042@ IN STACK           7  3975  L 68M 0!0           64  8684     000+2
+  679         * STATIC VARIABLE (SEED : 2004)
+  680         * PUSH (2004:5)
+  681                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  3982  # 76Q 094           64  8768     094
+  682                LCA   2004,0&X2         * LOAD MEMORY 2004 IN STACK            7  3989  L !04 0!0           65  2004     000+2
+  683                M     15995&X2,6&X2     * MULTIPLY STACK AT -5 TO STACK AT     7  3996  @ IRE 0!6           65 15995+2   006+2
+  684                SW    2&X2              * SET WM IN STACK AT 2                 4  4003  , 0!2               65   002+2
+  685                LCA   6&X2,15995&X2     * LOAD STACK AT 6 TO STACK AT -5       7  4007  L 0!6 IRE           65   006+2 15995+2
+  686         * POP (5)
+  687                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  4014  # 78K 094           65  8782     094
+  688         * CONSTANT (19 : @00019@)
+  689         * PUSH (@00019@:5)
+  690                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  4021  # 76Q 094           65  8768     094
+  691                LCA   LRGAAA,0&X2       * LOAD DATA @00019@ IN STACK           7  4028  L 78P 0!0           66  8787     000+2
+  692                A     0&X2,15995&X2     * ADD STACK TO STACK AT -5             7  4035  A 0!0 IRE           66   000+2 15995+2
+  693         * POP (5)
+  694                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  4042  # 78K 094           66  8782     094
+  695                B     SNPDIV            * JUMP TO SNIPPET SNIP_DIV             4  4049  B 10M               66  8104
+  696         * POP (5)
+  697                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  4053  # 78K 094           66  8782     094
+1                                                                                                         PAGE   13
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  698         * PUSH (@!04@:3)
+  699                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  4060  # 76N 094           66  8765     094
+  700                LCA   LSGAAA,0&X2       * LOAD DATA @!04@ IN STACK             7  4067  L 79! 0!0           67  8790     000+2
+  701         * ASSIGNMENT (SEED = (((42 * SEED) + 19) % 100000))
+  702         * POP (X1:3)
+  703                LCA   0&X2,X1           * LOAD STACK IN X1                     7  4074  L 0!0 089           67   000+2   089
+  704                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  4081  # 66Q 094           67  8668     094
+  705         * POP (0+X1:5)
+  706                LCA   0&X2,0&X1         * LOAD STACK IN 0&X1                   7  4088  L 0!0 0'0           67   000+2   000+1
+  707                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  4095  # 78K 094           67  8782     094
+  708         * END ASSIGNMENT (SEED = (((42 * SEED) + 19) % 100000))
+  709         * PUT ON STACK RETURN VALUE (SEED)
+  710         * STATIC VARIABLE (SEED : 2004)
+  711         * PUSH (2004:5)
+  712                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  4102  # 76Q 094           68  8768     094
+  713                LCA   2004,0&X2         * LOAD MEMORY 2004 IN STACK            7  4109  L !04 0!0           68  2004     000+2
+  714         * POP (15997+X3:5)
+  715                LCA   0&X2,15997&X3     * LOAD STACK IN 15997&X3               7  4116  L 0!0 IIG           68   000+2 15997+3
+  716                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  4123  # 78K 094           68  8782     094
+  717         * POP (3)
+  718         LCAAAA MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  4130  # 66Q 094           68  8668     094
+  719         * END [BLOCK ENDING AT LCAAAA]
+  720         ***************************************
+  721                LCA   3&X3,X1           * LOAD RETURN ADDRESS IN X1            7  4137  L 0?3 089           69   003+3   089
+  722                B     0&X1              * JUMP BACK TO CALLER IN X1            4  4144  B 0'0               69   000+1
+  723         ***************************************************************************
+  724         * END FUNCTION : GENRAND
+  725         ***************************************************************************
+  726         ***************************************************************************
+  727         * FUNCTION : ITOA
+  728         ***************************************************************************
+  729         LYAAAA SBR   3&X3              * SAVE RETURN ADDRESS IN REGISTER      4  4148  H 0?3               69   003+3
+  730         * SET THE RIGHT WM AND CLEAR THE WRONG ONES
+  731                SW    1&X3              * SET WM AT 1&X3                       4  4152  , 0?1               69   001+3
+  732                CW    2&X3              * CLEAR WM AT 2&X3                     4  4156  ) 0?2               69   002+3
+  733                CW    3&X3              * CLEAR WM AT 3&X3                     4  4160  ) 0?3               69   003+3
+  734         ***************************************
+  735         * BEGIN [BLOCK ENDING AT LZAAAA]
+  736                LCA   LTGAAA,9&X3       * LOAD *CHAR 2005 INTO MEMORY 9&X3     7  4164  L 73O 0?9           69  8736     009+3
+  737                LCA   LCGAAA,14&X3      * LOAD INT 1 INTO MEMORY 14&X3         7  4171  L 75L 0A4           70  8753     014+3
+  738         * PUSH (14)
+  739                MA    LUGAAA,X2         * ADD 14 TO STACK POINTER              7  4178  # 77M 094           70  8774     094
+  740         * PARAMETER VARIABLE (STR : 15992+X3)
+  741         * PUSH (15992+X3:3)
+  742                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  4185  # 76N 094           70  8765     094
+  743                LCA   15992&X3,0&X2     * LOAD MEMORY 15992&X3 IN STACK        7  4192  L IIB 0!0           70 15992+3   000+2
+  744         * PUSH (@006@:3)
+  745                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  4199  # 76N 094           70  8765     094
+  746                LCA   LVGAAA,0&X2       * LOAD DATA @006@ IN STACK             7  4206  L 70R 0!0           71  8709     000+2
+  747                MA    X3,0&X2           * ADD X3 TO STACK                      7  4213  # 099 0!0           71   099     000+2
+1                                                                                                         PAGE   14
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  748         * ASSIGNMENT (START = STR)
+  749         * POP (X1:3)
+  750                LCA   0&X2,X1           * LOAD STACK IN X1                     7  4220  L 0!0 089           71   000+2   089
+  751                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  4227  # 66Q 094           71  8668     094
+  752         * POP (0+X1:3)
+  753                LCA   0&X2,0&X1         * LOAD STACK IN 0&X1                   7  4234  L 0!0 0'0           71   000+2   000+1
+  754                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  4241  # 66Q 094           72  8668     094
+  755         * END ASSIGNMENT (START = STR)
+  756         * IF [IF ((VALUE < 0) THEN [BLOCK ENDING AT LABAAA] ELSE [IF ((VALUE == 0)
+  757         * LESS (VALUE < 0)
+  758         * PARAMETER VARIABLE (VALUE : 15997+X3)
+  759         * PUSH (15997+X3:5)
+  760                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  4248  # 76Q 094           72  8768     094
+  761                LCA   15997&X3,0&X2     * LOAD MEMORY 15997&X3 IN STACK        7  4255  L IIG 0!0           72 15997+3   000+2
+  762                B     CLNNMN            * JUMP TO SNIPPET CLEAN_NUMBER         4  4262  B 07L               72  8073
+  763         * CONSTANT (0 : @00000@)
+  764         * PUSH (@00000@:5)
+  765                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  4266  # 76Q 094           72  8768     094
+  766                LCA   LAGAAA,0&X2       * LOAD DATA @00000@ IN STACK           7  4273  L 74M 0!0           72  8744     000+2
+  767                B     CLNNMN            * JUMP TO SNIPPET CLEAN_NUMBER         4  4280  B 07L               73  8073
+  768                C     0&X2,15995&X2     * COMPARE STACK TO STACK AT -5         7  4284  C 0!0 IRE           73   000+2 15995+2
+  769         * POP (5)
+  770                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  4291  # 78K 094           73  8782     094
+  771                MCW   LAGAAA,0&X2       * MOVE 0 IN STACK                      7  4298  M 74M 0!0           73  8744     000+2
+  772                BL    LYEAAA            * JUMP IF LESS                         5  4305  B 31U T             73  4314
+  773                B     LZEAAA            * JUMP TO END                          4  4310  B 32/               73  4321
+  774         LYEAAA MCW   LCGAAA,0&X2       * MOVE 1 IN STACK                      7  4314  M 75L 0!0           74  8753     000+2
+  775         LZEAAA MCS   0&X2,0&X2         * CLEAR WM IN STACK                    7  4321  Z 0!0 0!0           74   000+2   000+2
+  776         * POP (5)
+  777                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  4328  # 78K 094           74  8782     094
+  778                BCE   LDBAAA,5&X2,      * JUMP WHEN FALSE                      8  4335  B 51W 0!5           74  4516     005+2
+  779         ***************************************
+  780         * BEGIN [BLOCK ENDING AT LABAAA]
+  781         * CONSTANT ('-' : @-@)
+  782         * PUSH (@-@:1)
+  783                MA    LWGAAA,X2         * ADD 1 TO STACK POINTER               7  4343  # 74P 094           74  8747     094
+  784                LCA   LXGAAA,0&X2       * LOAD DATA @-@ IN STACK               7  4350  L 68N 0!0           75  8685     000+2
+  785         * POSTINCREMENT (STR++)
+  786         * PUSH (@I9B@:3)
+  787                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  4357  # 76N 094           75  8765     094
+  788                LCA   LYGAAA,0&X2       * LOAD DATA @I9B@ IN STACK             7  4364  L 72N 0!0           75  8725     000+2
+  789                MA    X3,0&X2           * ADD X3 TO STACK                      7  4371  # 099 0!0           75   099     000+2
+  790         * POP (X1:3)
+  791                LCA   0&X2,X1           * LOAD STACK IN X1                     7  4378  L 0!0 089           75   000+2   089
+  792                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  4385  # 66Q 094           76  8668     094
+  793         * PUSH (0+X1:3)
+  794                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  4392  # 76N 094           76  8765     094
+  795                LCA   0&X1,0&X2         * LOAD MEMORY 0&X1 IN STACK            7  4399  L 0'0 0!0           76   000+1   000+2
+  796                MA    LWGAAA,0&X1       * POSTINCREMENT POINTER AT X1          7  4406  # 74P 0'0           76  8747     000+1
+  797         * ASSIGNMENT ((*(STR++)) = '-')
+1                                                                                                         PAGE   15
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  798         * POP (X1:3)
+  799                LCA   0&X2,X1           * LOAD STACK IN X1                     7  4413  L 0!0 089           76   000+2   089
+  800                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  4420  # 66Q 094           77  8668     094
+  801         * POP (0+X1:1)
+  802                LCA   0&X2,0&X1         * LOAD STACK IN 0&X1                   7  4427  L 0!0 0'0           77   000+2   000+1
+  803                MA    LZGAAA,X2         * ADD -1 TO STACK POINTER              7  4434  # 68Q 094           77  8688     094
+  804         * END ASSIGNMENT ((*(STR++)) = '-')
+  805         * NEGATE (-VALUE)
+  806         * PARAMETER VARIABLE (VALUE : 15997+X3)
+  807         * PUSH (15997+X3:5)
+  808                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  4441  # 76Q 094           77  8768     094
+  809                LCA   15997&X3,0&X2     * LOAD MEMORY 15997&X3 IN STACK        7  4448  L IIG 0!0           77 15997+3   000+2
+  810                ZS    0&X2                                                     4  4455  ! 0!0               77   000+2
+  811                B     CLNNMN            * JUMP TO SNIPPET CLEAN_NUMBER         4  4459  B 07L               78  8073
+  812         * PUSH (@I9G@:3)
+  813                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  4463  # 76N 094           78  8765     094
+  814                LCA   LJGAAA,0&X2       * LOAD DATA @I9G@ IN STACK             7  4470  L 66Q 0!0           78  8668     000+2
+  815                MA    X3,0&X2           * ADD X3 TO STACK                      7  4477  # 099 0!0           78   099     000+2
+  816         * ASSIGNMENT (VALUE = (-VALUE))
+  817         * POP (X1:3)
+  818                LCA   0&X2,X1           * LOAD STACK IN X1                     7  4484  L 0!0 089           78   000+2   089
+  819                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  4491  # 66Q 094           78  8668     094
+  820         * POP (0+X1:5)
+  821                LCA   0&X2,0&X1         * LOAD STACK IN 0&X1                   7  4498  L 0!0 0'0           79   000+2   000+1
+  822                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  4505  # 78K 094           79  8782     094
+  823         * END ASSIGNMENT (VALUE = (-VALUE))
+  824         * END [BLOCK ENDING AT LABAAA]
+  825         ***************************************
+  826         LABAAA B     LGBAAA            * JUMP WHEN TRUE                       4  4512  B 77W               79  4776
+  827         * IF [IF ((VALUE == 0) THEN [BLOCK ENDING AT LBBAAA]]
+  828         * EQUAL (VALUE == 0)
+  829         * PARAMETER VARIABLE (VALUE : 15997+X3)
+  830         * PUSH (15997+X3:5)
+  831         LDBAAA MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  4516  # 76Q 094           79  8768     094
+  832                LCA   15997&X3,0&X2     * LOAD MEMORY 15997&X3 IN STACK        7  4523  L IIG 0!0           79 15997+3   000+2
+  833                B     CLNNMN            * JUMP TO SNIPPET CLEAN_NUMBER         4  4530  B 07L               79  8073
+  834         * CONSTANT (0 : @00000@)
+  835         * PUSH (@00000@:5)
+  836                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  4534  # 76Q 094           80  8768     094
+  837                LCA   LAGAAA,0&X2       * LOAD DATA @00000@ IN STACK           7  4541  L 74M 0!0           80  8744     000+2
+  838                B     CLNNMN            * JUMP TO SNIPPET CLEAN_NUMBER         4  4548  B 07L               80  8073
+  839                C     0&X2,15995&X2     * COMPARE STACK TO STACK AT -5         7  4552  C 0!0 IRE           80   000+2 15995+2
+  840         * POP (5)
+  841                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  4559  # 78K 094           80  8782     094
+  842         * POP (5)
+  843                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  4566  # 78K 094           80  8782     094
+  844         * PUSH (@00000@:5)
+  845                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  4573  # 76Q 094           81  8768     094
+  846                LCA   LAGAAA,0&X2       * LOAD DATA @00000@ IN STACK           7  4580  L 74M 0!0           81  8744     000+2
+  847                BE    LAFAAA            * JUMP IF EQUAL                        5  4587  B 59W S             81  4596
+1                                                                                                         PAGE   16
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  848                B     LBFAAA            * JUMP TO END                          4  4592  B 60T               81  4603
+  849         LAFAAA MCW   LCGAAA,0&X2       * MOVE 1 IN STACK                      7  4596  M 75L 0!0           81  8753     000+2
+  850         LBFAAA MCS   0&X2,0&X2         * CLEAR WM IN STACK                    7  4603  Z 0!0 0!0           81   000+2   000+2
+  851         * POP (5)
+  852                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  4610  # 78K 094           82  8782     094
+  853                BCE   LGBAAA,5&X2,      * JUMP WHEN FALSE                      8  4617  B 77W 0!5           82  4776     005+2
+  854         ***************************************
+  855         * BEGIN [BLOCK ENDING AT LBBAAA]
+  856         * CONSTANT ('0' : @0@)
+  857         * PUSH (@0@:1)
+  858                MA    LWGAAA,X2         * ADD 1 TO STACK POINTER               7  4625  # 74P 094           82  8747     094
+  859                LCA   LAHAAA,0&X2       * LOAD DATA @0@ IN STACK               7  4632  L 71R 0!0           82  8719     000+2
+  860         * SUBSCRIPT (STR[0])
+  861         * PARAMETER VARIABLE (STR : 15992+X3)
+  862         * PUSH (15992+X3:3)
+  863                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  4639  # 76N 094           82  8765     094
+  864                LCA   15992&X3,0&X2     * LOAD MEMORY 15992&X3 IN STACK        7  4646  L IIB 0!0           83 15992+3   000+2
+  865         * END SUBSCRIPT (STR[0])
+  866         * ASSIGNMENT ((STR[0]) = '0')
+  867         * POP (X1:3)
+  868                LCA   0&X2,X1           * LOAD STACK IN X1                     7  4653  L 0!0 089           83   000+2   089
+  869                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  4660  # 66Q 094           83  8668     094
+  870         * POP (0+X1:1)
+  871                LCA   0&X2,0&X1         * LOAD STACK IN 0&X1                   7  4667  L 0!0 0'0           83   000+2   000+1
+  872                MA    LZGAAA,X2         * ADD -1 TO STACK POINTER              7  4674  # 68Q 094           83  8688     094
+  873         * END ASSIGNMENT ((STR[0]) = '0')
+  874         * CONSTANT ('\0' : EOS)
+  875         * PUSH (EOS:1)
+  876                MA    LWGAAA,X2         * ADD 1 TO STACK POINTER               7  4681  # 74P 094           84  8747     094
+  877                LCA   EOS,0&X2          * LOAD MEMORY EOS IN STACK             7  4688  L 345 0!0           84   345     000+2
+  878         * SUBSCRIPT (STR[1])
+  879         * PARAMETER VARIABLE (STR : 15992+X3)
+  880         * PUSH (15992+X3:3)
+  881                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  4695  # 76N 094           84  8765     094
+  882                LCA   15992&X3,0&X2     * LOAD MEMORY 15992&X3 IN STACK        7  4702  L IIB 0!0           84 15992+3   000+2
+  883                A     LCGAAA,0&X2       * ADD OFFSET 1 TO POINT ELEMENT 1      7  4709  A 75L 0!0           84  8753     000+2
+  884         * END SUBSCRIPT (STR[1])
+  885         * ASSIGNMENT ((STR[1]) = '\0')
+  886         * POP (X1:3)
+  887                LCA   0&X2,X1           * LOAD STACK IN X1                     7  4716  L 0!0 089           85   000+2   089
+  888                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  4723  # 66Q 094           85  8668     094
+  889         * POP (0+X1:1)
+  890                LCA   0&X2,0&X1         * LOAD STACK IN 0&X1                   7  4730  L 0!0 0'0           85   000+2   000+1
+  891                MA    LZGAAA,X2         * ADD -1 TO STACK POINTER              7  4737  # 68Q 094           85  8688     094
+  892         * END ASSIGNMENT ((STR[1]) = '\0')
+  893         * RETURN TO LZAAAA WITH RETURN VALUE START
+  894         * PUT ON STACK RETURN VALUE (START)
+  895         * LOCAL VARIABLE (START : 6+X3)
+  896         * PUSH (6+X3:3)
+  897                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  4744  # 76N 094           85  8765     094
+1                                                                                                         PAGE   17
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  898                LCA   6&X3,0&X2         * LOAD MEMORY 6&X3 IN STACK            7  4751  L 0?6 0!0           86   006+3   000+2
+  899         * POP (15984+X3:3)
+  900                LCA   0&X2,15984&X3     * LOAD STACK IN 15984&X3               7  4758  L 0!0 IHD           86   000+2 15984+3
+  901                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  4765  # 66Q 094           86  8668     094
+  902                B     LZAAAA            * JUMP TO END OF FUNCTION BLOCK        4  4772  B V4V               86  5545
+  903         * END [BLOCK ENDING AT LBBAAA]
+  904         ***************************************
+  905         * END IF [IF ((VALUE == 0) THEN [BLOCK ENDING AT LBBAAA]]
+  906         * END IF [IF ((VALUE < 0) THEN [BLOCK ENDING AT LABAAA] ELSE [IF ((VALUE ==
+  907         * WHILE [WHILE ((EXP <= (VALUE / BASE))) [BLOCK ENDING AT LFBAAA] TOP:LGBAA
+  908         * LESSOREQUAL (EXP <= (VALUE / BASE))
+  909         * LOCAL VARIABLE (EXP : 14+X3)
+  910         * PUSH (14+X3:5)
+  911         LGBAAA MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  4776  # 76Q 094           86  8768     094
+  912                LCA   14&X3,0&X2        * LOAD MEMORY 14&X3 IN STACK           7  4783  L 0A4 0!0           86   014+3   000+2
+  913                B     CLNNMN            * JUMP TO SNIPPET CLEAN_NUMBER         4  4790  B 07L               87  8073
+  914         * DIVIDE (VALUE / BASE)
+  915         * PARAMETER VARIABLE (BASE : 15989+X3)
+  916         * PUSH (15989+X3:5)
+  917                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  4794  # 76Q 094           87  8768     094
+  918                LCA   15989&X3,0&X2     * LOAD MEMORY 15989&X3 IN STACK        7  4801  L IHI 0!0           87 15989+3   000+2
+  919         * PARAMETER VARIABLE (VALUE : 15997+X3)
+  920         * PUSH (15997+X3:5)
+  921                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  4808  # 76Q 094           87  8768     094
+  922                LCA   15997&X3,0&X2     * LOAD MEMORY 15997&X3 IN STACK        7  4815  L IIG 0!0           87 15997+3   000+2
+  923                B     SNPDIV            * JUMP TO SNIPPET SNIP_DIV             4  4822  B 10M               87  8104
+  924                MCW   0&X2,15995&X2     * MOVE STACK IN STACK AT -5            7  4826  M 0!0 IRE           88   000+2 15995+2
+  925         * POP (5)
+  926                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  4833  # 78K 094           88  8782     094
+  927                B     CLNNMN            * JUMP TO SNIPPET CLEAN_NUMBER         4  4840  B 07L               88  8073
+  928                C     0&X2,15995&X2     * COMPARE STACK TO STACK AT -5         7  4844  C 0!0 IRE           88   000+2 15995+2
+  929         * POP (5)
+  930                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  4851  # 78K 094           88  8782     094
+  931                MCW   LCGAAA,0&X2       * MOVE 1 IN STACK                      7  4858  M 75L 0!0           88  8753     000+2
+  932                BH    LCFAAA            * JUMP IF LESS OR EQUAL                5  4865  B 87U U             89  4874
+  933                B     LDFAAA            * JUMP TO END                          4  4870  B 88/               89  4881
+  934         LCFAAA MCW   LAGAAA,0&X2       * MOVE 0 IN STACK                      7  4874  M 74M 0!0           89  8744     000+2
+  935         LDFAAA MCS   0&X2,0&X2         * CLEAR WM IN STACK                    7  4881  Z 0!0 0!0           89   000+2   000+2
+  936         * POP (5)
+  937                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  4888  # 78K 094           89  8782     094
+  938                BCE   LJBAAA,5&X2,      * JUMP TO BOTTOM OF WHILE              8  4895  B '0Z 0!5           89  5009     005+2
+  939         ***************************************
+  940         * BEGIN [BLOCK ENDING AT LFBAAA]
+  941         * MULTIPLY (EXP * BASE)
+  942         * LOCAL VARIABLE (EXP : 14+X3)
+  943         * PUSH (14+X3:5)
+  944                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  4903  # 76Q 094           90  8768     094
+  945                LCA   14&X3,0&X2        * LOAD MEMORY 14&X3 IN STACK           7  4910  L 0A4 0!0           90   014+3   000+2
+  946         * PARAMETER VARIABLE (BASE : 15989+X3)
+  947         * PUSH (15989+X3:5)
+1                                                                                                         PAGE   18
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  948                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  4917  # 76Q 094           90  8768     094
+  949                LCA   15989&X3,0&X2     * LOAD MEMORY 15989&X3 IN STACK        7  4924  L IHI 0!0           90 15989+3   000+2
+  950                M     15995&X2,6&X2     * MULTIPLY STACK AT -5 TO STACK AT     7  4931  @ IRE 0!6           90 15995+2   006+2
+  951                SW    2&X2              * SET WM IN STACK AT 2                 4  4938  , 0!2               90   002+2
+  952                LCA   6&X2,15995&X2     * LOAD STACK AT 6 TO STACK AT -5       7  4942  L 0!6 IRE           91   006+2 15995+2
+  953         * POP (5)
+  954                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  4949  # 78K 094           91  8782     094
+  955         * PUSH (@014@:3)
+  956                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  4956  # 76N 094           91  8765     094
+  957                LCA   LUGAAA,0&X2       * LOAD DATA @014@ IN STACK             7  4963  L 77M 0!0           91  8774     000+2
+  958                MA    X3,0&X2           * ADD X3 TO STACK                      7  4970  # 099 0!0           91   099     000+2
+  959         * ASSIGNMENT (EXP = (EXP * BASE))
+  960         * POP (X1:3)
+  961                LCA   0&X2,X1           * LOAD STACK IN X1                     7  4977  L 0!0 089           92   000+2   089
+  962                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  4984  # 66Q 094           92  8668     094
+  963         * POP (0+X1:5)
+  964                LCA   0&X2,0&X1         * LOAD STACK IN 0&X1                   7  4991  L 0!0 0'0           92   000+2   000+1
+  965                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  4998  # 78K 094           92  8782     094
+  966         * END ASSIGNMENT (EXP = (EXP * BASE))
+  967         * END [BLOCK ENDING AT LFBAAA]
+  968         ***************************************
+  969         LFBAAA B     LGBAAA            * JUMP TO TOP OF WHILE                 4  5005  B 77W               92  4776
+  970         * END WHILE [WHILE ((EXP <= (VALUE / BASE))) [BLOCK ENDING AT LFBAAA] TOP:L
+  971         * WHILE [WHILE (EXP) [BLOCK ENDING AT LIBAAA] TOP:LJBAAA BOTTOM:LKBAAA]
+  972         * LOCAL VARIABLE (EXP : 14+X3)
+  973         * PUSH (14+X3:5)
+  974         LJBAAA MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  5009  # 76Q 094           92  8768     094
+  975                LCA   14&X3,0&X2        * LOAD MEMORY 14&X3 IN STACK           7  5016  L 0A4 0!0           93   014+3   000+2
+  976                MCS   0&X2,0&X2         * CLEAR WM IN STACK                    7  5023  Z 0!0 0!0           93   000+2   000+2
+  977         * POP (5)
+  978                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  5030  # 78K 094           93  8782     094
+  979                BCE   LKBAAA,5&X2,      * JUMP TO BOTTOM OF WHILE              8  5037  B U6/ 0!5           93  5461     005+2
+  980         ***************************************
+  981         * BEGIN [BLOCK ENDING AT LIBAAA]
+  982         * SUBSCRIPT (DIGITS[(VALUE / EXP)])
+  983         * LOCAL VARIABLE (DIGITS : 9+X3)
+  984         * PUSH (9+X3:3)
+  985                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  5045  # 76N 094           93  8765     094
+  986                LCA   9&X3,0&X2         * LOAD MEMORY 9&X3 IN STACK            7  5052  L 0?9 0!0           94   009+3   000+2
+  987         * DIVIDE (VALUE / EXP)
+  988         * LOCAL VARIABLE (EXP : 14+X3)
+  989         * PUSH (14+X3:5)
+  990                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  5059  # 76Q 094           94  8768     094
+  991                LCA   14&X3,0&X2        * LOAD MEMORY 14&X3 IN STACK           7  5066  L 0A4 0!0           94   014+3   000+2
+  992         * PARAMETER VARIABLE (VALUE : 15997+X3)
+  993         * PUSH (15997+X3:5)
+  994                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  5073  # 76Q 094           94  8768     094
+  995                LCA   15997&X3,0&X2     * LOAD MEMORY 15997&X3 IN STACK        7  5080  L IIG 0!0           94 15997+3   000+2
+  996                B     SNPDIV            * JUMP TO SNIPPET SNIP_DIV             4  5087  B 10M               94  8104
+  997                MCW   0&X2,15995&X2     * MOVE STACK IN STACK AT -5            7  5091  M 0!0 IRE           95   000+2 15995+2
+1                                                                                                         PAGE   19
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  998         * POP (5)
+  999                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  5098  # 78K 094           95  8782     094
+ 1000         * PUT RAW INDEX ON THE STACK
+ 1001         * PUSH (@00001@:5)
+ 1002                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  5105  # 76Q 094           95  8768     094
+ 1003                LCA   LCGAAA,0&X2       * LOAD DATA @00001@ IN STACK           7  5112  L 75L 0!0           95  8753     000+2
+ 1004                M     15995&X2,6&X2     * MULTIPLY STACK AT -5 TO STACK AT     7  5119  @ IRE 0!6           95 15995+2   006+2
+ 1005                SW    2&X2              * SET WM IN STACK AT 2                 4  5126  , 0!2               95   002+2
+ 1006                LCA   6&X2,15995&X2     * LOAD STACK AT 6 IN STACK AT -5       7  5130  L 0!6 IRE           96   006+2 15995+2
+ 1007         * POP (5)
+ 1008                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  5137  # 78K 094           96  8782     094
+ 1009         * STACK TOP IS NOW ARRAY INDEX
+ 1010                B     NMNPTR            * JUMP TO SNIPPET NUMBER_TO_POINTE     4  5144  B 28!               96  8280
+ 1011                MA    0&X2,15997&X2     * ADD STACK TO STACK AT -3             7  5148  # 0!0 IRG           96   000+2 15997+2
+ 1012         * POP (3)
+ 1013                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  5155  # 66Q 094           96  8668     094
+ 1014         * STACK TOP IS LOCATION IN ARRAY NOW
+ 1015         * END SUBSCRIPT (DIGITS[(VALUE / EXP)])
+ 1016         * POP (X1:3)
+ 1017                LCA   0&X2,X1           * LOAD STACK IN X1                     7  5162  L 0!0 089           96   000+2   089
+ 1018                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  5169  # 66Q 094           97  8668     094
+ 1019         * PUSH (0+X1:1)
+ 1020                MA    LWGAAA,X2         * ADD 1 TO STACK POINTER               7  5176  # 74P 094           97  8747     094
+ 1021                LCA   0&X1,0&X2         * LOAD MEMORY 0&X1 IN STACK            7  5183  L 0'0 0!0           97   000+1   000+2
+ 1022         * POSTINCREMENT (STR++)
+ 1023         * PUSH (@I9B@:3)
+ 1024                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  5190  # 76N 094           97  8765     094
+ 1025                LCA   LYGAAA,0&X2       * LOAD DATA @I9B@ IN STACK             7  5197  L 72N 0!0           97  8725     000+2
+ 1026                MA    X3,0&X2           * ADD X3 TO STACK                      7  5204  # 099 0!0           98   099     000+2
+ 1027         * POP (X1:3)
+ 1028                LCA   0&X2,X1           * LOAD STACK IN X1                     7  5211  L 0!0 089           98   000+2   089
+ 1029                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  5218  # 66Q 094           98  8668     094
+ 1030         * PUSH (0+X1:3)
+ 1031                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  5225  # 76N 094           98  8765     094
+ 1032                LCA   0&X1,0&X2         * LOAD MEMORY 0&X1 IN STACK            7  5232  L 0'0 0!0           98   000+1   000+2
+ 1033                MA    LWGAAA,0&X1       * POSTINCREMENT POINTER AT X1          7  5239  # 74P 0'0           99  8747     000+1
+ 1034         * ASSIGNMENT ((*(STR++)) = (DIGITS[(VALUE / EXP)]))
+ 1035         * POP (X1:3)
+ 1036                LCA   0&X2,X1           * LOAD STACK IN X1                     7  5246  L 0!0 089           99   000+2   089
+ 1037                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  5253  # 66Q 094           99  8668     094
+ 1038         * POP (0+X1:1)
+ 1039                LCA   0&X2,0&X1         * LOAD STACK IN 0&X1                   7  5260  L 0!0 0'0           99   000+2   000+1
+ 1040                MA    LZGAAA,X2         * ADD -1 TO STACK POINTER              7  5267  # 68Q 094           99  8688     094
+ 1041         * END ASSIGNMENT ((*(STR++)) = (DIGITS[(VALUE / EXP)]))
+ 1042         * MODULO (%) (VALUE % EXP)
+ 1043         * LOCAL VARIABLE (EXP : 14+X3)
+ 1044         * PUSH (14+X3:5)
+ 1045                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  5274  # 76Q 094          100  8768     094
+ 1046                LCA   14&X3,0&X2        * LOAD MEMORY 14&X3 IN STACK           7  5281  L 0A4 0!0          100   014+3   000+2
+ 1047         * PARAMETER VARIABLE (VALUE : 15997+X3)
+1                                                                                                         PAGE   20
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+ 1048         * PUSH (15997+X3:5)
+ 1049                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  5288  # 76Q 094          100  8768     094
+ 1050                LCA   15997&X3,0&X2     * LOAD MEMORY 15997&X3 IN STACK        7  5295  L IIG 0!0          100 15997+3   000+2
+ 1051                B     SNPDIV            * JUMP TO SNIPPET SNIP_DIV             4  5302  B 10M              100  8104
+ 1052         * POP (5)
+ 1053                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  5306  # 78K 094          100  8782     094
+ 1054         * PUSH (@I9G@:3)
+ 1055                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  5313  # 76N 094          101  8765     094
+ 1056                LCA   LJGAAA,0&X2       * LOAD DATA @I9G@ IN STACK             7  5320  L 66Q 0!0          101  8668     000+2
+ 1057                MA    X3,0&X2           * ADD X3 TO STACK                      7  5327  # 099 0!0          101   099     000+2
+ 1058         * ASSIGNMENT (VALUE = (VALUE % EXP))
+ 1059         * POP (X1:3)
+ 1060                LCA   0&X2,X1           * LOAD STACK IN X1                     7  5334  L 0!0 089          101   000+2   089
+ 1061                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  5341  # 66Q 094          101  8668     094
+ 1062         * POP (0+X1:5)
+ 1063                LCA   0&X2,0&X1         * LOAD STACK IN 0&X1                   7  5348  L 0!0 0'0          102   000+2   000+1
+ 1064                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  5355  # 78K 094          102  8782     094
+ 1065         * END ASSIGNMENT (VALUE = (VALUE % EXP))
+ 1066         * DIVIDE (EXP / BASE)
+ 1067         * PARAMETER VARIABLE (BASE : 15989+X3)
+ 1068         * PUSH (15989+X3:5)
+ 1069                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  5362  # 76Q 094          102  8768     094
+ 1070                LCA   15989&X3,0&X2     * LOAD MEMORY 15989&X3 IN STACK        7  5369  L IHI 0!0          102 15989+3   000+2
+ 1071         * LOCAL VARIABLE (EXP : 14+X3)
+ 1072         * PUSH (14+X3:5)
+ 1073                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  5376  # 76Q 094          102  8768     094
+ 1074                LCA   14&X3,0&X2        * LOAD MEMORY 14&X3 IN STACK           7  5383  L 0A4 0!0          103   014+3   000+2
+ 1075                B     SNPDIV            * JUMP TO SNIPPET SNIP_DIV             4  5390  B 10M              103  8104
+ 1076                MCW   0&X2,15995&X2     * MOVE STACK IN STACK AT -5            7  5394  M 0!0 IRE          103   000+2 15995+2
+ 1077         * POP (5)
+ 1078                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  5401  # 78K 094          103  8782     094
+ 1079         * PUSH (@014@:3)
+ 1080                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  5408  # 76N 094          103  8765     094
+ 1081                LCA   LUGAAA,0&X2       * LOAD DATA @014@ IN STACK             7  5415  L 77M 0!0          103  8774     000+2
+ 1082                MA    X3,0&X2           * ADD X3 TO STACK                      7  5422  # 099 0!0          104   099     000+2
+ 1083         * ASSIGNMENT (EXP = (EXP / BASE))
+ 1084         * POP (X1:3)
+ 1085                LCA   0&X2,X1           * LOAD STACK IN X1                     7  5429  L 0!0 089          104   000+2   089
+ 1086                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  5436  # 66Q 094          104  8668     094
+ 1087         * POP (0+X1:5)
+ 1088                LCA   0&X2,0&X1         * LOAD STACK IN 0&X1                   7  5443  L 0!0 0'0          104   000+2   000+1
+ 1089                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  5450  # 78K 094          104  8782     094
+ 1090         * END ASSIGNMENT (EXP = (EXP / BASE))
+ 1091         * END [BLOCK ENDING AT LIBAAA]
+ 1092         ***************************************
+ 1093         LIBAAA B     LJBAAA            * JUMP TO TOP OF WHILE                 4  5457  B '0Z              104  5009
+ 1094         * END WHILE [WHILE (EXP) [BLOCK ENDING AT LIBAAA] TOP:LJBAAA BOTTOM:LKBAAA]
+ 1095         * CONSTANT ('\0' : EOS)
+ 1096         * PUSH (EOS:1)
+ 1097         LKBAAA MA    LWGAAA,X2         * ADD 1 TO STACK POINTER               7  5461  # 74P 094          105  8747     094
+1                                                                                                         PAGE   21
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+ 1098                LCA   EOS,0&X2          * LOAD MEMORY EOS IN STACK             7  5468  L 345 0!0          105   345     000+2
+ 1099         * PARAMETER VARIABLE (STR : 15992+X3)
+ 1100         * PUSH (15992+X3:3)
+ 1101                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  5475  # 76N 094          105  8765     094
+ 1102                LCA   15992&X3,0&X2     * LOAD MEMORY 15992&X3 IN STACK        7  5482  L IIB 0!0          105 15992+3   000+2
+ 1103         * ASSIGNMENT ((*STR) = '\0')
+ 1104         * POP (X1:3)
+ 1105                LCA   0&X2,X1           * LOAD STACK IN X1                     7  5489  L 0!0 089          105   000+2   089
+ 1106                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  5496  # 66Q 094          106  8668     094
+ 1107         * POP (0+X1:1)
+ 1108                LCA   0&X2,0&X1         * LOAD STACK IN 0&X1                   7  5503  L 0!0 0'0          106   000+2   000+1
+ 1109                MA    LZGAAA,X2         * ADD -1 TO STACK POINTER              7  5510  # 68Q 094          106  8688     094
+ 1110         * END ASSIGNMENT ((*STR) = '\0')
+ 1111         * PUT ON STACK RETURN VALUE (START)
+ 1112         * LOCAL VARIABLE (START : 6+X3)
+ 1113         * PUSH (6+X3:3)
+ 1114                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  5517  # 76N 094          106  8765     094
+ 1115                LCA   6&X3,0&X2         * LOAD MEMORY 6&X3 IN STACK            7  5524  L 0?6 0!0          106   006+3   000+2
+ 1116         * POP (15984+X3:3)
+ 1117                LCA   0&X2,15984&X3     * LOAD STACK IN 15984&X3               7  5531  L 0!0 IHD          107   000+2 15984+3
+ 1118                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  5538  # 66Q 094          107  8668     094
+ 1119         * POP (14)
+ 1120         LZAAAA MA    LBHAAA,X2         * ADD -14 TO STACK POINTER             7  5545  # 76K 094          107  8762     094
+ 1121         * END [BLOCK ENDING AT LZAAAA]
+ 1122         ***************************************
+ 1123                LCA   3&X3,X1           * LOAD RETURN ADDRESS IN X1            7  5552  L 0?3 089          107   003+3   089
+ 1124                B     0&X1              * JUMP BACK TO CALLER IN X1            4  5559  B 0'0              107   000+1
+ 1125         ***************************************************************************
+ 1126         * END FUNCTION : ITOA
+ 1127         ***************************************************************************
+ 1128         ***************************************************************************
+ 1129         * FUNCTION : MAIN
+ 1130         ***************************************************************************
+ 1131         LYDAAA SBR   3&X3              * SAVE RETURN ADDRESS IN REGISTER      4  5563  H 0?3              107   003+3
+ 1132         * SET THE RIGHT WM AND CLEAR THE WRONG ONES
+ 1133                SW    1&X3              * SET WM AT 1&X3                       4  5567  , 0?1              108   001+3
+ 1134                CW    2&X3              * CLEAR WM AT 2&X3                     4  5571  ) 0?2              108   002+3
+ 1135                CW    3&X3              * CLEAR WM AT 3&X3                     4  5575  ) 0?3              108   003+3
+ 1136         ***************************************
+ 1137         * BEGIN [BLOCK ENDING AT LZDAAA]
+ 1138         * PUSH (3)
+ 1139                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  5579  # 76N 094          108  8765     094
+ 1140         * FOR [FOR ((ZB = 0); (ZB <= 64); (++ZB)) [BLOCK ENDING AT LAEAAA] TOP:LFEA
+ 1141         * CONSTANT (0 : @00000@)
+ 1142         * PUSH (@00000@:5)
+ 1143                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  5586  # 76Q 094          108  8768     094
+ 1144                LCA   LAGAAA,0&X2       * LOAD DATA @00000@ IN STACK           7  5593  L 74M 0!0          108  8744     000+2
+ 1145         * PUSH (@!40@:3)
+ 1146                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  5600  # 76N 094          109  8765     094
+ 1147                LCA   LCHAAA,0&X2       * LOAD DATA @!40@ IN STACK             7  5607  L 69J 0!0          109  8691     000+2
+1                                                                                                         PAGE   22
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+ 1148         * ASSIGNMENT (ZB = 0)
+ 1149         * POP (X1:3)
+ 1150                LCA   0&X2,X1           * LOAD STACK IN X1                     7  5614  L 0!0 089          109   000+2   089
+ 1151                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  5621  # 66Q 094          109  8668     094
+ 1152         * POP (0+X1:5)
+ 1153                LCA   0&X2,0&X1         * LOAD STACK IN 0&X1                   7  5628  L 0!0 0'0          109   000+2   000+1
+ 1154                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  5635  # 78K 094          110  8782     094
+ 1155         * END ASSIGNMENT (ZB = 0)
+ 1156         * LESSOREQUAL (ZB <= 64)
+ 1157         * STATIC VARIABLE (ZB : 2040)
+ 1158         * PUSH (2040:5)
+ 1159         LFEAAA MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  5642  # 76Q 094          110  8768     094
+ 1160                LCA   2040,0&X2         * LOAD MEMORY 2040 IN STACK            7  5649  L !40 0!0          110  2040     000+2
+ 1161                B     CLNNMN            * JUMP TO SNIPPET CLEAN_NUMBER         4  5656  B 07L              110  8073
+ 1162         * CONSTANT (64 : @00064@)
+ 1163         * PUSH (@00064@:5)
+ 1164                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  5660  # 76Q 094          110  8768     094
+ 1165                LCA   LEGAAA,0&X2       * LOAD DATA @00064@ IN STACK           7  5667  L 73! 0!0          110  8730     000+2
+ 1166                B     CLNNMN            * JUMP TO SNIPPET CLEAN_NUMBER         4  5674  B 07L              111  8073
+ 1167                C     0&X2,15995&X2     * COMPARE STACK TO STACK AT -5         7  5678  C 0!0 IRE          111   000+2 15995+2
+ 1168         * POP (5)
+ 1169                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  5685  # 78K 094          111  8782     094
+ 1170                MCW   LCGAAA,0&X2       * MOVE 1 IN STACK                      7  5692  M 75L 0!0          111  8753     000+2
+ 1171                BH    LEFAAA            * JUMP IF LESS OR EQUAL                5  5699  B X0Y U            111  5708
+ 1172                B     LFFAAA            * JUMP TO END                          4  5704  B X1V              111  5715
+ 1173         LEFAAA MCW   LAGAAA,0&X2       * MOVE 0 IN STACK                      7  5708  M 74M 0!0          112  8744     000+2
+ 1174         LFFAAA MCS   0&X2,0&X2         * CLEAR WM IN STACK                    7  5715  Z 0!0 0!0          112   000+2   000+2
+ 1175         * POP (5)
+ 1176                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  5722  # 78K 094          112  8782     094
+ 1177                BCE   LGEAAA,5&X2,      * JUMP TO BOTTOM OF FOR                8  5729  B L3W 0!5          112  6336     005+2
+ 1178         ***************************************
+ 1179         * BEGIN [BLOCK ENDING AT LAEAAA]
+ 1180         * FOR [FOR ((ZA = 0); (ZA <= 128); (++ZA)) [BLOCK ENDING AT LBEAAA] TOP:LCE
+ 1181         * CONSTANT (0 : @00000@)
+ 1182         * PUSH (@00000@:5)
+ 1183                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  5737  # 76Q 094          112  8768     094
+ 1184                LCA   LAGAAA,0&X2       * LOAD DATA @00000@ IN STACK           7  5744  L 74M 0!0          113  8744     000+2
+ 1185         * PUSH (@!35@:3)
+ 1186                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  5751  # 76N 094          113  8765     094
+ 1187                LCA   LDHAAA,0&X2       * LOAD DATA @!35@ IN STACK             7  5758  L 79R 0!0          113  8799     000+2
+ 1188         * ASSIGNMENT (ZA = 0)
+ 1189         * POP (X1:3)
+ 1190                LCA   0&X2,X1           * LOAD STACK IN X1                     7  5765  L 0!0 089          113   000+2   089
+ 1191                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  5772  # 66Q 094          113  8668     094
+ 1192         * POP (0+X1:5)
+ 1193                LCA   0&X2,0&X1         * LOAD STACK IN 0&X1                   7  5779  L 0!0 0'0          114   000+2   000+1
+ 1194                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  5786  # 78K 094          114  8782     094
+ 1195         * END ASSIGNMENT (ZA = 0)
+ 1196         * LESSOREQUAL (ZA <= 128)
+ 1197         * STATIC VARIABLE (ZA : 2035)
+1                                                                                                         PAGE   23
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+ 1198         * PUSH (2035:5)
+ 1199         LCEAAA MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  5793  # 76Q 094          114  8768     094
+ 1200                LCA   2035,0&X2         * LOAD MEMORY 2035 IN STACK            7  5800  L !35 0!0          114  2035     000+2
+ 1201                B     CLNNMN            * JUMP TO SNIPPET CLEAN_NUMBER         4  5807  B 07L              114  8073
+ 1202         * CONSTANT (128 : @00128@)
+ 1203         * PUSH (@00128@:5)
+ 1204                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  5811  # 76Q 094          114  8768     094
+ 1205                LCA   LDGAAA,0&X2       * LOAD DATA @00128@ IN STACK           7  5818  L 66M 0!0          115  8664     000+2
+ 1206                B     CLNNMN            * JUMP TO SNIPPET CLEAN_NUMBER         4  5825  B 07L              115  8073
+ 1207                C     0&X2,15995&X2     * COMPARE STACK TO STACK AT -5         7  5829  C 0!0 IRE          115   000+2 15995+2
+ 1208         * POP (5)
+ 1209                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  5836  # 78K 094          115  8782     094
+ 1210                MCW   LCGAAA,0&X2       * MOVE 1 IN STACK                      7  5843  M 75L 0!0          115  8753     000+2
+ 1211                BH    LGFAAA            * JUMP IF LESS OR EQUAL                5  5850  B Y5Z U            115  5859
+ 1212                B     LHFAAA            * JUMP TO END                          4  5855  B Y6W              116  5866
+ 1213         LGFAAA MCW   LAGAAA,0&X2       * MOVE 0 IN STACK                      7  5859  M 74M 0!0          116  8744     000+2
+ 1214         LHFAAA MCS   0&X2,0&X2         * CLEAR WM IN STACK                    7  5866  Z 0!0 0!0          116   000+2   000+2
+ 1215         * POP (5)
+ 1216                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  5873  # 78K 094          116  8782     094
+ 1217                BCE   LDEAAA,5&X2,      * JUMP TO BOTTOM OF FOR                8  5880  B K2T 0!5          116  6223     005+2
+ 1218         ***************************************
+ 1219         * BEGIN [BLOCK ENDING AT LBEAAA]
+ 1220         * FUNCTION CALL PUTCHAR(((ESCAPE(ZA, ZB, 10) == 0) ? 'X' : ' '))
+ 1221         * PUSH (5)
+ 1222                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  5888  # 76Q 094          117  8768     094
+ 1223         * TERNARY (?:) ((ESCAPE(ZA, ZB, 10) == 0) ? 'X' : ' ')
+ 1224         * EQUAL (ESCAPE(ZA, ZB, 10) == 0)
+ 1225         * FUNCTION CALL ESCAPE(ZA, ZB, 10)
+ 1226         * PUSH (5)
+ 1227                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  5895  # 76Q 094          117  8768     094
+ 1228         * CONSTANT (10 : @00010@)
+ 1229         * PUSH (@00010@:5)
+ 1230                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  5902  # 76Q 094          117  8768     094
+ 1231                LCA   LEHAAA,0&X2       * LOAD DATA @00010@ IN STACK           7  5909  L 70O 0!0          117  8706     000+2
+ 1232         * STATIC VARIABLE (ZB : 2040)
+ 1233         * PUSH (2040:5)
+ 1234                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  5916  # 76Q 094          117  8768     094
+ 1235                LCA   2040,0&X2         * LOAD MEMORY 2040 IN STACK            7  5923  L !40 0!0          118  2040     000+2
+ 1236         * STATIC VARIABLE (ZA : 2035)
+ 1237         * PUSH (2035:5)
+ 1238                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  5930  # 76Q 094          118  8768     094
+ 1239                LCA   2035,0&X2         * LOAD MEMORY 2035 IN STACK            7  5937  L !35 0!0          118  2035     000+2
+ 1240         * CREATE A STACK FRAME WITH X3 POINTER TO IT
+ 1241         * PUSH (X3:3)
+ 1242                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  5944  # 76N 094          118  8765     094
+ 1243                LCA   X3,0&X2           * LOAD X3 IN STACK                     7  5951  L 099 0!0          118   099     000+2
+ 1244                MCW   X2,X3             * MOVE X2 IN X3                        7  5958  M 094 099          119   094     099
+ 1245                B     LSDAAA            * JUMP TO FUNCTION ESCAPE              4  5965  B !60              119  2060
+ 1246         * POP (X3:3)
+ 1247                LCA   0&X2,X3           * LOAD STACK IN X3                     7  5969  L 0!0 099          119   000+2   099
+1                                                                                                         PAGE   24
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+ 1248                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  5976  # 66Q 094          119  8668     094
+ 1249         * POP (5)
+ 1250                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  5983  # 78K 094          119  8782     094
+ 1251         * POP (5)
+ 1252                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  5990  # 78K 094          119  8782     094
+ 1253         * POP (5)
+ 1254                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  5997  # 78K 094          120  8782     094
+ 1255         * END FUNCTION CALL ESCAPE(ZA, ZB, 10)
+ 1256                B     CLNNMN            * JUMP TO SNIPPET CLEAN_NUMBER         4  6004  B 07L              120  8073
+ 1257         * CONSTANT (0 : @00000@)
+ 1258         * PUSH (@00000@:5)
+ 1259                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  6008  # 76Q 094          120  8768     094
+ 1260                LCA   LAGAAA,0&X2       * LOAD DATA @00000@ IN STACK           7  6015  L 74M 0!0          120  8744     000+2
+ 1261                B     CLNNMN            * JUMP TO SNIPPET CLEAN_NUMBER         4  6022  B 07L              120  8073
+ 1262                C     0&X2,15995&X2     * COMPARE STACK TO STACK AT -5         7  6026  C 0!0 IRE          120   000+2 15995+2
+ 1263         * POP (5)
+ 1264                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  6033  # 78K 094          121  8782     094
+ 1265         * POP (5)
+ 1266                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  6040  # 78K 094          121  8782     094
+ 1267         * PUSH (@00000@:5)
+ 1268                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  6047  # 76Q 094          121  8768     094
+ 1269                LCA   LAGAAA,0&X2       * LOAD DATA @00000@ IN STACK           7  6054  L 74M 0!0          121  8744     000+2
+ 1270                BE    LKFAAA            * JUMP IF EQUAL                        5  6061  B !7' S            121  6070
+ 1271                B     LLFAAA            * JUMP TO END                          4  6066  B !7X              121  6077
+ 1272         LKFAAA MCW   LCGAAA,0&X2       * MOVE 1 IN STACK                      7  6070  M 75L 0!0          122  8753     000+2
+ 1273         LLFAAA MCS   0&X2,0&X2         * CLEAR WM IN STACK                    7  6077  Z 0!0 0!0          122   000+2   000+2
+ 1274         * POP (5)
+ 1275                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  6084  # 78K 094          122  8782     094
+ 1276                BCE   LIFAAA,5&X2,      * JUMP IF FALSE                        8  6091  B J1X 0!5          122  6117     005+2
+ 1277         * CONSTANT ('X' : @X@)
+ 1278         * PUSH (@X@:1)
+ 1279                MA    LWGAAA,X2         * ADD 1 TO STACK POINTER               7  6099  # 74P 094          122  8747     094
+ 1280                LCA   LFHAAA,0&X2       * LOAD DATA @X@ IN STACK               7  6106  L 74Q 0!0          123  8748     000+2
+ 1281                B     LJFAAA            * JUMP TO END                          4  6113  B J3/              123  6131
+ 1282         * CONSTANT (' ' : @ @)
+ 1283         * PUSH (@ @:1)
+ 1284         LIFAAA MA    LWGAAA,X2         * ADD 1 TO STACK POINTER               7  6117  # 74P 094          123  8747     094
+ 1285                LCA   LGHAAA,0&X2       * LOAD DATA @ @ IN STACK               7  6124  L 66N 0!0          123  8665     000+2
+ 1286         * CREATE A STACK FRAME WITH X3 POINTER TO IT
+ 1287         * PUSH (X3:3)
+ 1288         LJFAAA MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  6131  # 76N 094          123  8765     094
+ 1289                LCA   X3,0&X2           * LOAD X3 IN STACK                     7  6138  L 099 0!0          123   099     000+2
+ 1290                MCW   X2,X3             * MOVE X2 IN X3                        7  6145  M 094 099          124   094     099
+ 1291                B     LLBAAA            * JUMP TO FUNCTION PUTCHAR             4  6152  B L8S              124  6382
+ 1292         * POP (X3:3)
+ 1293                LCA   0&X2,X3           * LOAD STACK IN X3                     7  6156  L 0!0 099          124   000+2   099
+ 1294                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  6163  # 66Q 094          124  8668     094
+ 1295         * POP (1)
+ 1296                MA    LZGAAA,X2         * ADD -1 TO STACK POINTER              7  6170  # 68Q 094          124  8688     094
+ 1297         * POP (5)
+1                                                                                                         PAGE   25
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+ 1298                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  6177  # 78K 094          124  8782     094
+ 1299         * END FUNCTION CALL PUTCHAR(((ESCAPE(ZA, ZB, 10) == 0) ? 'X' : ' '))
+ 1300         * END [BLOCK ENDING AT LBEAAA]
+ 1301         ***************************************
+ 1302         * PREINCREMENT((++ZA)
+ 1303         * PUSH (@!35@:3)
+ 1304         LEEAAA MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  6184  # 76N 094          125  8765     094
+ 1305                LCA   LDHAAA,0&X2       * LOAD DATA @!35@ IN STACK             7  6191  L 79R 0!0          125  8799     000+2
+ 1306         * POP (X1:3)
+ 1307                LCA   0&X2,X1           * LOAD STACK IN X1                     7  6198  L 0!0 089          125   000+2   089
+ 1308                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  6205  # 66Q 094          125  8668     094
+ 1309                A     LCGAAA,0&X1       * PREINCREMENT MEMORY AT X1            7  6212  A 75L 0'0          125  8753     000+1
+ 1310                B     LCEAAA            * JUMP TO TOP OF FOR                   4  6219  B X9T              125  5793
+ 1311         * END FOR [FOR ((ZA = 0); (ZA <= 128); (++ZA)) [BLOCK ENDING AT LBEAAA] TOP
+ 1312         * FUNCTION CALL PUTCHAR('\N')
+ 1313         * PUSH (5)
+ 1314         LDEAAA MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  6223  # 76Q 094          126  8768     094
+ 1315         * CONSTANT ('\N' : EOL)
+ 1316         * PUSH (EOL:1)
+ 1317                MA    LWGAAA,X2         * ADD 1 TO STACK POINTER               7  6230  # 74P 094          126  8747     094
+ 1318                LCA   EOL,0&X2          * LOAD MEMORY EOL IN STACK             7  6237  L 346 0!0          126   346     000+2
+ 1319         * CREATE A STACK FRAME WITH X3 POINTER TO IT
+ 1320         * PUSH (X3:3)
+ 1321                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  6244  # 76N 094          126  8765     094
+ 1322                LCA   X3,0&X2           * LOAD X3 IN STACK                     7  6251  L 099 0!0          126   099     000+2
+ 1323                MCW   X2,X3             * MOVE X2 IN X3                        7  6258  M 094 099          127   094     099
+ 1324                B     LLBAAA            * JUMP TO FUNCTION PUTCHAR             4  6265  B L8S              127  6382
+ 1325         * POP (X3:3)
+ 1326                LCA   0&X2,X3           * LOAD STACK IN X3                     7  6269  L 0!0 099          127   000+2   099
+ 1327                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  6276  # 66Q 094          127  8668     094
+ 1328         * POP (1)
+ 1329                MA    LZGAAA,X2         * ADD -1 TO STACK POINTER              7  6283  # 68Q 094          127  8688     094
+ 1330         * POP (5)
+ 1331                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  6290  # 78K 094          127  8782     094
+ 1332         * END FUNCTION CALL PUTCHAR('\N')
+ 1333         * END [BLOCK ENDING AT LAEAAA]
+ 1334         ***************************************
+ 1335         * PREINCREMENT((++ZB)
+ 1336         * PUSH (@!40@:3)
+ 1337         LHEAAA MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  6297  # 76N 094          128  8765     094
+ 1338                LCA   LCHAAA,0&X2       * LOAD DATA @!40@ IN STACK             7  6304  L 69J 0!0          128  8691     000+2
+ 1339         * POP (X1:3)
+ 1340                LCA   0&X2,X1           * LOAD STACK IN X1                     7  6311  L 0!0 089          128   000+2   089
+ 1341                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  6318  # 66Q 094          128  8668     094
+ 1342                A     LCGAAA,0&X1       * PREINCREMENT MEMORY AT X1            7  6325  A 75L 0'0          128  8753     000+1
+ 1343                B     LFEAAA            * JUMP TO TOP OF FOR                   4  6332  B W4S              128  5642
+ 1344         * END FOR [FOR ((ZB = 0); (ZB <= 64); (++ZB)) [BLOCK ENDING AT LAEAAA] TOP:
+ 1345         * PUT ON STACK RETURN VALUE (0)
+ 1346         * CONSTANT (0 : @00000@)
+ 1347         * PUSH (@00000@:5)
+1                                                                                                         PAGE   26
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+ 1348         LGEAAA MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  6336  # 76Q 094          129  8768     094
+ 1349                LCA   LAGAAA,0&X2       * LOAD DATA @00000@ IN STACK           7  6343  L 74M 0!0          129  8744     000+2
+ 1350         * POP (15997+X3:5)
+ 1351                LCA   0&X2,15997&X3     * LOAD STACK IN 15997&X3               7  6350  L 0!0 IIG          129   000+2 15997+3
+ 1352                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  6357  # 78K 094          129  8782     094
+ 1353         * POP (3)
+ 1354         LZDAAA MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  6364  # 66Q 094          129  8668     094
+ 1355         * END [BLOCK ENDING AT LZDAAA]
+ 1356         ***************************************
+ 1357                LCA   3&X3,X1           * LOAD RETURN ADDRESS IN X1            7  6371  L 0?3 089          130   003+3   089
+ 1358                B     0&X1              * JUMP BACK TO CALLER IN X1            4  6378  B 0'0              130   000+1
+ 1359         ***************************************************************************
+ 1360         * END FUNCTION : MAIN
+ 1361         ***************************************************************************
+ 1362         ***************************************************************************
+ 1363         * FUNCTION : PUTCHAR
+ 1364         ***************************************************************************
+ 1365         LLBAAA SBR   3&X3              * SAVE RETURN ADDRESS IN REGISTER      4  6382  H 0?3              130   003+3
+ 1366         * SET THE RIGHT WM AND CLEAR THE WRONG ONES
+ 1367                SW    1&X3              * SET WM AT 1&X3                       4  6386  , 0?1              130   001+3
+ 1368                CW    2&X3              * CLEAR WM AT 2&X3                     4  6390  ) 0?2              130   002+3
+ 1369                CW    3&X3              * CLEAR WM AT 3&X3                     4  6394  ) 0?3              130   003+3
+ 1370         ***************************************
+ 1371         * BEGIN [BLOCK ENDING AT LMBAAA]
+ 1372         * PUSH (3)
+ 1373                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  6398  # 76N 094          130  8765     094
+ 1374         * IF [IF ((C != '\N') THEN [BLOCK ENDING AT LNBAAA] ELSE [BLOCK ENDING AT L
+ 1375         * NOTEQUAL (!=) (C != '\N')
+ 1376         * PARAMETER VARIABLE (C : 15997+X3)
+ 1377         * PUSH (15997+X3:1)
+ 1378                MA    LWGAAA,X2         * ADD 1 TO STACK POINTER               7  6405  # 74P 094          131  8747     094
+ 1379                LCA   15997&X3,0&X2     * LOAD MEMORY 15997&X3 IN STACK        7  6412  L IIG 0!0          131 15997+3   000+2
+ 1380         * CONSTANT ('\N' : EOL)
+ 1381         * PUSH (EOL:1)
+ 1382                MA    LWGAAA,X2         * ADD 1 TO STACK POINTER               7  6419  # 74P 094          131  8747     094
+ 1383                LCA   EOL,0&X2          * LOAD MEMORY EOL IN STACK             7  6426  L 346 0!0          131   346     000+2
+ 1384                C     0&X2,15999&X2     * COMPARE STACK TO STACK AT -1         7  6433  C 0!0 IRI          131   000+2 15999+2
+ 1385         * POP (1)
+ 1386                MA    LZGAAA,X2         * ADD -1 TO STACK POINTER              7  6440  # 68Q 094          132  8688     094
+ 1387         * POP (1)
+ 1388                MA    LZGAAA,X2         * ADD -1 TO STACK POINTER              7  6447  # 68Q 094          132  8688     094
+ 1389         * PUSH (@00001@:5)
+ 1390                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  6454  # 76Q 094          132  8768     094
+ 1391                LCA   LCGAAA,0&X2       * LOAD DATA @00001@ IN STACK           7  6461  L 75L 0!0          132  8753     000+2
+ 1392                BE    LMFAAA            * JUMP IF EQUAL                        5  6468  B M7X S            132  6477
+ 1393                B     LNFAAA            * JUMP TO END                          4  6473  B M8U              132  6484
+ 1394         LMFAAA MCW   LAGAAA,0&X2       * MOVE 0 IN STACK                      7  6477  M 74M 0!0          133  8744     000+2
+ 1395         LNFAAA MCS   0&X2,0&X2         * CLEAR WM IN STACK                    7  6484  Z 0!0 0!0          133   000+2   000+2
+ 1396         * POP (5)
+ 1397                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  6491  # 78K 094          133  8782     094
+1                                                                                                         PAGE   27
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+ 1398                BCE   LQBAAA,5&X2,      * JUMP WHEN FALSE                      8  6498  B O0/ 0!5          133  6601     005+2
+ 1399         ***************************************
+ 1400         * BEGIN [BLOCK ENDING AT LNBAAA]
+ 1401         * PARAMETER VARIABLE (C : 15997+X3)
+ 1402         * PUSH (15997+X3:1)
+ 1403                MA    LWGAAA,X2         * ADD 1 TO STACK POINTER               7  6506  # 74P 094          133  8747     094
+ 1404                LCA   15997&X3,0&X2     * LOAD MEMORY 15997&X3 IN STACK        7  6513  L IIG 0!0          134 15997+3   000+2
+ 1405         * POSTINCREMENT (__PUTCHAR_POS++)
+ 1406         * PUSH (@!24@:3)
+ 1407                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  6520  # 76N 094          134  8765     094
+ 1408                LCA   LHHAAA,0&X2       * LOAD DATA @!24@ IN STACK             7  6527  L 71N 0!0          134  8715     000+2
+ 1409         * POP (X1:3)
+ 1410                LCA   0&X2,X1           * LOAD STACK IN X1                     7  6534  L 0!0 089          134   000+2   089
+ 1411                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  6541  # 66Q 094          134  8668     094
+ 1412         * PUSH (0+X1:3)
+ 1413                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  6548  # 76N 094          135  8765     094
+ 1414                LCA   0&X1,0&X2         * LOAD MEMORY 0&X1 IN STACK            7  6555  L 0'0 0!0          135   000+1   000+2
+ 1415                MA    LWGAAA,0&X1       * POSTINCREMENT POINTER AT X1          7  6562  # 74P 0'0          135  8747     000+1
+ 1416         * ASSIGNMENT ((*(__PUTCHAR_POS++)) = C)
+ 1417         * POP (X1:3)
+ 1418                LCA   0&X2,X1           * LOAD STACK IN X1                     7  6569  L 0!0 089          135   000+2   089
+ 1419                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  6576  # 66Q 094          135  8668     094
+ 1420         * POP (0+X1:1)
+ 1421                LCA   0&X2,0&X1         * LOAD STACK IN 0&X1                   7  6583  L 0!0 0'0          136   000+2   000+1
+ 1422                MA    LZGAAA,X2         * ADD -1 TO STACK POINTER              7  6590  # 68Q 094          136  8688     094
+ 1423         * END ASSIGNMENT ((*(__PUTCHAR_POS++)) = C)
+ 1424         * END [BLOCK ENDING AT LNBAAA]
+ 1425         ***************************************
+ 1426         LNBAAA B     LTBAAA            * JUMP WHEN TRUE                       4  6597  B R0Y              136  6908
+ 1427         ***************************************
+ 1428         * BEGIN [BLOCK ENDING AT LOBAAA]
+ 1429         * WHILE [WHILE ((((INT) __PUTCHAR_LAST) >= ((INT) __PUTCHAR_POS))) [BLOCK E
+ 1430         * STATIC VARIABLE (__PUTCHAR_LAST : 2027)
+ 1431         * PUSH (2027:3)
+ 1432         LQBAAA MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  6601  # 76N 094          136  8765     094
+ 1433                LCA   2027,0&X2         * LOAD MEMORY 2027 IN STACK            7  6608  L !27 0!0          136  2027     000+2
+ 1434         * CAST POINTER(__PUTCHAR_LAST) TO NUMBER
+ 1435                B     PTRNMN            * JUMP TO SNIPPET POINTER_TO_NUMBE     4  6615  B 48R              136  8489
+ 1436         * STATIC VARIABLE (__PUTCHAR_POS : 2024)
+ 1437         * PUSH (2024:3)
+ 1438                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  6619  # 76N 094          137  8765     094
+ 1439                LCA   2024,0&X2         * LOAD MEMORY 2024 IN STACK            7  6626  L !24 0!0          137  2024     000+2
+ 1440         * CAST POINTER(__PUTCHAR_POS) TO NUMBER
+ 1441                B     PTRNMN            * JUMP TO SNIPPET POINTER_TO_NUMBE     4  6633  B 48R              137  8489
+ 1442         * GREATEROREQUAL (((INT) __PUTCHAR_LAST) >= ((INT) __PUTCHAR_POS))
+ 1443                B     CLNNMN            * JUMP TO SNIPPET CLEAN_NUMBER         4  6637  B 07L              137  8073
+ 1444                C     0&X2,15995&X2     * COMPARE STACK TO STACK AT -5         7  6641  C 0!0 IRE          137   000+2 15995+2
+ 1445         * POP (5)
+ 1446                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  6648  # 78K 094          137  8782     094
+ 1447                MCW   LCGAAA,0&X2       * MOVE 1 IN STACK                      7  6655  M 75L 0!0          138  8753     000+2
+1                                                                                                         PAGE   28
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+ 1448                BL    LOFAAA            * JUMP IF GREATER OR EQUAL             5  6662  B O7/ T            138  6671
+ 1449                B     LPFAAA            * JUMP TO END                          4  6667  B O7Y              138  6678
+ 1450         LOFAAA MCW   LAGAAA,0&X2       * MOVE 1 IN STACK                      7  6671  M 74M 0!0          138  8744     000+2
+ 1451         LPFAAA MCS   0&X2,0&X2         * CLEAR WM IN STACK                    7  6678  Z 0!0 0!0          138   000+2   000+2
+ 1452         * POP (5)
+ 1453                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  6685  # 78K 094          138  8782     094
+ 1454                BCE   LRBAAA,5&X2,      * JUMP TO BOTTOM OF WHILE              8  6692  B P9V 0!5          139  6795     005+2
+ 1455         ***************************************
+ 1456         * BEGIN [BLOCK ENDING AT LPBAAA]
+ 1457         * CONSTANT (' ' : @ @)
+ 1458         * PUSH (@ @:1)
+ 1459                MA    LWGAAA,X2         * ADD 1 TO STACK POINTER               7  6700  # 74P 094          139  8747     094
+ 1460                LCA   LGHAAA,0&X2       * LOAD DATA @ @ IN STACK               7  6707  L 66N 0!0          139  8665     000+2
+ 1461         * POSTDECREMENT (__PUTCHAR_LAST--)
+ 1462         * PUSH (@!27@:3)
+ 1463                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  6714  # 76N 094          139  8765     094
+ 1464                LCA   LIHAAA,0&X2       * LOAD DATA @!27@ IN STACK             7  6721  L 75R 0!0          139  8759     000+2
+ 1465         * POP (X1:3)
+ 1466                LCA   0&X2,X1           * LOAD STACK IN X1                     7  6728  L 0!0 089          140   000+2   089
+ 1467                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  6735  # 66Q 094          140  8668     094
+ 1468         * PUSH (0+X1:3)
+ 1469                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  6742  # 76N 094          140  8765     094
+ 1470                LCA   0&X1,0&X2         * LOAD MEMORY 0&X1 IN STACK            7  6749  L 0'0 0!0          140   000+1   000+2
+ 1471                MA    LZGAAA,0&X1       * POSTDECREMENT POINTER AT X1          7  6756  # 68Q 0'0          140  8688     000+1
+ 1472         * ASSIGNMENT ((*(__PUTCHAR_LAST--)) = ' ')
+ 1473         * POP (X1:3)
+ 1474                LCA   0&X2,X1           * LOAD STACK IN X1                     7  6763  L 0!0 089          141   000+2   089
+ 1475                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  6770  # 66Q 094          141  8668     094
+ 1476         * POP (0+X1:1)
+ 1477                LCA   0&X2,0&X1         * LOAD STACK IN 0&X1                   7  6777  L 0!0 0'0          141   000+2   000+1
+ 1478                MA    LZGAAA,X2         * ADD -1 TO STACK POINTER              7  6784  # 68Q 094          141  8688     094
+ 1479         * END ASSIGNMENT ((*(__PUTCHAR_LAST--)) = ' ')
+ 1480         * END [BLOCK ENDING AT LPBAAA]
+ 1481         ***************************************
+ 1482         LPBAAA B     LQBAAA            * JUMP TO TOP OF WHILE                 4  6791  B O0/              141  6601
+ 1483         * END WHILE [WHILE ((((INT) __PUTCHAR_LAST) >= ((INT) __PUTCHAR_POS))) [BLO
+ 1484         * STATIC VARIABLE (__PUTCHAR_POS : 2024)
+ 1485         * PUSH (2024:3)
+ 1486         LRBAAA MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  6795  # 76N 094          141  8765     094
+ 1487                LCA   2024,0&X2         * LOAD MEMORY 2024 IN STACK            7  6802  L !24 0!0          142  2024     000+2
+ 1488         * PUSH (@!27@:3)
+ 1489                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  6809  # 76N 094          142  8765     094
+ 1490                LCA   LIHAAA,0&X2       * LOAD DATA @!27@ IN STACK             7  6816  L 75R 0!0          142  8759     000+2
+ 1491         * ASSIGNMENT (__PUTCHAR_LAST = __PUTCHAR_POS)
+ 1492         * POP (X1:3)
+ 1493                LCA   0&X2,X1           * LOAD STACK IN X1                     7  6823  L 0!0 089          142   000+2   089
+ 1494                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  6830  # 66Q 094          142  8668     094
+ 1495         * POP (0+X1:3)
+ 1496                LCA   0&X2,0&X1         * LOAD STACK IN 0&X1                   7  6837  L 0!0 0'0          143   000+2   000+1
+ 1497                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  6844  # 66Q 094          143  8668     094
+1                                                                                                         PAGE   29
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+ 1498         * END ASSIGNMENT (__PUTCHAR_LAST = __PUTCHAR_POS)
+ 1499         * CONSTANT (201 : @201@)
+ 1500         * PUSH (@201@:3)
+ 1501                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  6851  # 76N 094          143  8765     094
+ 1502                LCA   LJHAAA,0&X2       * LOAD DATA @201@ IN STACK             7  6858  L 71K 0!0          143  8712     000+2
+ 1503         * PUSH (@!24@:3)
+ 1504                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  6865  # 76N 094          143  8765     094
+ 1505                LCA   LHHAAA,0&X2       * LOAD DATA @!24@ IN STACK             7  6872  L 71N 0!0          144  8715     000+2
+ 1506         * ASSIGNMENT (__PUTCHAR_POS = 201)
+ 1507         * POP (X1:3)
+ 1508                LCA   0&X2,X1           * LOAD STACK IN X1                     7  6879  L 0!0 089          144   000+2   089
+ 1509                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  6886  # 66Q 094          144  8668     094
+ 1510         * POP (0+X1:3)
+ 1511                LCA   0&X2,0&X1         * LOAD STACK IN 0&X1                   7  6893  L 0!0 0'0          144   000+2   000+1
+ 1512                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  6900  # 66Q 094          144  8668     094
+ 1513         * END ASSIGNMENT (__PUTCHAR_POS = 201)
+ 1514         * START ASM BLOCK
+ 1515                W                       * START ASM BLOCK                      1  6907  2                  144
+ 1516         * END ASM BLOCK
+ 1517         * END [BLOCK ENDING AT LOBAAA]
+ 1518         ***************************************
+ 1519         * END IF [IF ((C != '\N') THEN [BLOCK ENDING AT LNBAAA] ELSE [BLOCK ENDING
+ 1520         * IF [IF ((__PUTCHAR_POS == 333) THEN [BLOCK ENDING AT LUBAAA]]
+ 1521         * EQUAL (__PUTCHAR_POS == 333)
+ 1522         * STATIC VARIABLE (__PUTCHAR_POS : 2024)
+ 1523         * PUSH (2024:3)
+ 1524         LTBAAA MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  6908  # 76N 094          145  8765     094
+ 1525                LCA   2024,0&X2         * LOAD MEMORY 2024 IN STACK            7  6915  L !24 0!0          145  2024     000+2
+ 1526         * CONSTANT (333 : @333@)
+ 1527         * PUSH (@333@:3)
+ 1528                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  6922  # 76N 094          145  8765     094
+ 1529                LCA   LKHAAA,0&X2       * LOAD DATA @333@ IN STACK             7  6929  L 79O 0!0          145  8796     000+2
+ 1530                C     0&X2,15997&X2     * COMPARE STACK TO STACK AT -3         7  6936  C 0!0 IRG          145   000+2 15997+2
+ 1531         * POP (3)
+ 1532                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  6943  # 66Q 094          146  8668     094
+ 1533         * POP (3)
+ 1534                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  6950  # 66Q 094          146  8668     094
+ 1535         * PUSH (@00000@:5)
+ 1536                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  6957  # 76Q 094          146  8768     094
+ 1537                LCA   LAGAAA,0&X2       * LOAD DATA @00000@ IN STACK           7  6964  L 74M 0!0          146  8744     000+2
+ 1538                BE    LQFAAA            * JUMP IF EQUAL                        5  6971  B R8' S            146  6980
+ 1539                B     LRFAAA            * JUMP TO END                          4  6976  B R8X              146  6987
+ 1540         LQFAAA MCW   LCGAAA,0&X2       * MOVE 1 IN STACK                      7  6980  M 75L 0!0          147  8753     000+2
+ 1541         LRFAAA MCS   0&X2,0&X2         * CLEAR WM IN STACK                    7  6987  Z 0!0 0!0          147   000+2   000+2
+ 1542         * POP (5)
+ 1543                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  6994  # 78K 094          147  8782     094
+ 1544                BCE   LMBAAA,5&X2,      * JUMP WHEN FALSE                      8  7001  B A2S 0!5          147  7122     005+2
+ 1545         ***************************************
+ 1546         * BEGIN [BLOCK ENDING AT LUBAAA]
+ 1547         * STATIC VARIABLE (__PUTCHAR_POS : 2024)
+1                                                                                                         PAGE   30
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+ 1548         * PUSH (2024:3)
+ 1549                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  7009  # 76N 094          147  8765     094
+ 1550                LCA   2024,0&X2         * LOAD MEMORY 2024 IN STACK            7  7016  L !24 0!0          148  2024     000+2
+ 1551         * PUSH (@!27@:3)
+ 1552                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  7023  # 76N 094          148  8765     094
+ 1553                LCA   LIHAAA,0&X2       * LOAD DATA @!27@ IN STACK             7  7030  L 75R 0!0          148  8759     000+2
+ 1554         * ASSIGNMENT (__PUTCHAR_LAST = __PUTCHAR_POS)
+ 1555         * POP (X1:3)
+ 1556                LCA   0&X2,X1           * LOAD STACK IN X1                     7  7037  L 0!0 089          148   000+2   089
+ 1557                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  7044  # 66Q 094          148  8668     094
+ 1558         * POP (0+X1:3)
+ 1559                LCA   0&X2,0&X1         * LOAD STACK IN 0&X1                   7  7051  L 0!0 0'0          149   000+2   000+1
+ 1560                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  7058  # 66Q 094          149  8668     094
+ 1561         * END ASSIGNMENT (__PUTCHAR_LAST = __PUTCHAR_POS)
+ 1562         * CONSTANT (201 : @201@)
+ 1563         * PUSH (@201@:3)
+ 1564                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  7065  # 76N 094          149  8765     094
+ 1565                LCA   LJHAAA,0&X2       * LOAD DATA @201@ IN STACK             7  7072  L 71K 0!0          149  8712     000+2
+ 1566         * PUSH (@!24@:3)
+ 1567                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  7079  # 76N 094          149  8765     094
+ 1568                LCA   LHHAAA,0&X2       * LOAD DATA @!24@ IN STACK             7  7086  L 71N 0!0          150  8715     000+2
+ 1569         * ASSIGNMENT (__PUTCHAR_POS = 201)
+ 1570         * POP (X1:3)
+ 1571                LCA   0&X2,X1           * LOAD STACK IN X1                     7  7093  L 0!0 089          150   000+2   089
+ 1572                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  7100  # 66Q 094          150  8668     094
+ 1573         * POP (0+X1:3)
+ 1574                LCA   0&X2,0&X1         * LOAD STACK IN 0&X1                   7  7107  L 0!0 0'0          150   000+2   000+1
+ 1575                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  7114  # 66Q 094          150  8668     094
+ 1576         * END ASSIGNMENT (__PUTCHAR_POS = 201)
+ 1577         * START ASM BLOCK
+ 1578                W                       * START ASM BLOCK                      1  7121  2                  150
+ 1579         * END ASM BLOCK
+ 1580         * END [BLOCK ENDING AT LUBAAA]
+ 1581         ***************************************
+ 1582         * END IF [IF ((__PUTCHAR_POS == 333) THEN [BLOCK ENDING AT LUBAAA]]
+ 1583         * POP (3)
+ 1584         LMBAAA MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  7122  # 66Q 094          151  8668     094
+ 1585         * END [BLOCK ENDING AT LMBAAA]
+ 1586         ***************************************
+ 1587                LCA   3&X3,X1           * LOAD RETURN ADDRESS IN X1            7  7129  L 0?3 089          151   003+3   089
+ 1588                B     0&X1              * JUMP BACK TO CALLER IN X1            4  7136  B 0'0              151   000+1
+ 1589         ***************************************************************************
+ 1590         * END FUNCTION : PUTCHAR
+ 1591         ***************************************************************************
+ 1592         ***************************************************************************
+ 1593         * FUNCTION : PUTS
+ 1594         ***************************************************************************
+ 1595         LWBAAA SBR   3&X3              * SAVE RETURN ADDRESS IN REGISTER      4  7140  H 0?3              151   003+3
+ 1596         * SET THE RIGHT WM AND CLEAR THE WRONG ONES
+ 1597                SW    1&X3              * SET WM AT 1&X3                       4  7144  , 0?1              151   001+3
+1                                                                                                         PAGE   31
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+ 1598                CW    2&X3              * CLEAR WM AT 2&X3                     4  7148  ) 0?2              151   002+3
+ 1599                CW    3&X3              * CLEAR WM AT 3&X3                     4  7152  ) 0?3              151   003+3
+ 1600         ***************************************
+ 1601         * BEGIN [BLOCK ENDING AT LXBAAA]
+ 1602         * PUSH (3)
+ 1603                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  7156  # 76N 094          152  8765     094
+ 1604         * WHILE [WHILE (((*S) != '\0')) [BLOCK ENDING AT LYBAAA] TOP:LZBAAA BOTTOM:
+ 1605         * NOTEQUAL (!=) ((*S) != '\0')
+ 1606         * DEREFERENCEEXPRESSION (*S)
+ 1607         * PARAMETER VARIABLE (S : 15997+X3)
+ 1608         * PUSH (15997+X3:3)
+ 1609         LZBAAA MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  7163  # 76N 094          152  8765     094
+ 1610                LCA   15997&X3,0&X2     * LOAD MEMORY 15997&X3 IN STACK        7  7170  L IIG 0!0          152 15997+3   000+2
+ 1611         * POP (X1:3)
+ 1612                LCA   0&X2,X1           * LOAD STACK IN X1                     7  7177  L 0!0 089          152   000+2   089
+ 1613                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  7184  # 66Q 094          152  8668     094
+ 1614         * PUSH (0+X1:1)
+ 1615                MA    LWGAAA,X2         * ADD 1 TO STACK POINTER               7  7191  # 74P 094          153  8747     094
+ 1616                LCA   0&X1,0&X2         * LOAD MEMORY 0&X1 IN STACK            7  7198  L 0'0 0!0          153   000+1   000+2
+ 1617         * END DEREFERENCEEXPRESSION (*S)
+ 1618         * CONSTANT ('\0' : EOS)
+ 1619         * PUSH (EOS:1)
+ 1620                MA    LWGAAA,X2         * ADD 1 TO STACK POINTER               7  7205  # 74P 094          153  8747     094
+ 1621                LCA   EOS,0&X2          * LOAD MEMORY EOS IN STACK             7  7212  L 345 0!0          153   345     000+2
+ 1622                C     0&X2,15999&X2     * COMPARE STACK TO STACK AT -1         7  7219  C 0!0 IRI          153   000+2 15999+2
+ 1623         * POP (1)
+ 1624                MA    LZGAAA,X2         * ADD -1 TO STACK POINTER              7  7226  # 68Q 094          154  8688     094
+ 1625         * POP (1)
+ 1626                MA    LZGAAA,X2         * ADD -1 TO STACK POINTER              7  7233  # 68Q 094          154  8688     094
+ 1627         * PUSH (@00001@:5)
+ 1628                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  7240  # 76Q 094          154  8768     094
+ 1629                LCA   LCGAAA,0&X2       * LOAD DATA @00001@ IN STACK           7  7247  L 75L 0!0          154  8753     000+2
+ 1630                BE    LSFAAA            * JUMP IF EQUAL                        5  7254  B B6T S            154  7263
+ 1631                B     LTFAAA            * JUMP TO END                          4  7259  B B7'              154  7270
+ 1632         LSFAAA MCW   LAGAAA,0&X2       * MOVE 0 IN STACK                      7  7263  M 74M 0!0          155  8744     000+2
+ 1633         LTFAAA MCS   0&X2,0&X2         * CLEAR WM IN STACK                    7  7270  Z 0!0 0!0          155   000+2   000+2
+ 1634         * POP (5)
+ 1635                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  7277  # 78K 094          155  8782     094
+ 1636                BCE   LXBAAA,5&X2,      * JUMP TO BOTTOM OF WHILE              8  7284  B D4' 0!5          155  7440     005+2
+ 1637         ***************************************
+ 1638         * BEGIN [BLOCK ENDING AT LYBAAA]
+ 1639         * FUNCTION CALL PUTCHAR((*(S++)))
+ 1640         * PUSH (5)
+ 1641                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  7292  # 76Q 094          155  8768     094
+ 1642         * DEREFERENCEEXPRESSION (*(S++))
+ 1643         * POSTINCREMENT (S++)
+ 1644         * PUSH (@I9G@:3)
+ 1645                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  7299  # 76N 094          156  8765     094
+ 1646                LCA   LJGAAA,0&X2       * LOAD DATA @I9G@ IN STACK             7  7306  L 66Q 0!0          156  8668     000+2
+ 1647                MA    X3,0&X2           * ADD X3 TO STACK                      7  7313  # 099 0!0          156   099     000+2
+1                                                                                                         PAGE   32
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+ 1648         * POP (X1:3)
+ 1649                LCA   0&X2,X1           * LOAD STACK IN X1                     7  7320  L 0!0 089          156   000+2   089
+ 1650                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  7327  # 66Q 094          156  8668     094
+ 1651         * PUSH (0+X1:3)
+ 1652                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  7334  # 76N 094          157  8765     094
+ 1653                LCA   0&X1,0&X2         * LOAD MEMORY 0&X1 IN STACK            7  7341  L 0'0 0!0          157   000+1   000+2
+ 1654                MA    LWGAAA,0&X1       * POSTINCREMENT POINTER AT X1          7  7348  # 74P 0'0          157  8747     000+1
+ 1655         * POP (X1:3)
+ 1656                LCA   0&X2,X1           * LOAD STACK IN X1                     7  7355  L 0!0 089          157   000+2   089
+ 1657                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  7362  # 66Q 094          157  8668     094
+ 1658         * PUSH (0+X1:1)
+ 1659                MA    LWGAAA,X2         * ADD 1 TO STACK POINTER               7  7369  # 74P 094          158  8747     094
+ 1660                LCA   0&X1,0&X2         * LOAD MEMORY 0&X1 IN STACK            7  7376  L 0'0 0!0          158   000+1   000+2
+ 1661         * END DEREFERENCEEXPRESSION (*(S++))
+ 1662         * CREATE A STACK FRAME WITH X3 POINTER TO IT
+ 1663         * PUSH (X3:3)
+ 1664                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  7383  # 76N 094          158  8765     094
+ 1665                LCA   X3,0&X2           * LOAD X3 IN STACK                     7  7390  L 099 0!0          158   099     000+2
+ 1666                MCW   X2,X3             * MOVE X2 IN X3                        7  7397  M 094 099          158   094     099
+ 1667                B     LLBAAA            * JUMP TO FUNCTION PUTCHAR             4  7404  B L8S              158  6382
+ 1668         * POP (X3:3)
+ 1669                LCA   0&X2,X3           * LOAD STACK IN X3                     7  7408  L 0!0 099          159   000+2   099
+ 1670                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  7415  # 66Q 094          159  8668     094
+ 1671         * POP (1)
+ 1672                MA    LZGAAA,X2         * ADD -1 TO STACK POINTER              7  7422  # 68Q 094          159  8688     094
+ 1673         * POP (5)
+ 1674                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  7429  # 78K 094          159  8782     094
+ 1675         * END FUNCTION CALL PUTCHAR((*(S++)))
+ 1676         * END [BLOCK ENDING AT LYBAAA]
+ 1677         ***************************************
+ 1678         LYBAAA B     LZBAAA            * JUMP TO TOP OF WHILE                 4  7436  B A6T              159  7163
+ 1679         * END WHILE [WHILE (((*S) != '\0')) [BLOCK ENDING AT LYBAAA] TOP:LZBAAA BOT
+ 1680         * POP (3)
+ 1681         LXBAAA MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  7440  # 66Q 094          159  8668     094
+ 1682         * END [BLOCK ENDING AT LXBAAA]
+ 1683         ***************************************
+ 1684                LCA   3&X3,X1           * LOAD RETURN ADDRESS IN X1            7  7447  L 0?3 089          160   003+3   089
+ 1685                B     0&X1              * JUMP BACK TO CALLER IN X1            4  7454  B 0'0              160   000+1
+ 1686         ***************************************************************************
+ 1687         * END FUNCTION : PUTS
+ 1688         ***************************************************************************
+ 1689         ***************************************************************************
+ 1690         * FUNCTION : STRCPY
+ 1691         ***************************************************************************
+ 1692         LJAAAA SBR   3&X3              * SAVE RETURN ADDRESS IN REGISTER      4  7458  H 0?3              160   003+3
+ 1693         * SET THE RIGHT WM AND CLEAR THE WRONG ONES
+ 1694                SW    1&X3              * SET WM AT 1&X3                       4  7462  , 0?1              160   001+3
+ 1695                CW    2&X3              * CLEAR WM AT 2&X3                     4  7466  ) 0?2              160   002+3
+ 1696                CW    3&X3              * CLEAR WM AT 3&X3                     4  7470  ) 0?3              160   003+3
+ 1697         ***************************************
+1                                                                                                         PAGE   33
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+ 1698         * BEGIN [BLOCK ENDING AT LKAAAA]
+ 1699         * PUSH (3)
+ 1700                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  7474  # 76N 094          160  8765     094
+ 1701         * WHILE [WHILE ((((*(DEST++)) = (*(SRC++))) != '\0')) [] TOP:LLAAAA BOTTOM:
+ 1702         * NOTEQUAL (!=) (((*(DEST++)) = (*(SRC++))) != '\0')
+ 1703         * DEREFERENCEEXPRESSION (*(SRC++))
+ 1704         * POSTINCREMENT (SRC++)
+ 1705         * PUSH (@I9D@:3)
+ 1706         LLAAAA MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  7481  # 76N 094          161  8765     094
+ 1707                LCA   LLHAAA,0&X2       * LOAD DATA @I9D@ IN STACK             7  7488  L 73R 0!0          161  8739     000+2
+ 1708                MA    X3,0&X2           * ADD X3 TO STACK                      7  7495  # 099 0!0          161   099     000+2
+ 1709         * POP (X1:3)
+ 1710                LCA   0&X2,X1           * LOAD STACK IN X1                     7  7502  L 0!0 089          161   000+2   089
+ 1711                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  7509  # 66Q 094          161  8668     094
+ 1712         * PUSH (0+X1:3)
+ 1713                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  7516  # 76N 094          162  8765     094
+ 1714                LCA   0&X1,0&X2         * LOAD MEMORY 0&X1 IN STACK            7  7523  L 0'0 0!0          162   000+1   000+2
+ 1715                MA    LWGAAA,0&X1       * POSTINCREMENT POINTER AT X1          7  7530  # 74P 0'0          162  8747     000+1
+ 1716         * POP (X1:3)
+ 1717                LCA   0&X2,X1           * LOAD STACK IN X1                     7  7537  L 0!0 089          162   000+2   089
+ 1718                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  7544  # 66Q 094          162  8668     094
+ 1719         * PUSH (0+X1:1)
+ 1720                MA    LWGAAA,X2         * ADD 1 TO STACK POINTER               7  7551  # 74P 094          163  8747     094
+ 1721                LCA   0&X1,0&X2         * LOAD MEMORY 0&X1 IN STACK            7  7558  L 0'0 0!0          163   000+1   000+2
+ 1722         * END DEREFERENCEEXPRESSION (*(SRC++))
+ 1723         * POSTINCREMENT (DEST++)
+ 1724         * PUSH (@I9G@:3)
+ 1725                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  7565  # 76N 094          163  8765     094
+ 1726                LCA   LJGAAA,0&X2       * LOAD DATA @I9G@ IN STACK             7  7572  L 66Q 0!0          163  8668     000+2
+ 1727                MA    X3,0&X2           * ADD X3 TO STACK                      7  7579  # 099 0!0          163   099     000+2
+ 1728         * POP (X1:3)
+ 1729                LCA   0&X2,X1           * LOAD STACK IN X1                     7  7586  L 0!0 089          164   000+2   089
+ 1730                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  7593  # 66Q 094          164  8668     094
+ 1731         * PUSH (0+X1:3)
+ 1732                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  7600  # 76N 094          164  8765     094
+ 1733                LCA   0&X1,0&X2         * LOAD MEMORY 0&X1 IN STACK            7  7607  L 0'0 0!0          164   000+1   000+2
+ 1734                MA    LWGAAA,0&X1       * POSTINCREMENT POINTER AT X1          7  7614  # 74P 0'0          164  8747     000+1
+ 1735         * ASSIGNMENT ((*(DEST++)) = (*(SRC++)))
+ 1736         * POP (X1:3)
+ 1737                LCA   0&X2,X1           * LOAD STACK IN X1                     7  7621  L 0!0 089          165   000+2   089
+ 1738                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  7628  # 66Q 094          165  8668     094
+ 1739                LCA   0&X2,0&X1         * LOAD STACK IN MEMORY X1              7  7635  L 0!0 0'0          165   000+2   000+1
+ 1740         * END ASSIGNMENT ((*(DEST++)) = (*(SRC++)))
+ 1741         * CONSTANT ('\0' : EOS)
+ 1742         * PUSH (EOS:1)
+ 1743                MA    LWGAAA,X2         * ADD 1 TO STACK POINTER               7  7642  # 74P 094          165  8747     094
+ 1744                LCA   EOS,0&X2          * LOAD MEMORY EOS IN STACK             7  7649  L 345 0!0          165   345     000+2
+ 1745                C     0&X2,15999&X2     * COMPARE STACK TO STACK AT -1         7  7656  C 0!0 IRI          166   000+2 15999+2
+ 1746         * POP (1)
+ 1747                MA    LZGAAA,X2         * ADD -1 TO STACK POINTER              7  7663  # 68Q 094          166  8688     094
+1                                                                                                         PAGE   34
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+ 1748         * POP (1)
+ 1749                MA    LZGAAA,X2         * ADD -1 TO STACK POINTER              7  7670  # 68Q 094          166  8688     094
+ 1750         * PUSH (@00001@:5)
+ 1751                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  7677  # 76Q 094          166  8768     094
+ 1752                LCA   LCGAAA,0&X2       * LOAD DATA @00001@ IN STACK           7  7684  L 75L 0!0          166  8753     000+2
+ 1753                BE    LUFAAA            * JUMP IF EQUAL                        5  7691  B G0' S            167  7700
+ 1754                B     LVFAAA            * JUMP TO END                          4  7696  B G0X              167  7707
+ 1755         LUFAAA MCW   LAGAAA,0&X2       * MOVE 0 IN STACK                      7  7700  M 74M 0!0          167  8744     000+2
+ 1756         LVFAAA MCS   0&X2,0&X2         * CLEAR WM IN STACK                    7  7707  Z 0!0 0!0          167   000+2   000+2
+ 1757         * POP (5)
+ 1758                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  7714  # 78K 094          167  8782     094
+ 1759                BCE   LKAAAA,5&X2,      * JUMP TO BOTTOM OF WHILE              8  7721  B G3T 0!5          167  7733     005+2
+ 1760                B     LLAAAA            * JUMP TO TOP OF WHILE                 4  7729  B D8/              168  7481
+ 1761         * END WHILE [WHILE ((((*(DEST++)) = (*(SRC++))) != '\0')) [] TOP:LLAAAA BOT
+ 1762         * POP (3)
+ 1763         LKAAAA MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  7733  # 66Q 094          168  8668     094
+ 1764         * END [BLOCK ENDING AT LKAAAA]
+ 1765         ***************************************
+ 1766                LCA   3&X3,X1           * LOAD RETURN ADDRESS IN X1            7  7740  L 0?3 089          168   003+3   089
+ 1767                B     0&X1              * JUMP BACK TO CALLER IN X1            4  7747  B 0'0              168   000+1
+ 1768         ***************************************************************************
+ 1769         * END FUNCTION : STRCPY
+ 1770         ***************************************************************************
+ 1771         ***************************************************************************
+ 1772         * FUNCTION : STRLEN
+ 1773         ***************************************************************************
+ 1774         LFAAAA SBR   3&X3              * SAVE RETURN ADDRESS IN REGISTER      4  7751  H 0?3              168   003+3
+ 1775         * SET THE RIGHT WM AND CLEAR THE WRONG ONES
+ 1776                SW    1&X3              * SET WM AT 1&X3                       4  7755  , 0?1              168   001+3
+ 1777                CW    2&X3              * CLEAR WM AT 2&X3                     4  7759  ) 0?2              168   002+3
+ 1778                CW    3&X3              * CLEAR WM AT 3&X3                     4  7763  ) 0?3              169   003+3
+ 1779         ***************************************
+ 1780         * BEGIN [BLOCK ENDING AT LGAAAA]
+ 1781                LCA   LMHAAA,8&X3       * LOAD INT -1 INTO MEMORY 8&X3         7  7767  L 67L 0?8          169  8673     008+3
+ 1782         * PUSH (8)
+ 1783                MA    LIGAAA,X2         * ADD 8 TO STACK POINTER               7  7774  # 71Q 094          169  8718     094
+ 1784         * WHILE [WHILE (((STR[(++LEN)]) != '\0')) [] TOP:LHAAAA BOTTOM:LIAAAA]
+ 1785         * NOTEQUAL (!=) ((STR[(++LEN)]) != '\0')
+ 1786         * SUBSCRIPT (STR[(++LEN)])
+ 1787         * PARAMETER VARIABLE (STR : 15997+X3)
+ 1788         * PUSH (15997+X3:3)
+ 1789         LHAAAA MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  7781  # 76N 094          169  8765     094
+ 1790                LCA   15997&X3,0&X2     * LOAD MEMORY 15997&X3 IN STACK        7  7788  L IIG 0!0          169 15997+3   000+2
+ 1791         * PREINCREMENT((++LEN)
+ 1792         * PUSH (@008@:3)
+ 1793                MA    LHGAAA,X2         * ADD 3 TO STACK POINTER               7  7795  # 76N 094          169  8765     094
+ 1794                LCA   LIGAAA,0&X2       * LOAD DATA @008@ IN STACK             7  7802  L 71Q 0!0          170  8718     000+2
+ 1795                MA    X3,0&X2           * ADD X3 TO STACK                      7  7809  # 099 0!0          170   099     000+2
+ 1796         * POP (X1:3)
+ 1797                LCA   0&X2,X1           * LOAD STACK IN X1                     7  7816  L 0!0 089          170   000+2   089
+1                                                                                                         PAGE   35
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+ 1798                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  7823  # 66Q 094          170  8668     094
+ 1799                A     LCGAAA,0&X1       * PREINCREMENT MEMORY AT X1            7  7830  A 75L 0'0          170  8753     000+1
+ 1800         * PUSH (0+X1:5)
+ 1801                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  7837  # 76Q 094          171  8768     094
+ 1802                LCA   0&X1,0&X2         * LOAD MEMORY 0&X1 IN STACK            7  7844  L 0'0 0!0          171   000+1   000+2
+ 1803         * PUT RAW INDEX ON THE STACK
+ 1804         * PUSH (@00001@:5)
+ 1805                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  7851  # 76Q 094          171  8768     094
+ 1806                LCA   LCGAAA,0&X2       * LOAD DATA @00001@ IN STACK           7  7858  L 75L 0!0          171  8753     000+2
+ 1807                M     15995&X2,6&X2     * MULTIPLY STACK AT -5 TO STACK AT     7  7865  @ IRE 0!6          171 15995+2   006+2
+ 1808                SW    2&X2              * SET WM IN STACK AT 2                 4  7872  , 0!2              171   002+2
+ 1809                LCA   6&X2,15995&X2     * LOAD STACK AT 6 IN STACK AT -5       7  7876  L 0!6 IRE          172   006+2 15995+2
+ 1810         * POP (5)
+ 1811                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  7883  # 78K 094          172  8782     094
+ 1812         * STACK TOP IS NOW ARRAY INDEX
+ 1813                B     NMNPTR            * JUMP TO SNIPPET NUMBER_TO_POINTE     4  7890  B 28!              172  8280
+ 1814                MA    0&X2,15997&X2     * ADD STACK TO STACK AT -3             7  7894  # 0!0 IRG          172   000+2 15997+2
+ 1815         * POP (3)
+ 1816                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  7901  # 66Q 094          172  8668     094
+ 1817         * STACK TOP IS LOCATION IN ARRAY NOW
+ 1818         * END SUBSCRIPT (STR[(++LEN)])
+ 1819         * POP (X1:3)
+ 1820                LCA   0&X2,X1           * LOAD STACK IN X1                     7  7908  L 0!0 089          172   000+2   089
+ 1821                MA    LJGAAA,X2         * ADD -3 TO STACK POINTER              7  7915  # 66Q 094          173  8668     094
+ 1822         * PUSH (0+X1:1)
+ 1823                MA    LWGAAA,X2         * ADD 1 TO STACK POINTER               7  7922  # 74P 094          173  8747     094
+ 1824                LCA   0&X1,0&X2         * LOAD MEMORY 0&X1 IN STACK            7  7929  L 0'0 0!0          173   000+1   000+2
+ 1825         * CONSTANT ('\0' : EOS)
+ 1826         * PUSH (EOS:1)
+ 1827                MA    LWGAAA,X2         * ADD 1 TO STACK POINTER               7  7936  # 74P 094          173  8747     094
+ 1828                LCA   EOS,0&X2          * LOAD MEMORY EOS IN STACK             7  7943  L 345 0!0          173   345     000+2
+ 1829                C     0&X2,15999&X2     * COMPARE STACK TO STACK AT -1         7  7950  C 0!0 IRI          174   000+2 15999+2
+ 1830         * POP (1)
+ 1831                MA    LZGAAA,X2         * ADD -1 TO STACK POINTER              7  7957  # 68Q 094          174  8688     094
+ 1832         * POP (1)
+ 1833                MA    LZGAAA,X2         * ADD -1 TO STACK POINTER              7  7964  # 68Q 094          174  8688     094
+ 1834         * PUSH (@00001@:5)
+ 1835                MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  7971  # 76Q 094          174  8768     094
+ 1836                LCA   LCGAAA,0&X2       * LOAD DATA @00001@ IN STACK           7  7978  L 75L 0!0          174  8753     000+2
+ 1837                BE    LWFAAA            * JUMP IF EQUAL                        5  7985  B I9U S            175  7994
+ 1838                B     LXFAAA            * JUMP TO END                          4  7990  B 00J              175  8001
+ 1839         LWFAAA MCW   LAGAAA,0&X2       * MOVE 0 IN STACK                      7  7994  M 74M 0!0          175  8744     000+2
+ 1840         LXFAAA MCS   0&X2,0&X2         * CLEAR WM IN STACK                    7  8001  Z 0!0 0!0          175   000+2   000+2
+ 1841         * POP (5)
+ 1842                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  8008  # 78K 094          175  8782     094
+ 1843                BCE   LIAAAA,5&X2,      * JUMP TO BOTTOM OF WHILE              8  8015  B 02P 0!5          175  8027     005+2
+ 1844                B     LHAAAA            * JUMP TO TOP OF WHILE                 4  8023  B G8/              176  7781
+ 1845         * END WHILE [WHILE (((STR[(++LEN)]) != '\0')) [] TOP:LHAAAA BOTTOM:LIAAAA]
+ 1846         * PUT ON STACK RETURN VALUE (LEN)
+ 1847         * LOCAL VARIABLE (LEN : 8+X3)
+1                                                                                                         PAGE   36
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+ 1848         * PUSH (8+X3:5)
+ 1849         LIAAAA MA    LZFAAA,X2         * ADD 5 TO STACK POINTER               7  8027  # 76Q 094          176  8768     094
+ 1850                LCA   8&X3,0&X2         * LOAD MEMORY 8&X3 IN STACK            7  8034  L 0?8 0!0          176   008+3   000+2
+ 1851         * POP (15994+X3:5)
+ 1852                LCA   0&X2,15994&X3     * LOAD STACK IN 15994&X3               7  8041  L 0!0 IID          176   000+2 15994+3
+ 1853                MA    LBGAAA,X2         * ADD -5 TO STACK POINTER              7  8048  # 78K 094          176  8782     094
+ 1854         * POP (8)
+ 1855         LGAAAA MA    LYGAAA,X2         * ADD -8 TO STACK POINTER              7  8055  # 72N 094          176  8725     094
+ 1856         * END [BLOCK ENDING AT LGAAAA]
+ 1857         ***************************************
+ 1858                LCA   3&X3,X1           * LOAD RETURN ADDRESS IN X1            7  8062  L 0?3 089          177   003+3   089
+ 1859                B     0&X1              * JUMP BACK TO CALLER IN X1            4  8069  B 0'0              177   000+1
+ 1860         ***************************************************************************
+ 1861         * END FUNCTION : STRLEN
+ 1862         ***************************************************************************
+ 1863         ****************************************************************
+ 1864         ** CLEAN NUMBER SNIPPET **
+ 1865         ****************************************************************
+ 1866         * NORMALIZES THE ZONE BITS OF A NUMBER, LEAVING EITHER A=0B=0
+ 1867         * FOR A POSITIVE OR A=0B=1 FOR A NEGATIVE
+ 1868         CLNNMN SBR   X1                                                       4  8073  H 089              177   089
+ 1869         * DO NOTHING ON EITHER NO ZONE BITS OR ONLY A B ZONE BIT
+ 1870                BWZ   CLNNME,0&X2,2                                            8  8077  V 10! 0!0 2        177  8100     000+2
+ 1871                BWZ   CLNNME,0&X2,K                                            8  8085  V 10! 0!0 K        177  8100     000+2
+ 1872         * ELSE CLEAR THE ZONE BITS, AS IT IS POSITIVE
+ 1873                MZ    @ @,0&X2                                                 7  8093  Y 80! 0!0          177  8800     000+2
+ 1874         CLNNME B     0&X1                                                     4  8100  B 0'0              178   000+1
+ 1875         ****************************************************************
+ 1876         ****************************************************************
+ 1877         ** DIVISION SNIPPET **
+ 1878         ****************************************************************
+ 1879         * SETUP RETURN ADDRESS
+ 1880         SNPDIV SBR   DIVEND&3                                                 4  8104  H 25R              178  8259
+ 1881         * POP DIVIDEND
+ 1882                MCW   0&X2,CDIV2                                               7  8108  M 0!0 26R          178   000+2  8269
+ 1883                SBR   X2,15995&X2                                              7  8115  H 094 IRE          178   094   15995+2
+ 1884         * POP DIVISOR
+ 1885                MCW   0&X2,CDIV1                                               7  8122  M 0!0 26M          178   000+2  8264
+ 1886                SBR   X2,15995&X2                                              7  8129  H 094 IRE          178   094   15995+2
+ 1887                B     *&17              * BRANCH 17 PLACES DOWN?               4  8136  B 15O              179  8156
+ 1888                DCW   @00000@                                                  5  8144                     179
+ 1889                DC    @00000000000@                                           11  8155                     179
+ 1890                ZA    CDIV2,*-7         * PUT DIVIDEND INTO WORKING BL         7  8156  ? 26R 15N          179  8269    8155
+ 1891                D     CDIV1,*-19        * DIVIDE                               7  8163  % 26M 15!          179  8264    8150
+ 1892                MZ    *-22,*-21         * KILL THE ZONE BIT                    7  8170  Y 15M 15N          180  8154    8155
+ 1893                MZ    *-29,*-34         * KILL THE ZONE BIT                    7  8177  Y 15M 14R          180  8154    8149
+ 1894                MCW   *-41,CDIV3        * PICK UP ANSWER                       7  8184  M 14R 27M          180  8149    8274
+ 1895                SW    *-44              * SO I CAN PICKUP REMAINDER            4  8191  , 15!              180  8150
+ 1896                MCW   *-46,CDIV4        * GET REMAINDER                        7  8195  M 15N 27R          180  8155    8279
+ 1897                CW    *-55              * CLEAR THE WM                         4  8202  ) 15!              180  8150
+1                                                                                                         PAGE   37
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+ 1898                MZ    CDIV3-1,CDIV3     *  CLEANUP QUOTIENT BITZONE            7  8206  Y 27L 27M          181  8273    8274
+ 1899                MZ    CDIV4-1,CDIV4     *  CLEANUP REMAINDER BITZONE           7  8213  Y 27Q 27R          181  8278    8279
+ 1900         * PUSH REMAINDER
+ 1901                SBR   X2,5&X2                                                  7  8220  H 094 0!5          181   094     005+2
+ 1902                SW    15996&X2                                                 4  8227  , IRF              181 15996+2
+ 1903                MCW   CDIV4,0&X2                                               7  8231  M 27R 0!0          181  8279     000+2
+ 1904         * PUSH QUOTIENT
+ 1905                SBR   X2,5&X2                                                  7  8238  H 094 0!5          181   094     005+2
+ 1906                SW    15996&X2                                                 4  8245  , IRF              182 15996+2
+ 1907                MCW   CDIV3,0&X2                                               7  8249  M 27M 0!0          182  8274     000+2
+ 1908         * JUMP BACK
+ 1909         DIVEND B     000                                                      4  8256  B 000              182   000
+ 1910         * DIVISOR
+ 1911         CDIV1  DCW   00000                                                    5  8264                     182
+ 1912         * DIVIDEND
+ 1913         CDIV2  DCW   00000                                                    5  8269                     182
+ 1914         * QUOTIENT
+ 1915         CDIV3  DCW   00000                                                    5  8274                     182
+ 1916         * REMAINDER
+ 1917         CDIV4  DCW   00000                                                    5  8279                     182
+ 1918         ****************************************************************
+ 1919         ****************************************************************
+ 1920         ** CAST NUMBER TO POINTER SNIPPET **
+ 1921         ****************************************************************
+ 1922         NMNPTR SBR   X1                                                       4  8280  H 089              183   089
+ 1923         * CASTS A 5-DIGIT NUMBER TO A 3-DIGIT ADDRESS
+ 1924         * MAKE A COPY OF THE TOP OF THE STACK
+ 1925                SW    15998&X2                                                 4  8284  , IRH              183 15998+2
+ 1926                LCA   0&X2,3&X2                                                7  8288  L 0!0 0!3          183   000+2   003+2
+ 1927                CW    15998&X2                                                 4  8295  ) IRH              183 15998+2
+ 1928         * ZERO OUT THE ZONE BITS OF OUR COPY
+ 1929                MZ    @0@,3&X2                                                 7  8299  Y 80J 0!3          183  8801     003+2
+ 1930                MZ    @0@,2&X2                                                 7  8306  Y 80J 0!2          183  8801     002+2
+ 1931                MZ    @0@,1&X2                                                 7  8313  Y 80J 0!1          184  8801     001+2
+ 1932         * SET THE LOW-ORDER DIGIT'S ZONE BITS
+ 1933                C     @04000@,0&X2                                             7  8320  C 80O 0!0          184  8806     000+2
+ 1934                BL    NPHIGH                                                   5  8327  B 40O T            184  8406
+ 1935                C     @08000@,0&X2                                             7  8332  C 81J 0!0          184  8811     000+2
+ 1936                BL    NPLOZ                                                    5  8339  B 39K T            184  8392
+ 1937                C     @12000@,0&X2                                             7  8344  C 81O 0!0          184  8816     000+2
+ 1938                BL    NPLZO                                                    5  8351  B 37M T            185  8374
+ 1939                S     @12000@,0&X2                                             7  8356  S 82J 0!0          185  8821     000+2
+ 1940                MZ    @A@,3&X2                                                 7  8363  Y 82K 0!3          185  8822     003+2
+ 1941                B     NPHIGH                                                   4  8370  B 40O              185  8406
+ 1942         NPLZO  S     @08000@,0&X2                                             7  8374  S 82P 0!0          185  8827     000+2
+ 1943                MZ    @I@,3&X2                                                 7  8381  Y 82Q 0!3          185  8828     003+2
+ 1944                B     NPHIGH                                                   4  8388  B 40O              186  8406
+ 1945         NPLOZ  S     @04000@,0&X2                                             7  8392  S 83L 0!0          186  8833     000+2
+ 1946                MZ    @S@,3&X2                                                 7  8399  Y 83M 0!3          186  8834     003+2
+ 1947         * FOR SOME REASON THE ZONE BITS GET SET - IT STILL WORKS THOUGH.
+1                                                                                                         PAGE   38
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+ 1948         NPHIGH C     @01000@,0&X2                                             7  8406  C 83R 0!0          186  8839     000+2
+ 1949                BL    NMPTRE                                                   5  8413  B 47J T            186  8471
+ 1950                C     @02000@,0&X2                                             7  8418  C 84M 0!0          186  8844     000+2
+ 1951                BL    NPHOZ                                                    5  8425  B 46M T            187  8464
+ 1952                C     @03000@,0&X2                                             7  8430  C 84R 0!0          187  8849     000+2
+ 1953                BL    NPHZO                                                    5  8437  B 45L T            187  8453
+ 1954                MZ    @A@,1&X2                                                 7  8442  Y 82K 0!1          187  8822     001+2
+ 1955                B     NMPTRE                                                   4  8449  B 47J              187  8471
+ 1956         NPHZO  MZ    @I@,1&X2                                                 7  8453  Y 82Q 0!1          187  8828     001+2
+ 1957                B     NMPTRE                                                   4  8460  B 47J              187  8471
+ 1958         NPHOZ  MZ    @S@,1&X2                                                 7  8464  Y 83M 0!1          188  8834     001+2
+ 1959         NMPTRE LCA   3&X2,15998&X2                                            7  8471  L 0!3 IRH          188   003+2 15998+2
+ 1960                SBR   X2,15998&X2                                              7  8478  H 094 IRH          188   094   15998+2
+ 1961                B     0&X1                                                     4  8485  B 0'0              188   000+1
+ 1962         ****************************************************************
+ 1963         ****************************************************************
+ 1964         ** CAST POINTER TO NUMBER SNIPPET **
+ 1965         ****************************************************************
+ 1966         PTRNMN SBR   X1                                                       4  8489  H 089              188   089
+ 1967         * CASTS A 3-DIGIT ADDRESS TO A 5-DIGIT NUMBER
+ 1968         * MAKE ROOM ON THE STACK FOR AN INT
+ 1969                MA    @002@,X2                                                 7  8493  # 85K 094          188  8852     094
+ 1970         * MAKE A COPY OF THE TOP OF THE STACK
+ 1971                LCA   15998&X2,3&X2                                            7  8500  L IRH 0!3          189 15998+2   003+2
+ 1972         * NOW ZERO OUT THE TOP OF THE STACK
+ 1973                LCA   @00000@,0&X2                                             7  8507  L 85P 0!0          189  8857     000+2
+ 1974         * NOW COPY BACK, SHIFTED OVER 2 DIGITS
+ 1975                MCW   3&X2,0&X2                                                7  8514  M 0!3 0!0          189   003+2   000+2
+ 1976         * NOW ZERO OUT THE ZONE BITS ON THE STACK
+ 1977                MZ    @0@,0&X2                                                 7  8521  Y 80J 0!0          189  8801     000+2
+ 1978                MZ    @0@,15999&X2                                             7  8528  Y 80J IRI          189  8801   15999+2
+ 1979                MZ    @0@,15998&X2                                             7  8535  Y 80J IRH          190  8801   15998+2
+ 1980         * CHECK THE HIGH-ORDER DIGIT'S ZONE BITS
+ 1981                BWZ   PNHOZ,1&X2,S                                             8  8542  V 57! 0!1 S        190  8570     001+2
+ 1982                BWZ   PNHZO,1&X2,K                                             8  8550  V 58J 0!1 K        190  8581     001+2
+ 1983                BWZ   PNHOO,1&X2,B                                             8  8558  V 59K 0!1 B        190  8592     001+2
+ 1984                B     PNLOW                                                    4  8566  B 59R              190  8599
+ 1985         PNHOZ  A     @01000@,0&X2                                             7  8570  A 86K 0!0          191  8862     000+2
+ 1986                B     PNLOW                                                    4  8577  B 59R              191  8599
+ 1987         PNHZO  A     @02000@,0&X2                                             7  8581  A 86P 0!0          191  8867     000+2
+ 1988                B     PNLOW                                                    4  8588  B 59R              191  8599
+ 1989         PNHOO  A     @03000@,0&X2                                             7  8592  A 87K 0!0          191  8872     000+2
+ 1990         PNLOW  BWZ   PNLOZ,3&X2,S                                             8  8599  V 62P 0!3 S        191  8627     003+2
+ 1991                BWZ   PNLZO,3&X2,K                                             8  8607  V 63Q 0!3 K        192  8638     003+2
+ 1992                BWZ   PNLOO,3&X2,B                                             8  8615  V 64R 0!3 B        192  8649     003+2
+ 1993                B     PTRNME                                                   4  8623  B 65O              192  8656
+ 1994         PNLOZ  A     @04000@,0&X2                                             7  8627  A 87P 0!0          192  8877     000+2
+ 1995                B     PTRNME                                                   4  8634  B 65O              192  8656
+ 1996         PNLZO  A     @08000@,0&X2                                             7  8638  A 88K 0!0          192  8882     000+2
+ 1997                B     PTRNME                                                   4  8645  B 65O              193  8656
+1                                                                                                         PAGE   39
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+ 1998         PNLOO  A     @12000@,0&X2                                             7  8649  A 88P 0!0          193  8887     000+2
+ 1999         PTRNME B     0&X1                                                     4  8656  B 0'0              193   000+1
+ 2000         ****************************************************************
+ 2001         LDGAAA DCW   @00128@                                                  5  8664                     193
+ 2002         LGHAAA DCW   @ @                                                      1  8665                     193
+ 2003         LJGAAA DCW   @I9G@                                                    3  8668                     193
+ 2004         LMHAAA DCW   @0000J@                                                  5  8673                     193
+ 2005         LPGAAA DCW   @100000@                                                 6  8679                     194
+ 2006         LQGAAA DCW   @00042@                                                  5  8684                     194
+ 2007         LXGAAA DCW   @-@                                                      1  8685                     194
+ 2008         LZGAAA DCW   @I9I@                                                    3  8688                     194
+ 2009         LCHAAA DCW   @!40@                                                    3  8691                     194
+ 2010         LGGAAA DCW   @00004@                                                  5  8696                     194
+ 2011         LKGAAA DCW   @00002@                                                  5  8701                     194
+ 2012         LEHAAA DCW   @00010@                                                  5  8706                     195
+ 2013         LVGAAA DCW   @006@                                                    3  8709                     195
+ 2014         LJHAAA DCW   @201@                                                    3  8712                     195
+ 2015         LHHAAA DCW   @!24@                                                    3  8715                     195
+ 2016         LIGAAA DCW   @008@                                                    3  8718                     195
+ 2017         LAHAAA DCW   @0@                                                      1  8719                     195
+ 2018         LNGAAA DCW   @023@                                                    3  8722                     195
+ 2019         LYGAAA DCW   @I9B@                                                    3  8725                     196
+ 2020         LEGAAA DCW   @00064@                                                  5  8730                     196
+ 2021         LLGAAA DCW   @013@                                                    3  8733                     196
+ 2022         LTGAAA DCW   @!05@                                                    3  8736                     196
+ 2023         LLHAAA DCW   @I9D@                                                    3  8739                     196
+ 2024         LAGAAA DCW   @00000@                                                  5  8744                     196
+ 2025         LWGAAA DCW   @001@                                                    3  8747                     196
+ 2026         LFHAAA DCW   @X@                                                      1  8748                     197
+ 2027         LCGAAA DCW   @00001@                                                  5  8753                     197
+ 2028         LMGAAA DCW   @018@                                                    3  8756                     197
+ 2029         LIHAAA DCW   @!27@                                                    3  8759                     197
+ 2030         LBHAAA DCW   @I8F@                                                    3  8762                     197
+ 2031         LHGAAA DCW   @003@                                                    3  8765                     197
+ 2032         LZFAAA DCW   @005@                                                    3  8768                     197
+ 2033         LOGAAA DCW   @I7B@                                                    3  8771                     198
+ 2034         LUGAAA DCW   @014@                                                    3  8774                     198
+ 2035         LFGAAA DCW   @00032@                                                  5  8779                     198
+ 2036         LBGAAA DCW   @I9E@                                                    3  8782                     198
+ 2037         LRGAAA DCW   @00019@                                                  5  8787                     198
+ 2038         LSGAAA DCW   @!04@                                                    3  8790                     198
+ 2039         LYFAAA DCW   @028@                                                    3  8793                     198
+ 2040         LKHAAA DCW   @333@                                                    3  8796                     199
+ 2041         LDHAAA DCW   @!35@                                                    3  8799                     199
+                     DCW   @ @                                                      1  8800              LIT    199
+                     DCW   @0@                                                      1  8801              LIT    199
+                     DCW   @04000@                                                  5  8806              LIT    199
+                     DCW   @08000@                                                  5  8811              LIT    199
+                     DCW   @12000@                                                  5  8816              LIT    199
+                     DCW   @12000@                                                  5  8821              LIT    200
+1                                                                                                         PAGE   40
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+                     DCW   @A@                                                      1  8822              LIT    200
+                     DCW   @08000@                                                  5  8827              LIT    200
+                     DCW   @I@                                                      1  8828              LIT    200
+                     DCW   @04000@                                                  5  8833              LIT    200
+                     DCW   @S@                                                      1  8834              LIT    200
+                     DCW   @01000@                                                  5  8839              LIT    200
+                     DCW   @02000@                                                  5  8844              LIT    201
+                     DCW   @03000@                                                  5  8849              LIT    201
+                     DCW   @002@                                                    3  8852              LIT    201
+                     DCW   @00000@                                                  5  8857              LIT    201
+                     DCW   @01000@                                                  5  8862              LIT    201
+                     DCW   @02000@                                                  5  8867              LIT    201
+                     DCW   @03000@                                                  5  8872              LIT    201
+                     DCW   @04000@                                                  5  8877              LIT    202
+                     DCW   @08000@                                                  5  8882              LIT    202
+                     DCW   @12000@                                                  5  8887              LIT    202
+ 2042                END   START             * END OF PROGRAM CODE.                          / !41 080               2041
+1                                                                                                         PAGE   41
+0SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS
+
+ CDIV1    8264: 0    CDIV2    8269: 0    CDIV3    8274: 0    CDIV4    8279: 0    CLNNME   8100: 0    CLNNMN   8073: 0   
+ DIVEND   8256: 0    EOL      0346: 0    EOS      0345: 0    LABAAA   4512: 0    LAFAAA   4596: 0    LAGAAA   8744: 0   
+ LAHAAA   8719: 0    LBAAAA   3931: 0    LBFAAA   4603: 0    LBGAAA   8782: 0    LBHAAA   8762: 0    LCAAAA   4130: 0   
+ LCEAAA   5793: 0    LCFAAA   4874: 0    LCGAAA   8753: 0    LCHAAA   8691: 0    LDBAAA   4516: 0    LDEAAA   6223: 0   
+ LDFAAA   4881: 0    LDGAAA   8664: 0    LDHAAA   8799: 0    LEEAAA   6184: 0    LEFAAA   5708: 0    LEGAAA   8730: 0   
+ LEHAAA   8706: 0    LFAAAA   7751: 0    LFBAAA   5005: 0    LFEAAA   5642: 0    LFFAAA   5715: 0    LFGAAA   8779: 0   
+ LFHAAA   8748: 0    LGAAAA   8055: 0    LGBAAA   4776: 0    LGEAAA   6336: 0    LGFAAA   5859: 0    LGGAAA   8696: 0   
+ LGHAAA   8665: 0    LHAAAA   7781: 0    LHEAAA   6297: 0    LHFAAA   5866: 0    LHGAAA   8765: 0    LHHAAA   8715: 0   
+ LIAAAA   8027: 0    LIBAAA   5457: 0    LIEAAA   2163: 0    LIFAAA   6117: 0    LIGAAA   8718: 0    LIHAAA   8759: 0   
+ LJAAAA   7458: 0    LJBAAA   5009: 0    LJEAAA   2170: 0    LJFAAA   6131: 0    LJGAAA   8668: 0    LJHAAA   8712: 0   
+ LKAAAA   7733: 0    LKBAAA   5461: 0    LKEAAA   2642: 0    LKFAAA   6070: 0    LKGAAA   8701: 0    LKHAAA   8796: 0   
+ LLAAAA   7481: 0    LLBAAA   6382: 0    LLEAAA   2744: 0    LLFAAA   6077: 0    LLGAAA   8733: 0    LLHAAA   8739: 0   
+ LMBAAA   7122: 0    LMEAAA   2507: 0    LMFAAA   6477: 0    LMGAAA   8756: 0    LMHAAA   8673: 0    LNBAAA   6597: 0   
+ LNEAAA   2609: 0    LNFAAA   6484: 0    LNGAAA   8722: 0    LOEAAA   2372: 0    LOFAAA   6671: 0    LOGAAA   8771: 0   
+ LPBAAA   6791: 0    LPEAAA   2474: 0    LPFAAA   6678: 0    LPGAAA   8679: 0    LQBAAA   6601: 0    LQEAAA   2332: 0   
+ LQFAAA   6980: 0    LQGAAA   8684: 0    LRBAAA   6795: 0    LREAAA   2339: 0    LRFAAA   6987: 0    LRGAAA   8787: 0   
+ LSDAAA   2060: 0    LSEAAA   2438: 0    LSFAAA   7263: 0    LSGAAA   8790: 0    LTBAAA   6908: 0    LTDAAA   3913: 0   
+ LTEAAA   2445: 0    LTFAAA   7270: 0    LTGAAA   8736: 0    LUEAAA   2573: 0    LUFAAA   7700: 0    LUGAAA   8774: 0   
+ LVDAAA   2224: 0    LVEAAA   2580: 0    LVFAAA   7707: 0    LVGAAA   8709: 0    LWBAAA   7140: 0    LWEAAA   2708: 0   
+ LWFAAA   7994: 0    LWGAAA   8747: 0    LXBAAA   7440: 0    LXDAAA   2798: 0    LXEAAA   2715: 0    LXFAAA   8001: 0   
+ LXGAAA   8685: 0    LYAAAA   4148: 0    LYBAAA   7436: 0    LYDAAA   5563: 0    LYEAAA   4314: 0    LYFAAA   8793: 0   
+ LYGAAA   8725: 0    LZAAAA   5545: 0    LZBAAA   7163: 0    LZDAAA   6364: 0    LZEAAA   4321: 0    LZFAAA   8768: 0   
+ LZGAAA   8688: 0    NMNPTR   8280: 0    NMPTRE   8471: 0    NPHIGH   8406: 0    NPHOZ    8464: 0    NPHZO    8453: 0   
+ NPLOZ    8392: 0    NPLZO    8374: 0    PNHOO    8592: 0    PNHOZ    8570: 0    PNHZO    8581: 0    PNLOO    8649: 0   
+ PNLOW    8599: 0    PNLOZ    8627: 0    PNLZO    8638: 0    PRCPOS   0335: 0    PRINT    0201: 0    PRTSIZ   0344: 0   
+ PTRNME   8656: 0    PTRNMN   8489: 0    PUCPOS   0338: 0    PUNCH    0101: 0    PUNSIZ   0341: 0    READ     0001: 0   
+ SNPDIV   8104: 0    START    2041: 0    X1       0089: 0    X2       0094: 0    X3       0099: 0   
+
+0UNREFERENCED SYMBOLS
+
+ LABAAA LBAAAA LCAAAA LEEAAA LFAAAA LFBAAA LGAAAA LHEAAA LIBAAA LJAAAA LNBAAA LPBAAA LWBAAA LYAAAA LYBAAA LYDAAA LZDAAA
+ PRCPOS PRINT  PRTSIZ PUCPOS PUNCH  PUNSIZ READ

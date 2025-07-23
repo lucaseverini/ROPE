@@ -1,0 +1,95 @@
+ CLEAR STORAGE 1     ,008015,022026,030037,044,049,053053N000000N00001026                                         1
+ CLEAR STORAGE 2     L068116,105106,110117B101/I9I#071029C029056B026/B001/0991,001/001117I0?                      2
+ BOOTSTRAP           ,008015,022029,036040,047054,061068,072/061039              ,0010011040                      3
+0                                                                                                         PAGE    1
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  101                BEGN                                                                                MACRO
+              ********FIRST LINE OF THE    BEGIN   MACRO**********************                           GEN  
+              *                                                                                          GEN  
+1                          AUTOCODER PROGRAM                                                              PAGE    2
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  102                JOB   AUTOCODER PROGRAM                                                             GEN
+  103                CTL   6611  *6=16,000C;6=16,000T;1=OBJDECK;,1=MODADD                                GEN
+              *                                                                                          GEN  
+  104         RDBUFF EQU   1                   *READ BUFFER   (1-80)                   0001              GEN
+  105         PUBUFF EQU   101                 *PUNCH BUFFER  (101-181)                0101              GEN
+  106         PRBUFF EQU   201                 *PRINT BUFFER  (201-332)                0201              GEN
+  107         X1     EQU   089                 *FIRST  INDEX REGISTER                  0089              GEN
+  108         X2     EQU   094                 *SECOND INDEX REGISTER                  0094              GEN
+  109         X3     EQU   099                 *THIRD  INDEX REGISTER                  0099              GEN
+              *                                                                                          GEN  
+              ********LAST LINE OF THE    BEGIN   MACRO***********************                           GEN  
+  110                DCW   @MACRO TEST PROGRAM@ 09-25-2011@                        30  0362                       4
+  111         A1     DCW   100                                                      3  0365                       4
+  112         A2     DCW   200                                                      3  0368                       4
+  113         L1I    DCW   000                                                      3  0371                       4
+  114         ****************************************************************
+  115         *         CHAIN EXAMPLE
+  116         ****************************************************************
+  117         T1     DCW   @MY @                                                    3  0374                       5
+  118         T2     DCW   @NAME @                                                  5  0379                       5
+  119         T3     DCW   @IS @                                                    3  0382                       5
+  120         T4     DCW   @FRED @                                                  5  0387                       5
+  121         START  NOP                                                            1  0388  N                    5
+  122                X123                                                                                MACRO
+              ********FIRST LINE OF THE    INDEX   MACRO**********************                           GEN  
+              *                                                                                          GEN  
+  123                MCW   @X1000X2000X3000@,X3   *MARK INDEX REGISTERS             7  0389  M 508 099   GEN      5   508     099
+  124                SW    X1,X2               *SET WORD MARKS                      7  0396  , 089 094   GEN      5   089     094
+  125                SW    X3                  *SET WORD MARK                       4  0403  , 099       GEN      6   099
+              *                                                                                          GEN  
+              ********LAST LINE OF THE    INDEX   MACRO***********************                           GEN  
+  126                CS    332                 *CLEAR UPPER PRINT BUFFER            4  0407  / 332                6   332
+  127                CS    299                 *CLEAR LOWER PRINT BUFFER            4  0411  / 299                6   299
+  128                MAD   A1,A2                                                                         MACRO
+  129                SW    A2-2                                                     4  0415  , 366       GEN      6   366
+  130                A     A1,A2                                                    7  0419  A 365 368   GEN      6   365     368
+  131                CW    A2-2                                                     4  0426  ) 366       GEN      6   366
+  132                MCW   T4,230              *MOVE THE FIRST FIELD                7  0430  M 387 230            6   387     230
+  133                CHAIN 3                   *CHAIN TWO MORE MCWS                                      MACRO
+  134                MCW                                                            1  0437  M           GEN      7
+  135                MCW                                                            1  0438  M           GEN      7
+  136                MCW                                                            1  0439  M           GEN      7
+  137         L1     W                         *PRINT IT                            1  0440  2                    7
+  138                WNOSP                     *PRINT WITHOUT SPACING                                    MACRO
+  139                W                         *PRINT BUFFER                        1  0441  2           GEN      7
+  140                DC    @S@                 *BUT DO NOT SPACE                    1  0442              GEN      7
+  141                LOOP  L1,L1I,@024@     *CALL MACRO TO FIND CARD                                     MACRO
+  142                A     @1@,L1I             *ADD ONE TO INDEX                    7  0443  A 509 371   GEN      7   509     371
+  143                MZ    L1I-1,L1I           *CLEAR ZONE                          7  0450  Y 370 371   GEN      7   370     371
+  144                C     @024@,L1I           *ARE WE THERE YET?                   7  0457  C 512 371   GEN      8   512     371
+1                          AUTOCODER PROGRAM                                                              PAGE    3
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  145                BL    L1                  *NO, GO TRY AGAIN                    5  0464  B 440 T     GEN      8   440
+  146                EXIT                      *GOOD BYE                                                 MACRO
+              * STARTS IN COLUMN 6                                                                       GEN  
+              **********************************************************                                 GEN  
+              *         GET READY TO BOOT FROM THE FOLLOWING DECK                                        GEN  
+              *                                                                                          GEN  
+  147         EXIT   CS    332             * CLEAR PRINT STORAGE                    4  0469  / 332       GEN      8   332
+  148                CS                    * CLEAR PRINT STORAGE                    1  0473  /           GEN      8
+  149                CS                    * CLEAR PUNCH STORAGE                    1  0474  /           GEN      8
+  150                CS                    * CLEAR READ STORAGE                     1  0475  /           GEN      8
+  151                SW    001             * SET WORDMARK IN LOCATION 1             4  0476  , 001       GEN      8   001
+  152         NREAD  R                     * READ FIRST CARD OF NEXT OBJECT         1  0480  1           GEN      9
+  153                BCE   001,001,,       * IS IT A COMMA? BRANCH TO THE..         8  0481  B 001 001 , GEN      9   001     001
+  154                B     NREAD           * CHECK THE NEXT ONE                     4  0489  B 480       GEN      9   480
+  155                NOP                                                            1  0493  N           GEN      9
+              *********************************************************                                  GEN  
+                     DCW   @X1000X2000X3000@                                       15  0508              LIT      9
+                     DCW   @1@                                                      1  0509              LIT      9
+                     DCW   @024@                                                    3  0512              LIT      9
+  156                END   START                                                             / 388 080                388
+1                                                                                                         PAGE    4
+0SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS
+
+ A1       0365: 0    A2       0368: 0    EXIT     0469: 0    L1       0440: 0    L1I      0371: 0    NREAD    0480: 0   
+ PRBUFF   0201: 0    PUBUFF   0101: 0    RDBUFF   0001: 0    START    0388: 0    T1       0374: 0    T2       0379: 0   
+ T3       0382: 0    T4       0387: 0    X1       0089: 0    X2       0094: 0    X3       0099: 0   
+
+0UNREFERENCED SYMBOLS
+
+ EXIT   PRBUFF PUBUFF RDBUFF T1     T2     T3

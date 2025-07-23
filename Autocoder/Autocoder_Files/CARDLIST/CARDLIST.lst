@@ -1,0 +1,84 @@
+ CLEAR STORAGE 1     ,008015,022026,030037,044,049,053053N000000N00001026                                         1
+ CLEAR STORAGE 2     L068116,105106,110117B101/I9I#071029C029056B026/B001/0991,001/001117I0?                      2
+ BOOTSTRAP           ,008015,022029,036040,047054,061068,072/061039              ,0010011040                      3
+0                                                                                                         PAGE    1
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  101    ***  ************************************************************************
+  102         *     SSSSS = CARD SEQUENCE NUMBER          ********** = LABEL
+  103         *     OPER- = OPERATION                     OPERATION--- = OPERATION
+  104 SS SSS  **********OPER-OPERANDS----------------------------------------------------
+  105 ** ***  *****|****|***********************************************************
+1                          FIRST PROGRAM                                                                  PAGE    2
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  106                JOB   FIRST PROGRAM
+  107                CTL   6611  *6=16,000C;6=16,000T;1=OBJDECK;,1=MODADD
+  108         *
+  109                ORG   400                                                                0400
+  110                DCW   @IBM 1401 CARD LIST PROGRAM 12-11-2008@                 37  0436                       4
+  111                DCW   @                               @                       31  0467                       5
+  112                DC    @IBM 1401 CARD LIST PROGRAM@                            26  0493                       6
+  113         LINE1  DC    @                              @                        30  0523                       7
+  114                DCW   @               1         2         3@                  36  0559                       8
+  115                DC    @         4         5         6@                        30  0589                       9
+  116         LINE2  DC    @         7         8 @                                 21  0610                      10
+  117                DCW   @ CARD 123456789012345678901234567890@                  36  0646                      11
+  118                DC    @123456789012345678901234567890@                        30  0676                      12
+  119         LINE3  DC    @12345678901234567890 @                                 21  0697                      13
+  120         CRDCNT DCW   00000        *COUNT THE CARDS                            5  0702                      13
+  121         LNECNT DCW   @55@         *COUNT THE LINES                            2  0704                      13
+  122         BEGIN  H                                                              1  0705  .                   13
+      ** ***  ** Non-blank in 73-75 would confuse "Real Autocoder"                                       WARN 
+  123                SW    001          *SAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA     4  0706  , 001               13   001
+  124         TOPPAG C     LNECNT,@55@  *SEE IF WE HAVE PRINTED 55 DATA LINES       7  0710  C 704 863           14   704     863
+  125                BU    DOCARD       *GUESS NOT                                  5  0717  B 778 /             14   778
+  126                CC    1            *SKIP TO TOP OF PAGE                        2  0722  F 1                 14
+  127                CS    232          *CLEAR THE PRINT LINE                       4  0724  / 232               14   232
+  128                CS                                                             1  0728  /                   14
+  129                MCW   LINE1,287    *PUT UP THE TOP LINE                        7  0729  M 523 287           14   523     287
+  130                W                  *PRINT                                      1  0736  2                   14
+  131                MCW   LINE2,287    *PUT UP THE TOP LINE                        7  0737  M 610 287           15   610     287
+  132                W                  *PRINT                                      1  0744  2                   15
+  133                MCW   LINE3,287    *PUT UP THE TOP LINE                        7  0745  M 697 287           15   697     287
+  134                W                  *PRINT                                      1  0752  2                   15
+  135                MCW   @00@,LNECNT  *RESET LINE COUNT                           7  0753  M 865 704           15   865     704
+  136                CS    299          *JUST IN CASE                               4  0760  / 299               15   299
+  137                MCW   @>@,206      *MARK THE LEFT OF THE CARD                  7  0764  M 866 206           15   866     206
+  138                MCW   @<@,287      *MARK THE RIGHT OF THE CARD                 7  0771  M 867 287           16   867     287
+  139         DOCARD R                  *READ A CARD                                1  0778  1                   16
+  140                B     LSTCRD,A     *LAST CARD?                                 5  0779  B 843 A             16   843
+  141                C     @LASTCARD@,108  *LAST CARD?                              7  0784  C 875 108           16   875     108
+  142                BE    LSTCRD       *MUST BE                                    5  0791  B 843 S             16   843
+  143                A     @1@,CRDCNT   *ADD TO THE CARD COUNT                      7  0796  A 876 702           16   876     702
+  144                MZ    CRDCNT-1,CRDCNT  *CLEAR ZONE                             7  0803  Y 701 702           16   701     702
+  145                MCW   CRDCNT,205   *PUT IN THE CARD COUNT                      7  0810  M 702 205           17   702     205
+  146                MCW   080,286      *PUT IN THE CARD                            7  0817  M 080 286           17   080     286
+  147                W                  *PRINT IT                                   1  0824  2                   17
+  148                A     @1@,LNECNT   *ADD 1 TO LINE COUNT                        7  0825  A 876 704           17   876     704
+  149                MZ    LNECNT-1,LNECNT  *CLEAR ZONE                             7  0832  Y 703 704           17   703     704
+  150                B     TOPPAG       *GO TO THE TOP OF PAGE ROUTINE              4  0839  B 710               17   710
+  151         LSTCRD CS    299          *CLEAR STORAGE                              4  0843  / 299               17   299
+      ** ***  ** Non-blank in 73-75 would confuse "Real Autocoder"                                       WARN 
+  152                MCW   @*************** END OF FILE*************@,245  *SPE     7  0847  M 916 245           18   916     245
+  153                W                  *PRINT IT                                   1  0854  2                   18
+1                          FIRST PROGRAM                                                                  PAGE    3
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  154                CC    1            *TOP OF FORM                                2  0855  F 1                 18
+      ** ***  ** Non-blank in 73-75 would confuse "Real Autocoder"                                       WARN 
+  155                H     *-3          *STOP AND BRANCH BACK IF START IS PRESS     4  0857  . 857               18   857
+  156                NOP                                                            1  0861  N                   18
+                     DCW   @55@                                                     2  0863              LIT     18
+                     DCW   @00@                                                     2  0865              LIT     18
+                     DCW   @>@                                                      1  0866              LIT     19
+                     DCW   @<@                                                      1  0867              LIT     19
+                     DCW   @LASTCARD@                                               8  0875              LIT     19
+                     DCW   @1@                                                      1  0876              LIT     19
+                     DCW   @*************** END OF FILE*************@              40  0916              LIT     21
+  157                END   BEGIN                                                             / 705 080                705
+1                                                                                                         PAGE    4
+0SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS
+
+ BEGIN    0705: 0    CRDCNT   0702: 0    DOCARD   0778: 0    LINE1    0523: 0    LINE2    0610: 0    LINE3    0697: 0   
+ LNECNT   0704: 0    LSTCRD   0843: 0    TOPPAG   0710: 0   

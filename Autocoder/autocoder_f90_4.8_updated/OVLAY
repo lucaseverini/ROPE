@@ -1,0 +1,6 @@
+     ovlay     headr
+     )00       cs   80
+               sw   24,56
+               sw   63,67
+               r    56
+               dcw  #1

@@ -1,0 +1,804 @@
+               JOB  Ray tracer
+               CTL  3311
+
+     ****************************************************************
+     * Ray tracer
+     *
+     * Ray-traces a scene and sends the resulting image to the
+     * printer.
+     *
+     * Copyright 2014 Lawrence Kesteloot
+     *
+     * Licensed under the Apache License, Version 2.0 (the "License");
+     * you may not use this file except in compliance with the License.
+     * You may obtain a copy of the License at
+     *
+     *     http://www.apache.org/licenses/LICENSE-2.0
+     *
+     * Unless required by applicable law or agreed to in writing, software
+     * distributed under the License is distributed on an "AS IS" BASIS,
+     * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     * See the License for the specific language governing permissions and
+     * limitations under the License.
+     *
+
+     * Index registers.
+               ORG  87
+     X1        DSA  000                 Index register 1 (column number, 0-based).
+               DCW  11                  Filler to avoid new card.
+     X2        DSA  000                 Index register 2 (shade).
+               DCW  22                  Filler to avoid new card.
+     X3        DSA  000                 Index register 2 (sphere pointer).
+
+     * Location of scene database. This is after the literal storage area.
+     * Each sphere is five numbers (X, Y, Z, R, R^2), each five digits long.
+     * After the last sphere there's a single star (*) character.
+     SCENE     EQU  3500
+
+     * Main routine.
+               ORG  333
+     *START     BSS  HASDCK,B            Read scene from deck if B switch is on.
+     START     B    CPYSCN              Copy the hard-coded scene.
+     *          B    RENDER
+
+     *HASDCK    B    READSC              Read the deck scene.
+     *          B    READSC              Read the deck scene.
+
+     * Render the scene.
+     RENDER    ZA   +49,YV              Reset YV
+
+     * Clear dithering buffers.
+               SBR  ERNEXT,ERBUF1+1     Clear first buffer
+               B    ERCLR
+               SBR  ERNEXT,ERBUF2+1     Clear second buffer
+               B    ERCLR
+               SBR  ERTHIS,ERBUF1+1     Set buffer for this line
+
+     * Next line.
+     NXTLN     SBR  X1,0                Reset column number
+               CS   332                 Clear printer area
+               CS
+               ZA   -49,XV              Reset XV
+
+     * Swap dithering buffers.
+               MCW  ERNEXT,TMP3
+               MCW  ERTHIS,ERNEXT
+               MCW  TMP3,ERTHIS
+               B    ERCLR               Clear next line's buffer
+
+     * Next pixel.
+     NXTPX     MCW  MAXDST,BSTDST       Huge distance so far (nothing hit).
+               SBR  X3,SCENE            Select the first sphere.
+               MN   @ @,BRIGHT          Use space to indicate no brightness so far.
+               MZ   @ @,BRIGHT
+
+     * Set up the ray from the camera.
+               ZA   X0,TRX0
+               ZA   Y0,TRY0
+               ZA   Z0,TRZ0
+               ZA   XV,TRXV
+               ZA   YV,TRYV
+               ZA   ZV,TRZV
+
+     NXTSPH    B    SELECT              Copy selected sphere into globals.
+
+     * Trace a ray from the camera into the scene.
+               B    TRACE               Trace this sphere.
+
+     * See if we hit the sphere.
+               BCE  ADVSPH,TRHIT,0      Missed it, go to next sphere.
+
+     * See if it's closer than any other hit this pixel.
+               ZA   BSTDST,TMP          BSTDST
+               S    TRDIST,TMP                 - TRDIST
+               BM   ADVSPH,TMP          TRDIST > BSTDST, we've done better, skip it.
+               MCW  TRDIST,BSTDST       Remember better distance.
+
+     * Compute surface normal.
+               ZA   TRXH,XN             X
+               S    XC,XN                 - XC
+               ZA   TRYH,YN             Y
+               S    YC,YN                 - YC
+               ZA   TRZH,ZN             Z
+               S    ZC,ZN                 - ZC
+
+     * Normalize the normal and multiply times 100.
+               S    TMP                 Clear TMP.
+               ZA   XN,TMP-2            XN*100
+               MZ   TMP-2,TMP           Move sign bit.
+               MZ   @2@,TMP-2           Clear old sign bit.
+               D    R,TMP-4                    / R
+               MCW  TMP-6,XN            Move back into XN.
+
+               S    TMP                 Clear TMP.
+               ZA   YN,TMP-2            YN*100
+               MZ   TMP-2,TMP           Move sign bit.
+               MZ   @2@,TMP-2           Clear old sign bit.
+               D    R,TMP-4                    / R
+               MCW  TMP-6,YN            Move back into YN.
+
+               S    TMP                 Clear TMP.
+               ZA   ZN,TMP-2            ZN*100
+               MZ   TMP-2,TMP           Move sign bit.
+               MZ   @2@,TMP-2           Clear old sign bit.
+               D    R,TMP-4                    / R
+               MCW  TMP-6,ZN            Move back into ZN.
+
+     * Dot with light vector.
+               ZA   XN,TMP-6            XN
+               M    XL,TMP                 * XL
+               ZA   TMP,BRIGHT
+
+               ZA   YN,TMP-6            YN
+               M    YL,TMP                 * YL
+               A    TMP,BRIGHT
+
+               ZA   ZN,TMP-6            ZN
+               M    ZL,TMP                 * ZL
+               A    TMP,BRIGHT
+
+               MZ   BRIGHT,BRTRND       Move sign bit to rounding value.
+               A    BRTRND,BRIGHT       Add 50 (or -50) to round instead of truncate.
+               MZ   BRIGHT,BRIGHT-2     Move sign bit.
+               ZA   BRIGHT-2,BRIGHT     / 100 (because of fixed point multiply)
+
+     * Add dithering error value to current brightness.
+               MCW  X1,X2               X1
+               A    X2,X2                  * 2 (two digits per error entry)
+               MA   ERTHIS,X2                  + ERTHIS
+               A    2+X2,BRIGHT         Add error to current value
+
+     * Clamp brightness to max of 99.
+               BCE  NOCLMP,BRIGHT-2,0   Skip clamp if hundreds digit is 0
+               ZA   +99,BRIGHT          Clamp to 99
+
+     * Clamp brightness to min of 0.
+     NOCLMP    BM   DARK,BRIGHT         Check if negative (dark side of sphere).
+               B    ADVSPH              Not negative.
+
+     DARK      S    BRIGHT              Zero out bright.
+
+     * Move to the next sphere in the scene.
+     ADVSPH    SBR  X3,25&X3            Go to next sphere.
+               BCE  ENDPX,0&X3,*        If end of scene, we're done with pixel.
+               B    NXTSPH              Try the next sphere.
+
+     * We're done checking all the spheres. If we lit anything, draw it now. We
+     * wait until here so that we don't accumulate the dithering error multiple
+     * times if we hit multiple objects in single pixel.
+     ENDPX     BCE  NODRAW,BRIGHT,      If we didn't shade, don't draw anything.
+               SBR  X2,0                Clear X2
+               MN   BRIGHT-1,X2         X2 = BRIGHT/10
+               MN   SHADES-9&X2,201&X1  Copy full character to printer buffer
+               MZ   SHADES-9&X2,201&X1
+
+     * Compute error term (units digit of BRIGHT minus 5).
+               S    TMP3                Clear TMP3
+               MN   BRIGHT,TMP3         Copy units digit to TMP3
+               S    @5@,TMP3            Subtract 5 to be 0-centered
+
+     * Distribute the error term to neighboring pixels. The standard
+     * Floyd-Steinberg algorithm uses coefficients of 7/16, 3/16, 5/16,
+     * and 1/16 for the right, bottom-left, bottom, and bottom-right
+     * pixels, respectively. The "16" denominator was probably picked because
+     * it's easy to compute on a binary machine. Here we change it
+     * to be decimal-friendly: 44/100, 19/100, 31/100, and 6/100.
+
+     * 44/100 of error added to pixel on the right.
+               MCW  X1,X2               X1
+               A    X2,X2                  * 2 (two digits per error entry)
+               MA   ERTHIS,X2                  + ERTHIS
+               ZA   @44@,ERROR-4        44
+               M    TMP3,ERROR             * TMP3
+               MZ   ERROR,ERROR-2                 / 100 (move sign)
+               A    ERROR-2,4+X2        Add error to next pixel
+
+     * Get address of next line's error buffer.
+               MCW  X1,X2               X1
+               A    X2,X2                  * 2 (two digits per error entry)
+               MZ   @2@,X2              Clear zone bits.
+               MA   ERNEXT,X2                      + ERNEXT
+     * 19/100 of error added to pixel on the lower-left.
+               ZA   @19@,ERROR-4        19
+               M    TMP3,ERROR             * TMP3
+               MZ   ERROR,ERROR-2                 / 100 (move sign)
+               A    ERROR-2,0+X2        Add error to bottom-left pixel
+     * 31/100 of error added to pixel below.
+               ZA   @31@,ERROR-4        31
+               M    TMP3,ERROR             * TMP3
+               MZ   ERROR,ERROR-2                 / 100 (move sign)
+               A    ERROR-2,2+X2        Add error to bottom pixel
+     * 6/100 of error added to pixel on the lower-right.
+               ZA   @06@,ERROR-4        6
+               M    TMP3,ERROR             * TMP3
+               MZ   ERROR,ERROR-2                 / 100 (move sign)
+               A    ERROR-2,4+X2        Add error to bottom-right pixel
+
+     * End of pixel.
+     NODRAW    A    +1,XV               XV++
+               SBR  X1,1&X1             X1++
+
+     * See if we're done.
+               ZA   MAXX,TMP3           MAXX
+               S    XV,TMP3                  - XV
+               BWZ  NXTPX,TMP3,B        XV <= MAXX, MAXX - XV >= 0
+
+     * Print our line.
+               W
+
+     * Next line. Move by 2 to roughly match the aspect ratio of the pixel.
+               A    -2,YV               YV -= 2
+
+     * See if we're done.
+               ZA   MINY,TMP3           MINY
+               S    YV,TMP3                  - YV
+               BWZ  NXTLN,TMP3,K        YV >= MINY, MINY - YV <= 0
+
+     * Done.
+     FINIS     H    FINIS
+               H
+
+     * Sphere being rendered right now.
+     XC        DCW  00000               Sphere center
+     YC        DCW  00000
+     ZC        DCW  00000
+     R         DCW  00000               Sphere radius
+     R2        DCW  00000               Sphere radius squared
+
+     * Initial ray.
+     X0        DCW  00000               Position
+     Y0        DCW  00000
+     Z0        DCW  00050
+     XV        DCW  00000               Direction
+     YV        DCW  00000
+     ZV        DCW  -00050
+
+     * Keep track of distance to closest sphere for this pixel.
+     BSTDST    DCW  #10                 Best distance so far.
+     MAXDST    DCW  @9999999999@        Max distance (represents un-hit pixel).
+
+     * Lighting and shading.
+     XN        DCW  00000               Surface normal
+     YN        DCW  00000
+     ZN        DCW  00000
+     XL        DCW  00040               Light vector * 100, normalized
+     YL        DCW  00040
+     ZL        DCW  00081
+     BRIGHT    DCW  00000               Brightness * 100
+
+     * Constants.
+     MAXX      DCW  +049                One past max XV
+     MINY      DCW  -050                One past min YV
+     SHADES    DCW  @.,-:=*?#&@@        The various shades of pixels.
+
+     * Work area.
+     TMP3      DCW  000                 Temporary working space
+     TMP       DCW  #20                 Larger temporary space
+     ERROR     DCW  #6                  Dithering error
+     BRTRND    DCW  +50                 For rounding BRIGHT.
+
+     ****************************************************************
+     * Subroutine to trace a ray. Given a ray and a (global) scene,
+     * returns whether the ray intersected the object and how far.
+     *
+     * Entry point:  TRACE
+     *
+     * The caller must set the following fields:
+     *
+     *     TRX0    Position of ray
+     *     TRY0
+     *     TRZ0
+     *     TRXV    Direction of ray
+     *     TRYV
+     *     TRZV
+     *
+     * Upon return:
+     *
+     *     TRHIT   1 if hit, 0 if not.
+     *     TRDIST  Distance to object, in lengths of the direction
+     *             vector, times 100.
+     *     TRXH    Hit location
+     *     TRYH
+     *     TRZH
+     *
+
+     TRACE     SBR  TRACEX&3            Save return address
+
+     * Move ray to be relative to sphere.
+               ZA   TRX0,TRXR           X0
+               S    XC,TRXR                - XC
+               ZA   TRY0,TRYR           Y0
+               S    YC,TRYR                - YC
+               ZA   TRZ0,TRZR           Z0
+               S    ZC,TRZR                - ZC
+
+     * Quadratic equation coefficients.
+               ZA   TRXV,DOX1           A = TRV*TRV
+               ZA   TRYV,DOY1
+               ZA   TRZV,DOZ1
+               ZA   TRXV,DOX2
+               ZA   TRYV,DOY2
+               ZA   TRZV,DOZ2
+               B    DOT
+               ZA   DOTV,TRA
+
+               ZA   TRXV,DOX1           B = 2*TRV*TRR
+               ZA   TRYV,DOY1
+               ZA   TRZV,DOZ1
+               ZA   TRXR,DOX2
+               ZA   TRYR,DOY2
+               ZA   TRZR,DOZ2
+               B    DOT
+               ZA   DOTV,TRB
+               A    DOTV,TRB
+
+               ZA   TRXR,DOX1           C = TRR*TRR - R*R
+               ZA   TRYR,DOY1
+               ZA   TRZR,DOZ1
+               ZA   TRXR,DOX2
+               ZA   TRYR,DOY2
+               ZA   TRZR,DOZ2
+               B    DOT
+               ZA   DOTV,TRC
+               S    R2,TRC
+
+     * Discriminant: B*B - 4*A*C
+               ZA   TRB,TRDISC-13       B*B
+               M    TRB,TRDISC
+               ZA   TRA,TRTMP-12        A*C
+               M    TRC,TRTMP
+               S    TRTMP,TRDISC
+               S    TRTMP,TRDISC
+               S    TRTMP,TRDISC
+               S    TRTMP,TRDISC
+
+               BWZ  TRNEG,TRDISC,K      Jump if TRDISC is negative (missed the sphere).
+
+               MCW  @1@,TRHIT
+
+     * Compute the distance to the hit point. (-b - isqrt(disc)) / (2*a)
+               ZA   TRDISC,SQIN
+               B    SQRT                 sqrt(DISC)
+               ZS   SQOUT,TRDIST        -
+               S    TRB,TRDIST                      - B
+
+     * We can test right here if the distance is positive (ahead of us in the ray)
+     * because A is always positive.
+               BM   TRDIST,TRACEX       DIST is negative, sphere is behind us.
+
+     * We divide by 2*A. We also want two extra digits of precision, otherwise
+     * we'll end up with crude numbers like 2 and 3. We do this by effectively
+     * multiplying TRDIST by 100 when we set up the divide.
+               ZA   TRDIST,TRTMP-2      Set up for divide, *100.
+               MZ   TRDIST,TRTMP        Move sign.
+               MZ   @2@,TRTMP-2         Clear previous sign we have moved to.
+               D    @2@,TRTMP-9         Divide by 2.
+               ZA   TRTMP-2,TRTMP       Set up for divide again.
+               D    TRA,TRTMP-9         Divide by A.
+               ZA   TRTMP-12,TRDIST     Move to output.
+
+     * Compute intersection point.
+               ZA   TRDIST,TRTMP-6      DIST
+               M    TRXV,TRTMP               * XV
+               MZ   TRTMP,TRTMP-2       (move zone to prepare for divide by 100)
+               ZA   TRTMP-2,TRXH                  / 100
+               A    TRX0,TRXH                           + X0
+
+               ZA   TRDIST,TRTMP-6      DIST
+               M    TRYV,TRTMP               * YV
+               MZ   TRTMP,TRTMP-2       (move zone to prepare for divide by 100)
+               ZA   TRTMP-2,TRYH                  / 100
+               A    TRY0,TRYH                           + Y0
+
+               ZA   TRDIST,TRTMP-6      DIST
+               M    TRZV,TRTMP               * ZV
+               MZ   TRTMP,TRTMP-2       (move zone to prepare for divide by 100)
+               ZA   TRTMP-2,TRZH                  / 100
+               A    TRZ0,TRZH                           + Z0
+
+               B    TRACEX
+
+     TRNEG     MCW  @0@,TRHIT
+
+     TRACEX    B    000                 Return to caller
+
+     * Input fields.
+     TRX0      DCW  #5                  Ray position
+     TRY0      DCW  #5
+     TRZ0      DCW  #5
+     TRXV      DCW  #5                  Ray direction
+     TRYV      DCW  #5
+     TRZV      DCW  #5
+
+     * Output fields.
+     TRHIT     DCW  #1                  Hit (1) or miss (0)
+     TRDIST    DCW  #10                 Distance in units of ray length, *100
+     TRXH      DCW  #5                  Hit location
+     TRYH      DCW  #5
+     TRZH      DCW  #5
+
+     * Internal work space.
+     TRXR      DCW  #5                  Ray position relative to sphere
+     TRYR      DCW  #5
+     TRZR      DCW  #5
+     TRA       DCW  #11                 Quadratic equation coefficients
+     TRB       DCW  #12
+     TRC       DCW  #11
+     TRDISC    DCW  #25                 Quadratic equation discriminant
+     TRTMP     DCW  #23
+
+     ****************************************************************
+     * Dot product of two 3-vectors.
+     *
+     * Entry point:  DOT
+     *
+     * The caller must set the following fields:
+     *
+     *     DOX1    Vector 1
+     *     DOY1
+     *     DOZ2
+     *     DOX2    Vector 2
+     *     DOY2
+     *     DOZ2
+     *
+     * Upon return:
+     *
+     *     DOTV    Dot product of vectors 1 and 2.
+     *
+
+     DOT       SBR  DOTX&3              Save return address
+
+               ZA   DOX1,DOTV-6         DOX1
+               M    DOX2,DOTV                * DOX2
+
+               ZA   DOY1,DOTMP-6        DOY1
+               M    DOY2,DOTMP               * DOY2
+               A    DOTMP,DOTV          Add to dot product
+
+               ZA   DOZ1,DOTMP-6        DOZ1
+               M    DOZ2,DOTMP               * DOZ2
+               A    DOTMP,DOTV          Add to dot product
+
+     DOTX      B    000                 Return
+
+     * Input fields.
+     DOX1      DCW  #5
+     DOY1      DCW  #5
+     DOZ1      DCW  #5
+     DOX2      DCW  #5
+     DOY2      DCW  #5
+     DOZ2      DCW  #5
+
+     * Output fields.
+     DOTV      DCW  #11
+
+     * Internal work space.
+     DOTMP     DCW  #11
+
+     ****************************************************************
+     * Integer square root. Uses Newton's method.
+     * See http://en.wikipedia.org/wiki/Integer_square_root
+     *
+     * Entry point:  SQRT
+     *
+     * The caller must set the following fields:
+     *
+     *     SQIN    Non-negative integer (25 digits).
+     *
+     * Upon return:
+     *
+     *     SQOUT   Square root of SQIN.
+     *
+     * The algorithm iterates this function:
+     *
+     *     X' = (X + N/X)/2
+     *
+     * Where N is the numbers whose root we want. It converges
+     * quadratically and is guaranteed to converge if X starts
+     * with the value N. The algorithm is finished when
+     * successive values of X stop changing.
+     *
+
+     SQRT      SBR  SQRTX&3             Save return address
+
+               ZA   SQIN,SQOUT          Seed iteration with N
+
+     SQLOOP    ZA   SQOUT,SQPREV        Save old value of X
+
+               ZA   SQIN,SQTMP          N/X
+               D    SQOUT,SQTMP-24
+               A    SQOUT,SQTMP-26          + X
+               ZA   SQTMP-26,SQOUT      Save it
+               A    SQTMP-26            (     )*2
+               A    SQTMP-26            (     )*4
+               A    SQOUT,SQTMP-26      (     )*5
+               ZA   SQTMP-27,SQOUT               /10
+               C    SQOUT,SQPREV        X = previous X?
+               BE   SQRTX               Yes, we're done.
+               S    SQOUT,SQPREV        Compute SQPREV - SQOUT
+               BWZ  SQLOOP,SQPREV,B     If positive (SQOUT < SQPREV), loop.
+     *                                  Otherwise negative, regressing.
+
+     SQRTX     B    000                 Return
+
+     * Input fields.
+     SQIN      DCW  #25
+
+     * Output fields.
+     SQOUT     DCW  #25
+
+     * Internal work space.
+     SQPREV    DCW  #25
+     SQTMP     DCW  #51
+
+     ****************************************************************
+     * Print a numeric field.
+     *
+     * The numeric field is printed with an optional "-" sign in front,
+     * and the sign bits are cleared.
+     *
+     * Entry point:  PRINT
+     *
+     * The caller must set the following fields:
+     *
+     *     PRARG   Address of field to print. The field must be terminated
+     *             by a word mark and must be shorter than 50 characters.
+     *             It may be signed or unsigned.
+     *
+
+     PRINT     SBR  PRINTX&3            Save return address
+
+               CS   332                 Clear print area
+               CS
+               MCW  PRARG,*+4           Copy address to first arg of LCA
+               LCA  000,PRLOC           Copy field to print area.
+               SBR  PRNEG+6             Save location so we can print sign there.
+               BM   PRNEG,PRLOC         If negative, print negative sign.
+               B    PRPOS               Positive or unsigned.
+
+     PRNEG     MCW  @-@,000             Print negative sign in front of number.
+
+     PRPOS     MZ   @2@,PRLOC           Clear sign, makes it easier to read.
+               W                        Print.
+
+     PRINTX    B    000                 Return
+
+     * Input fields.
+     PRARG     DSA  000                 Address of field to print (lowest order byte).
+
+     * Internal work space.
+     PRLOC     EQU  250                 Where we're printing to.
+
+     ****************************************************************
+     * Print some useful globals.
+     *
+     * Entry point:  PRALL
+     *
+
+     PRALL     SBR  PRALLX&3            Save return address
+
+               SBR  PRARG,X0
+               B    PRINT
+               SBR  PRARG,Y0
+               B    PRINT
+               SBR  PRARG,Z0
+               B    PRINT
+
+               SBR  PRARG,XV
+               B    PRINT
+               SBR  PRARG,YV
+               B    PRINT
+               SBR  PRARG,ZV
+               B    PRINT
+
+               SBR  PRARG,XC
+               B    PRINT
+               SBR  PRARG,YC
+               B    PRINT
+               SBR  PRARG,ZC
+               B    PRINT
+
+               SBR  PRARG,TRXH
+               B    PRINT
+               SBR  PRARG,TRYH
+               B    PRINT
+               SBR  PRARG,TRZH
+               B    PRINT
+
+               SBR  PRARG,XN
+               B    PRINT
+               SBR  PRARG,YN
+               B    PRINT
+               SBR  PRARG,ZN
+               B    PRINT
+
+     PRALLX    B    000                 Return
+
+     ****************************************************************
+     * Select a sphere to render.
+     *
+     * Entry point:  SELECT
+     *
+     * The sphere data is copied to the global variables used by
+     * the TRACE routine and elsewhere.
+     *
+     * The caller must set the following fields:
+     *
+     *     X3      Address of sphere to copy. Use SCENE for
+     *             the first sphere, SCENE+25 for the second, etc.
+     *
+     * Upon return:
+     *
+     *     The XC, YC, ZC, R, and R2 variables have the
+     *     values of the specified sphere.
+     *
+
+     SELECT    SBR  SELECX&3            Save return address
+
+     * Copy to MCW instruction. Add 24 to get last byte of sphere.
+               SBR  SECOPY+3,24&X3
+
+     * Load into globals
+     SECOPY    MCW  000,R2              Copy radius squared
+               CHAIN 4                  Copy radius, ZC, YC, and XC
+
+     SELECX    B    000                 Return
+
+     ****************************************************************
+     * Read a scene from a card deck.
+     *
+     * Entry point:  READSC
+     *
+     * The scene is one sphere per card, with the following four
+     * fields at these locations:
+     *
+     *    Location    Field
+     *    1-5         X location of sphere's center.
+     *    6-10        Y location of sphere's center.
+     *    11-15       Z location of sphere's center.
+     *    16-20       Radius of sphere.
+     *
+     * For negative numbers, the units digit must have the negative
+     * zone bits set. The rest of the card can be used as a comment.
+     *
+
+     READSC    SBR  READSX&3            Save return address
+
+               CS   80                  Clear word marks.
+               SW   1,6                 Set word marks in card.
+               SW   11,16
+               SBR  X3,SCENE            Select the first sphere.
+
+     RENEXT    R                        Read a card
+
+               LCA  20,19&X3            Copy radius
+               CHAIN 3                  Copy Z, Y, and X
+
+     * Square the radius
+               S    RESQR               Clear work area.
+               MCW  19&X3,RESQR-6       R
+               M    19&X3,RESQR           * R
+               SW   RESQR-4             Set end of R^2.
+               MZ   @2@,RESQR           Clear sign of R^2.
+               LCA  RESQR,24&X3         Copy to scene.
+               CW   RESQR-4             Clear end of R^2.
+
+               SBR  X3,25&X3            Next sphere.
+
+               BIN  REDONE,A            If last card, we're done.
+               B    RENEXT              Go to next card.
+
+     REDONE    MCW  @*@,0&X3            Mark end of scene.
+
+     READSX    B    000                 Return
+
+     * Internal work space.
+     RESQR     DCW  #11                 To square the radius.
+
+     ****************************************************************
+     * Copy the hard-coded scene to the scene database.
+     *
+     * Entry point:  CPYSCN
+     *
+     * Note: Destroys X1 and X3.
+
+     CPYSCN    SBR  CPYSCX&3            Save return address
+
+               SBR  X1,HRDSCN-4         Source
+               SBR  X3,SCENE            Destination
+
+     CPLOOP    MN   0&X1,0&X3           Move the BCD bits.
+               MZ   0&X1,0&X3           Move the zone bits.
+
+               BWZ  CPWM,0&X1,1         Word mark?
+               CW   0&X3                Clear word mark.
+               B    CPCONT
+
+     CPWM      SW   0&X3                Set word mark.
+
+     CPCONT    BCE  CPYSCX,0&X1,*       End of scene, done with copy.
+
+               SBR  X1,1&X1             Next byte.
+               SBR  X3,1&X3
+
+               B    CPLOOP
+
+     CPYSCX    B    000                 Return
+
+     ****************************************************************
+     * Clear the next error buffer.
+     *
+     * Entry point:  ERCLR 
+     *
+     * Clears the error buffer (ERBUF1 or ERBUF2) pointed to by ERNEXT.
+     * This means settings every two-byte pixel to 00, with a word
+     * mark on the high-order digit.
+     *
+     * Note: Destroys X2.
+     *
+
+     ERCLR     SBR  ERCLRX&3            Save return address
+
+               MCW  ERNEXT,X2           Move ERNEXT into our index
+
+     ERLOOP    LCA  @00@,1&X2           Save 00 with word mark
+               SBR  X2,2&X2             Increment X by 2
+               BCE  ERCLRX,0&X2,*       Check if end of buffer
+               B    ERLOOP              Next pixel
+
+     ERCLRX    B    000                 Return
+               NOP                      Word mark of B instruction
+
+     ****************************************************************
+     * Floyd-Steinberg dithering error buffers.
+     *
+     * We have two buffers: one for the current line and one for
+     * the next line. Each buffer has enough entries for each pixel,
+     * plus two for the pixels off the ends (so we don't have to do
+     * edge checking). Each pixel has two digits, for an error between
+     * -99 and 99.
+     *
+     * After each row, we swap which buffer we consider "this" line
+     * and which we consider "next" line.
+     *
+
+     ERBUF1    DC   0                   Byte before buffer.
+               DC   #50                 101 pixels, 2 digits per pixel
+               DC   #50
+               DC   #50
+               DC   #52
+               DC   @**@                End of buffer mark
+     ERBUF2    DC   0                   Byte before buffer.
+               DC   #50                 101 pixels, 2 digits per pixel
+               DC   #50
+               DC   #50
+               DC   #52
+               DC   @**@                End of buffer mark
+     ERTHIS    DCW  000                 Points to start of ERBUF* for this line
+     ERNEXT    DCW  000                 Points to start of ERBUF* for next line
+
+     ****************************************************************
+     * Hard-coded built-in scene.
+     *
+     HRDSCN    DCW  -00080              Sphere 0 center
+               DCW  00080
+               DCW  -00200
+               DCW  00100               Sphere radius
+               DCW  10000               Sphere radius squared
+
+               DCW  00080               Sphere 1 center
+               DCW  -00020
+               DCW  -00200
+               DCW  00100               Sphere radius
+               DCW  10000               Sphere radius squared
+
+               DCW  -00080               Sphere 2 center
+               DCW  -00100
+               DCW  -00200
+               DCW  00100               Sphere radius
+               DCW  10000               Sphere radius squared
+
+
+               DCW  @*@                 Mark end of scene.
+
+               END  START

@@ -1,0 +1,704 @@
+ CLEAR STORAGE 1     ,008015,022026,030037,044,049,053053N000000N00001026                                         1
+ CLEAR STORAGE 2     L068116,105106,110117B101/I9I#071029C029056B026/B001/0991,001/001117I0?                      2
+ BOOTSTRAP           ,008015,022029,036040,047054,061068,072/061039              ,0010011040                      3
+0                          COMPUTE PI TO 500 DECIMAL PLACES                                               PAGE    1
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  101                JOB   COMPUTE PI TO 500 DECIMAL PLACES
+  102                CTL   6611
+  103         ***************************************************************************
+  104         *
+  105         *     COMPUTE PI TO 500 DECIMAL PLACES USING THE BORWEIN ALGORITHM:
+  106         *
+  107         *     INITIALIZATION
+  108         *
+  109         *         Y[0] = SQRT(2) - 1
+  110         *         A[0] = 6 - 4*SQRT(2)
+  111         *
+  112         *     FOR I = 1 TO 5
+  113         *
+  114         *         Y4     = Y[I-1]**4
+  115         *         YROOT4 = (1 - Y4)**(1/4)
+  116         *         Y[I]   = (1 - YROOT4)/(1 + YROOT4)
+  117         *         YTERM4 = (1 + Y[I])**4
+  118         *         A[I]   = A[I-1]*YTERM4
+  119         *         POWER2 = 2**(2*I + 1)
+  120         *         Y2     = Y[I]**2
+  121         *         ATERM  = POWER2*Y[I]*(1 + Y[I] + Y2)
+  122         *         A[I]   = A[I] - ATERM
+  123         *         PI[I]  = 1/A[I]
+  124         *
+  125               AR THE  ITERATIONS ARE DONE, PI = PI[5].                                             MACRO
+  126         *  R THE  UNKNOWN                                                                          MACRO       MACRO ERROR
+  127         *
+  128         *     TO ENSURE ACCURACY OF ALL 500 DECIMAL PLACES, THIS PROGRAM
+  129         *     CALCULATES WITH 505 DIGITS.
+  130         *
+  131         ***************************************************************************
+  132                ORG   87                                                                 0087
+  133         X1     DSA   0                  INDEX REGISTER 1                      3  0089  000                  4   000
+  134                ORG   92                                                                 0092
+  135         X2     DSA   0                  INDEX REGISTER 2                      3  0094  000                  5   000
+  136                ORG   97                                                                 0097
+  137         X3     DSA   0                  INDEX REGISTER 3                      3  0099  000                  6   000
+  138         *
+  139                ORG   333                                                                0333
+  140         *
+  141         * PRINT THE HEADER.
+  142         *
+  143         START  CS    332                                                      4  0333  / 332                7   332
+  144                CS                                                             1  0337  /                    7
+  145                MCW   @***** PI TO 500 DECIMAL PLACES *****@,319               7  0338  M R19 319            7  2919     319
+  146                W                                                              1  0345  2                    7
+  147         *
+1                          COMPUTE PI TO 500 DECIMAL PLACES                                               PAGE    2
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  148         * COMPUTE SQRT(2).
+  149         *
+  150                ZA    LENN,SQLENN        SQLENN = LENN                         7  0346  ? 954 L00            7   954    2300
+  151                ZA    DP,SQDP            SQDP   = DP                           7  0353  ? 957 L04            7   957    2304
+  152         *
+  153                SBR   SQADRN,TWO         SQADRN = @TWO                         7  0360  H L10 963            7  2310     963
+  154                SBR   SQADRX,SQRT2       SQADRX = @SQRT2                       7  0367  H L13 '67            8  2313    1067
+  155                SBR   SQADRP,TEMP1       SQADRP = @TEMP1                       7  0374  H L16 W99            8  2316    1699
+  156                SBR   SQADRT,TEMP2       SQADRT = @TEMP2                       7  0381  H L19 X51            8  2319    1751
+  157                B     SQRT                                                     4  0388  B Y57                8  1857
+  158         *
+  159         * COMPUTE Y[0] = SQRT(2) - 1
+  160         *
+  161                MCW   SQRT2,YI           SQRT(2)                               7  0392  M '67 S25            8  1067    1225
+  162                S     @1@,YI-505                 - 1                           7  0399  S R20 720            8  2920     720
+  163                MZ    @ @,YI-505                                               7  0406  Y R21 720            9  2921     720
+  164                SW    YI-504                                                   4  0413  , 721                9   721
+  165         *
+  166         * COMPUTE A[0] = 6 - 4*SQRT(2)
+  167         *
+  168                S     AI                                                       4  0417  S /21                9  1121
+  169                MCW   @6@,AI-505        6                                      7  0421  M R22 616            9  2922     616
+  170                S     SQRT2,AI            - SQRT(2)                            7  0428  S '67 /21            9  1067    1121
+  171                S     SQRT2,AI            - SQRT(2)                            7  0435  S '67 /21            9  1067    1121
+  172                S     SQRT2,AI            - SQRT(2)                            7  0442  S '67 /21           10  1067    1121
+  173                S     SQRT2,AI            - SQRT(2)                            7  0449  S '67 /21           10  1067    1121
+  174         *
+  175         * START OF LOOP.  INCREMENT THE ITERATION COUNTER.
+  176         *
+  177         LOOP   A     @1@,ITERS                                                7  0456  A R20 961           10  2920     961
+  178         *
+  179         * COMPUTE Y4 = Y[I-1]**4
+  180         *
+  181                SW    Y2-505,Y4-506                                            7  0463  , 824 927           10   824     927
+  182                ZA    DP,P2LENF                                                7  0470  ? 957 M01           10   957    2401
+  183                SBR   P2AFCT,YI                                                7  0477  H L97 S25           11  2397    1225
+  184                SBR   P2APRD,Y2&505                                            7  0484  H ### Y34           11   ###    1834
+  185                B     POWR2              Y[I-1]**2                             4  0491  B L20               11  2320
+  186                SBR   P2AFCT,Y2                                                7  0495  H L97 T29           11  2397    1329
+  187                SBR   P2APRD,Y4&504                                            7  0502  H ### Z37           11   ###    1937
+  188                B     POWR2              (Y[I-1]**2)**2                        4  0509  B L20               11  2320
+  189         *
+  190         * COMPUTE YRT4 = (1 - Y4)**(1/4)
+  191         *
+  192                S     TEMP3&505                                                4  0513  S L09               12  2309
+  193                MCW   @1@,TEMP3          1                                     7  0517  M R20 Y04           12  2920    1804
+  194                S     Y4,TEMP3&505         - Y4                                7  0524  S U33 L09           12  1433    2309
+  195         *
+  196                ZA    LENN,SQLENN        SQLENN = LENN                         7  0531  ? 954 L00           12   954    2300
+  197                ZA    DP,SQDP            SQDP   = DP                           7  0538  ? 957 L04           12   957    2304
+1                          COMPUTE PI TO 500 DECIMAL PLACES                                               PAGE    3
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  198         *
+  199                SBR   SQADRN,TEMP3       SQADRN = @TEMP3                       7  0545  H L10 Y04           12  2310    1804
+  200                SBR   SQADRX,YRT4        SQADRX = @YRT4                        7  0552  H L13 W41           13  2313    1641
+  201                SBR   SQADRP,TEMP1       SQADRP = @TEMP1                       7  0559  H L16 W99           13  2316    1699
+  202                SBR   SQADRT,TEMP2       SQADRT = @TEMP2                       7  0566  H L19 X51           13  2319    1751
+  203                B     SQRT               SQRT(1 - Y4)                          4  0573  B Y57               13  1857
+  204         *
+  205                MCW   YRT4,TEMP3&505                                           7  0577  M W41 L09           13  1641    2309
+  206                SBR   SQADRN,TEMP3       SQADRN = @TEMP3                       7  0584  H L10 Y04           13  2310    1804
+  207                SBR   SQADRX,YRT4        SQADRX = @YRT4                        7  0591  H L13 W41           14  2313    1641
+  208                SBR   SQADRP,TEMP1       SQADRP = @TEMP1                       7  0598  H L16 W99           14  2316    1699
+  209                SBR   SQADRT,TEMP2       SQADRT = @TEMP2                       7  0605  H L19 X51           14  2319    1751
+  210                B     SQRT               SQRT(SQRT(1 - Y4))                    4  0612  B Y57               14  1857
+  211         *
+  212         * COMPUTE Y[I] = (1 - YRT4)/(1 + YRT4)
+  213         *
+  214                S     YI&507                                                   4  0616  S X32               14  1732
+  215                MCW   @1@,YI-503         1                                     7  0620  M R20 722           14  2920     722
+  216                S     YRT4,YI&2            - YRT4 (DIVIDEND)                   7  0627  S W41 S27           15  1641    1227
+  217                MZ    @ @,YI&2                                                 7  0634  Y R21 S27           15  2921    1227
+  218         *
+  219                ZA    YRT4,Y2            YRT4                                  7  0641  ? W41 T29           15  1641    1329
+  220                A     @1@,Y2-505              & 1 (DIVISOR)                    7  0648  A R20 824           15  2920     824
+  221                MZ    @ @,Y2-505                                               7  0655  Y R21 824           15  2921     824
+  222         *
+  223                D     Y2,YI-503          (1 - YRT4)/(1 & YRT4)                 7  0662  % T29 722           16  1329     722
+  224         *
+  225         * COMPUTE YTERM4 = (1 + Y[I])**4
+  226         *
+  227                CW    Y2-505,Y2-506                                            7  0669  ) 824 823           16   824     823
+  228                CW    Y4-506                                                   4  0676  ) 927               16   927
+  229                ZA    YI,TEMP1           Y[I]                                  7  0680  ? S25 W99           16  1225    1699
+  230                A     @1@,TEMP1-505           & 1                              7  0687  A R20 /94           16  2920    1194
+  231                MZ    @ @,TEMP1-505                                            7  0694  Y R21 /94           16  2921    1194
+  232         *
+  233                ZA    @506@,P2LENF                                             7  0701  ? R25 M01           17  2925    2401
+  234                SBR   P2AFCT,TEMP1                                             7  0708  H L97 W99           17  2397    1699
+  235                SBR   P2APRD,Y2&505                                            7  0715  H ### Y34           17   ###    1834
+  236                B     POWR2              (1 & Y[I])**2                         4  0722  B L20               17  2320
+  237                SW    Y2-506                                                   4  0726  , 823               17   823
+  238         *
+  239                SBR   P2AFCT,Y2                                                7  0730  H L97 T29           17  2397    1329
+  240                SBR   P2APRD,Y4&504                                            7  0737  H ### Z37           18   ###    1937
+  241                B     POWR2              ((1 & Y[I])**2)**2                    4  0744  B L20               18  2320
+  242                SW    Y4-506                                                   4  0748  , 927               18   927
+  243         *
+  244         * COMPUTE A[I] = A[I-1]*YTERM4
+  245         *
+  246                SW    TEMP2-506                                                4  0752  , S45               18  1245
+  247                ZA    Y4,TEMP2           YTERM4                                7  0756  ? U33 X51           18  1433    1751
+1                          COMPUTE PI TO 500 DECIMAL PLACES                                               PAGE    4
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  248                M     AI,TEMP2&507             *A[I-1]                         7  0763  @ /21 K58           18  1121    2258
+  249                ZA    TEMP2&2,AI                                               7  0770  ? X53 /21           19  1753    1121
+  250                CW    TEMP2-506                                                4  0777  ) S45               19  1245
+  251         *
+  252         * COMPUTE POWER2 = 2**(2*I + 1)
+  253         *
+  254                A     POW2                                                     4  0781  A W47               19  1647
+  255                A     POW2               POWER2 = 2*POWER2                     4  0785  A W47               19  1647
+  256         *
+  257         * COMPUTE Y2 = Y[I]**2
+  258         *
+  259                SW    Y2-505                                                   4  0789  , 824               19   824
+  260                ZA    DP,P2LENF                                                7  0793  ? 957 M01           19   957    2401
+  261                SBR   P2AFCT,YI                                                7  0800  H L97 S25           19  2397    1225
+  262                SBR   P2APRD,Y2&505                                            7  0807  H ### Y34           20   ###    1834
+  263                B     POWR2              Y[I]**2                               4  0814  B L20               20  2320
+  264         *
+  265         * COMPUTE ATERM = POW2*Y[I]*(1 + Y[I] + Y2)
+  266         *
+  267                SW    TEMP2-506                                                4  0818  , S45               20  1245
+  268                S     TEMP2-1                                                  4  0822  S X50               20  1750
+  269                MCW   @1@,TEMP2-506      (1                                    7  0826  M R20 S45           20  2920    1245
+  270                A     YI,TEMP2-1            & Y[I]                             7  0833  A S25 X50           20  1225    1750
+  271                A     Y2,TEMP2-1                   & Y2)                       7  0840  A T29 X50           21  1329    1750
+  272                M     YI,TEMP2&506                      *Y[I])                 7  0847  @ S25 K57           21  1225    2257
+  273                M     POW2,TEMP2&5                            *POWER2          7  0854  @ W47 X56           21  1647    1756
+  274                SW    TEMP2-500                                                4  0861  , S51               21  1251
+  275         *
+  276         * COMPUTE A[I] = A[I] - ATERM
+  277         *
+  278                S     TEMP2&5,AI         A[I] - ATERM                          7  0865  S X56 /21           21  1756    1121
+  279                CW    TEMP2-500,TEMP2-506                                      7  0872  ) S51 S45           21  1251    1245
+  280         *
+  281         * COMPUTE PI[I] = 1/A[I]
+  282         *
+  283                S     PI&507                                                   4  0879  S !44               22  2044
+  284                MCW   @1@,PI-503         1                                     7  0883  M R20 '34           22  2920    1034
+  285                D     AI,PI-503           /PI[I]                               7  0890  % /21 '34           22  1121    1034
+  286         *
+  287         *
+  288         * ALL DONE?
+  289         *
+  290                C     ITERS,ITRMAX                                             7  0897  C 961 962           22   961     962
+  291                BE    DONE               DONE IF ITERS = ITRMAX                5  0904  B 913 S             22   913
+  292                B     LOOP               ELSE LOOP AGAIN                       4  0909  B 456               22   456
+  293         *
+  294         * PRINT FINAL PI
+  295         *
+  296         DONE   SBR   PRADDR,PI          PRADDR = @PI - DP                     7  0913  H Q43 V37           23  2843    1537
+  297                ZA    DP,CNVOFF                                                7  0920  ? 957 N72           23   957    2572
+1                          COMPUTE PI TO 500 DECIMAL PLACES                                               PAGE    5
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  298                B     CNVRTN                                                   4  0927  B M10               23  2410
+  299                MA    CNVOFF,PRADDR                                            7  0931  # N72 Q43           23  2572    2843
+  300                ZA    DPPRT,PRDP         PRDP = DP TO PRINT                    7  0938  ? 960 Q47           23   960    2847
+  301                B     PRINT                                                    4  0945  B N85               23  2585
+  302         *
+  303         FINIS  H     FINIS                                                    4  0949  . 949               24   949
+  304                H                                                              1  0953  .                   24
+  305         *
+  306         LENN   DCW   1                  LEN(TWO)                              1  0954                      24
+      ** ***  ** Non-blank in 73-75 would confuse "Real Autocoder"                                       WARN 
+  307         DP     DCW   505                ACTUAL NUMBER OF DECIMAL PLACES (     3  0957                      24
+  308         DPPRT  DCW   500                NUMBER OF DECIMAL PLACES TO PRINT     3  0960                      24
+  309         ITERS  DCW   0                  ITERATION COUNTER                     1  0961                      24
+  310         ITRMAX DCW   5                  MAX ITERATIONS                        1  0962                      24
+  311         *
+  312         TWO    DCW   2                                                        1  0963                      25
+      ** ***  ** DCW specifies area of more than 52 characters                                           ERROR
+  313                DC    #1010              LEN = 2*DP                           52  1015                      27  BAD STATEMENT
+      ** ***  ** DCW specifies area of more than 52 characters                                           ERROR
+  314         SQRT2  DCW   #506               LEN = LEN(TWO) & DP                  52  1067                      29  BAD STATEMENT
+  315                DC    #2                 REMAINDER OF /2: LEN = 2              2  1069                      29
+  316         *
+      ** ***  ** DCW specifies area of more than 52 characters                                           ERROR
+  317         AI     DCW   #506               LEN = DP & 1                         52  1121                      31  BAD STATEMENT
+      ** ***  ** DCW specifies area of more than 52 characters                                           ERROR
+  318                DC    #508               LEN = DP & 3                         52  1173                      33  BAD STATEMENT
+      ** ***  ** DCW specifies area of more than 52 characters                                           ERROR
+  319         YI     DCW   #506               LEN = DP & 1                         52  1225                      35  BAD STATEMENT
+      ** ***  ** DCW specifies area of more than 52 characters                                           ERROR
+  320                DC    #507               LEN = DP & 2                         52  1277                      37  BAD STATEMENT
+      ** ***  ** DCW specifies area of more than 52 characters                                           ERROR
+  321         Y2     DCW   #508               LEN = DP & 3                         52  1329                      39  BAD STATEMENT
+      ** ***  ** DCW specifies area of more than 52 characters                                           ERROR
+  322                DC    #505               LEN = DP                             52  1381                      41  BAD STATEMENT
+      ** ***  ** DCW specifies area of more than 52 characters                                           ERROR
+  323         Y4     DCW   #509               LEN = DP & 4                         52  1433                      43  BAD STATEMENT
+      ** ***  ** DCW specifies area of more than 52 characters                                           ERROR
+  324                DC    #504               LEN = DP - 1                         52  1485                      45  BAD STATEMENT
+      ** ***  ** DCW specifies area of more than 52 characters                                           ERROR
+  325         PI     DCW   #506               LEN = DP & 1                         52  1537                      47  BAD STATEMENT
+      ** ***  ** DCW specifies area of more than 52 characters                                           ERROR
+  326                DC    #507               LEN = DP & 2                         52  1589                      49  BAD STATEMENT
+      ** ***  ** DCW specifies area of more than 52 characters                                           ERROR
+  327         YRT4   DCW   #506               LEN = DP & 1                         52  1641                      51  BAD STATEMENT
+  328                DC    #2                 REMAINDER OF /2: LEN = 2              2  1643                      51
+  329         POW2   DCW   0002                                                     4  1647                      51
+  330         *
+      ** ***  ** DCW specifies area of more than 52 characters                                           ERROR
+  331         TEMP1  DCW   #506               LEN = DP & 1                         52  1699                      53  BAD STATEMENT
+      ** ***  ** DCW specifies area of more than 52 characters                                           ERROR
+1                          COMPUTE PI TO 500 DECIMAL PLACES                                               PAGE    6
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  332         TEMP2  DCW   #1011              LEN = LEN(TWO) & 2*DP                52  1751                      55  BAD STATEMENT
+      ** ***  ** Non-blank in 73-75 would confuse "Real Autocoder"                                       WARN 
+      ** ***  ** DCW specifies area of more than 52 characters                                           ERROR
+  333                DC    #507               REMAINDER OF /TEMP1: LEN = LEN(TE    52  1803                      57  BAD STATEMENT
+  334         TEMP3  DCW   0                                                        1  1804                      57
+      ** ***  ** DCW specifies area of more than 52 characters                                           ERROR
+  335                DC    #1010              LEN = 2*DP                           52  1856                      59  BAD STATEMENT
+  336         ***************************************************************************
+  337         *
+  338         *     SQUARE ROOT SUBROUTINE
+  339         *
+  340         *     THIS SUBROUTINE COMPUTES THE SQUARE ROOT OF N TO DP DECIMAL PLACES
+  341         *     USING NEWTON'S ALGORITHM:
+  342         *
+  343         *         X = (X + N/X)/2
+  344         *
+  345         *     WHERE X IS INITIALIZED TO N, AND THE FORMULA ITERATES UNTIL TWO
+  346         *     SUCCESSIVE VALUES OF X (X AND XPREV) ARE THE SAME.  THE CALLER
+  347         *     MUST ALSO SUPPLY A TEMPORARY WORK AREA.
+  348         *
+  349         *     ENTRY POINT:  SQRT
+  350         *
+  351         *     BEFORE CALLING, THE CALLER MUST SET:
+  352         *
+  353         *         SQLENN = LEN(N)
+  354         *         SQDP   = DP
+  355         *         SQADRN = @N
+  356         *         SQADRX = @X
+  357         *         SQADRP = @XPREV
+  358         *         SQADRT = @TEMP
+  359         *
+  360         *     UPON RETURN:
+  361         *
+  362         *         X      = SQRT(N)
+  363         *         SQITER = NUMBER OF ITERATIONS
+  364         *
+  365         *     NOTES:
+  366         *
+  367         *         (1) N MUST BE FOLLOWED IN MEMORY BY 2*DP DIGITS
+  368         *             (COULD BE ZEROS OR BLANKS)
+  369         *         (2) LEN(X) MUST BE LEN(N) + DP, AND IT MUST BE FOLLOWED IN
+  370         *             MEMORY BY 2 ZEROES OR BLANKS
+  371         *         (3) LEN(XPREV) MUST BE LEN(X)
+  372         *         (4) LEN(TEMP) MUST BE LEN(N) + 2*DP, AND IT MUST BE FOLLOWED
+  373         *             IN MEMORY BY (LEN(X) + 1) DIGITS (COULD BE ZEROES OR BLANKS)
+  374         *
+  375         ***************************************************************************
+  376         SQRT   SBR   SQRTX&3                                                  4  1857  H K97               59  2297
+  377         *
+  378         * SET @X, @XPREV, AND @TEMP
+1                          COMPUTE PI TO 500 DECIMAL PLACES                                               PAGE    7
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  379         *
+  380                MCW   SQADRX,SQZA1&6     @X                                    7  1861  M L13 K20           59  2313    2220
+  381                MCW   SQADRX,SQLOOP&3    @X                                    7  1868  M L13 K24           59  2313    2224
+  382                MCW   SQADRX,SQZA2&3     @X                                    7  1875  M L13 K43           59  2313    2243
+  383                MCW   SQADRX,SQD1&3      @X                                    7  1882  M L13 K57           60  2313    2257
+  384                MWC   SQADRX,SQA&3       @X                                                         MACRO
+  385         *  MWC    UNKNOWN                                                                          MACRO       MACRO ERROR
+  386                MCW   SQADRP,SQMCW&6     @XPREV                                7  1889  M L16 K13           60  2316    2213
+  387                MCW   SQADRP,SQLOOP&6    @XPREV                                7  1896  M L16 K27           60  2316    2227
+  388                MCW   SQADRP,SQZA2&6     @XPREV                                7  1903  M L16 K46           60  2316    2246
+  389                MCW   SQADRT,SQA&6       @TEMP                                 7  1910  M L19 K71           60  2319    2271
+  390                MCW   SQADRT,SQZA4&3     @TEMP                                 7  1917  M L19 K75           61  2319    2275
+  391         *
+  392         * COMPUTE AND SET @X + 2
+  393         *
+  394                MCW   SQADRX,SQZA4&6     @X                                    7  1924  M L13 K78           61  2313    2278
+  395                MA    @002@,SQZA4&6         & 2                                7  1931  # R28 K78           61  2928    2278
+  396         *
+  397         * COMPUTE AND SET @X - (LEN(N) + DP) + 2
+  398         *
+  399                MCW   SQADRX,SQD2&6      @X                                    7  1938  M L13 K85           61  2313    2285
+  400                ZA    SQLENN,CNVOFF         - LEN(N)                           7  1945  ? L00 N72           61  2300    2572
+  401                B     CNVRTN                                                   4  1952  B M10               61  2410
+  402                MA    CNVOFF,SQD2&6                                            7  1956  # N72 K85           62  2572    2285
+  403                ZA    SQDP,CNVOFF                    - DP                      7  1963  ? L04 N72           62  2304    2572
+  404                B     CNVRTN                                                   4  1970  B M10               62  2410
+  405                MA    CNVOFF,SQD2&6                                            7  1974  # N72 K85           62  2572    2285
+  406                MA    @002@,SQD2&6                        & 2                  7  1981  # R28 K85           62  2928    2285
+  407         *
+  408         * COMPUTE AND SET @N + DP
+  409         *
+  410                MCW   SQADRN,SQZA1&3     @N                                    7  1988  M L10 K17           62  2310    2217
+  411                ZA    SQDP,CNVOFF           & DP                               7  1995  ? L04 N72           63  2304    2572
+  412                B     CNVRTP                                                   4  2002  B M02               63  2402
+  413                MA    CNVOFF,SQZA1&3                                           7  2006  # N72 K17           63  2572    2217
+  414         *
+  415         * COMPUTE AND SET @N + 2*DP
+  416         *
+  417                MCW   SQADRN,SQZA3&3     @N                                    7  2013  M L10 K50           63  2310    2250
+  418                ZA    SQDP,CNVOFF           & DP                               7  2020  ? L04 N72           63  2304    2572
+  419                A     CNVOFF                     & DP                          4  2027  A N72               63  2572
+  420                B     CNVRTP                                                   4  2031  B M02               64  2402
+  421                MA    CNVOFF,SQZA3&3                                           7  2035  # N72 K50           64  2572    2250
+  422         *
+  423         * COMPUTE AND SET @TEMP + LEN(N) + DP + 1
+  424         *
+  425                MCW   SQADRT,SQZA3&6     @TEMP                                 7  2042  M L19 K53           64  2319    2253
+  426                ZA    SQLENN,CNVOFF            & LEN(N)                        7  2049  ? L00 N72           64  2300    2572
+  427                B     CNVRTP                                                   4  2056  B M02               64  2402
+  428                MA    CNVOFF,SQZA3&6                                           7  2060  # N72 K53           64  2572    2253
+1                          COMPUTE PI TO 500 DECIMAL PLACES                                               PAGE    8
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  429                ZA    SQDP,CNVOFF                       & DP                   7  2067  ? L04 N72           65  2304    2572
+  430                B     CNVRTP                                                   4  2074  B M02               65  2402
+  431                MA    CNVOFF,SQZA3&6                                           7  2078  # N72 K53           65  2572    2253
+  432                MA    @001@,SQZA3&6                          & 1               7  2085  # R31 K53           65  2931    2253
+  433         *
+  434         * COMPUTE AND SET @TEMP + LEN(N) - DP + 1
+  435         *
+  436                MCW   SQADRT,SQD1&6      @TEMP                                 7  2092  M L19 K60           65  2319    2260
+  437                ZA    SQLENN,CNVOFF            & LEN(N)                        7  2099  ? L00 N72           65  2300    2572
+  438                B     CNVRTP                                                   4  2106  B M02               66  2402
+  439                MA    CNVOFF,SQD1&6                                            7  2110  # N72 K60           66  2572    2260
+  440                ZA    SQDP,CNVOFF                       - DP                   7  2117  ? L04 N72           66  2304    2572
+  441                B     CNVRTN                                                   4  2124  B M10               66  2410
+  442                MA    CNVOFF,SQD1&6                                            7  2128  # N72 K60           66  2572    2260
+  443         *
+  444                MA    @001@,SQD1&6                           & 1               7  2135  # R31 K60           66  2931    2260
+  445         *
+  446         * COMPUTE AND SET @TEMP - (LEN(N) + DP)
+  447         *
+  448                MCW   SQADRT,SQSW&3      @TEMP                                 7  2142  M L19 K64           67  2319    2264
+  449                ZA    SQLENN,CNVOFF            - LEN(N)                        7  2149  ? L00 N72           67  2300    2572
+  450                B     CNVRTN                                                   4  2156  B M10               67  2410
+  451                MA    CNVOFF,SQSW&3                                            7  2160  # N72 K64           67  2572    2264
+  452                ZA    SQDP,CNVOFF                       - DP                   7  2167  ? L04 N72           67  2304    2572
+  453                B     CNVRTN                                                   4  2174  B M10               67  2410
+  454                MA    CNVOFF,SQSW&3                                            7  2178  # N72 K64           68  2572    2264
+  455         *
+  456                SW    SQCW&1                                                   4  2185  , K87               68  2287
+  457                MCW   SQSW&3,SQCW&3                                            7  2189  M K64 K89           68  2264    2289
+  458                CW    SQCW&1                                                   4  2196  ) K87               68  2287
+  459         *
+  460         * NEWTON'S ALGORITHM:
+  461         *
+  462         *     XPREV = 0;
+  463         *     X = N;
+  464         *     WHILE (X != XPREV) {
+  465         *         XPREV = X;
+  466         *         X = (X + N/X)/2;
+  467         *     }
+  468         *
+  469                MCW   @0@,SQITER         SQITER = 0                            7  2200  M R32 L07           68  2932    2307
+  470         SQMCW  MCW   @0@,000            XPREV  = 0                            7  2207  M R32 000           68  2932     000
+  471         SQZA1  ZA    000,000            X = UPPER HALF OF N                   7  2214  ? 000 000           69   000     000
+  472         *
+  473         SQLOOP C     000,000            IF X = XPREV?                         7  2221  C 000 000           69   000     000
+  474                B     SQRTX,S                THEN DONE                         5  2228  B K94 S             69  2294
+  475                A     @1@,SQITER             ELSE BUMP SQITER BY 1             7  2233  A R20 L07           69  2920    2307
+  476         *
+  477         SQZA2  ZA    000,000            XPREV = X                             7  2240  ? 000 000           69   000     000
+  478         SQZA3  ZA    000,000            TEMP = N                              7  2247  ? 000 000           70   000     000
+1                          COMPUTE PI TO 500 DECIMAL PLACES                                               PAGE    9
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  479         SQD1   D     000,000                    /X                            7  2254  % 000 000           70   000     000
+  480         SQSW   SW    000                                                      4  2261  , 000               70   000
+  481         SQA    A     000,000                       & X                        7  2265  A 000 000           70   000     000
+  482         SQZA4  ZA    000,000                                                  7  2272  ? 000 000           70   000     000
+  483         SQD2   D     @2@,000            X = TEMP/2                            7  2279  % R33 000           70  2933     000
+  484         SQCW   CW    000                                                      4  2286  ) 000               71   000
+  485         *
+  486         * LOOP AGAIN.
+  487         *
+  488                B     SQLOOP                                                   4  2290  B K21               71  2221
+  489         *
+  490         SQRTX  B     0000               RETURN                                4  2294  B 000               71   000
+  491         *
+  492         SQLENN DCW   000                LEN(N)                                3  2300                      71
+  493         SQDP   DCW   0000               NUMBER OF DECIMAL PLACES (DP)         4  2304                      71
+  494         SQITER DCW   000                ITERATION COUNTER                     3  2307                      71
+  495         *
+  496         SQADRN DSA   000                @N                                    3  2310  000                 71   000
+  497         SQADRX DSA   000                @X                                    3  2313  000                 72   000
+  498         SQADRP DSA   000                @XPREV                                3  2316  000                 72   000
+  499         SQADRT DSA   000                @TEMP                                 3  2319  000                 72   000
+  500         ***************************************************************************
+  501         *
+  502         *     SQUARE SUBROUTINE
+  503         *
+  504         *     THIS SUBROUTINE THE SQUARE OF A FACTOR (FACTOR**2).
+  505         *
+  506         *     ENTRY POINT:  POWR2
+  507         *
+  508         *     BEFORE CALLING, THE CALLER MUST SET:
+  509         *
+  510         *         P2AFCT = @FACTOR
+  511         *         P2APRD = @PRODUCT
+  512         *         P2LENF = LENGTH OF FACTOR
+  513         *
+  514         *     UPON RETURN:
+  515         *
+  516         *         PRODUCT = FACTOR**2
+  517         *
+  518         ***************************************************************************
+  519         POWR2  SBR   POWR2X&3                                                 4  2320  H L94               72  2394
+  520         *
+  521                MCW   P2AFCT,P2MCW&3                                           7  2324  M L97 L80           72  2397    2380
+  522                MCW   P2APRD,P2MCW&6                                           7  2331  M ### L83           72   ###    2383
+  523                ZA    P2LENF,CNVOFF                                            7  2338  ? M01 N72           72  2401    2572
+  524                A     @1@,CNVOFF                                               7  2345  A R20 N72           73  2920    2572
+  525                B     CNVRTN                                                   4  2352  B M10               73  2410
+  526                MA    CNVOFF,P2MCW&6                                           7  2356  # N72 L83           73  2572    2383
+  527         *
+  528                MCW   P2AFCT,P2M&3                                             7  2363  M L97 L87           73  2397    2387
+1                          COMPUTE PI TO 500 DECIMAL PLACES                                               PAGE   10
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  529                MCW   P2APRD,P2M&6                                             7  2370  M ### L90           73   ###    2390
+  530         *
+  531         P2MCW  MCW   000,000            SET FACTOR AS MULTIPLIER              7  2377  M 000 000           73   000     000
+  532         P2M    M     000,000            PRODUCT = FACTOR X FACTOR             7  2384  @ 000 000           74   000     000
+  533         POWR2X B     000                RETURN                                4  2391  B 000               74   000
+  534         *
+  535         P2AFCT DSA   000                @FACTOR                               3  2397  000                 74   000
+  536         P2APRD DAS   000                @PRODUCT (FACTOR X FACTOR)                                 MACRO
+  537         *  DAS    UNKNOWN                                                                          MACRO       MACRO ERROR
+  538         P2LENF DCW   0000               LEN(FACTOR)                           4  2401                      74
+  539         ***************************************************************************
+  540         *
+  541         *     CONVERT OFFSET SUBROUTINE
+  542         *
+  543         *     THIS SUBROUTINE CONVERTS AN OFFSET THAT IS A 5-DIGIT NUMBER
+  544         *     INTO ITS 3-CHARACTER ADDRESS ENCODING.
+  545         *
+  546         *     ENTRY POINTS:  CNVRTP FOR POSITIVE OFFSETS
+  547         *                    CNVRTN FOR NEGATIVE OFFSETS
+  548         *                               (PASSED IN AS A POSITIVE VALUE)
+  549         *
+  550         *     BEFORE CALLING, THE CALLER MUST SET:
+  551         *
+  552         *         CNVOFF = OFFSET TO ADD OR SUBTRACT FROM AN ADDRESS
+  553         *                  (5-DIGIT NUMBER)
+  554         *
+  555         *     UPON RETURN:
+  556         *
+  557         *         CNVOFF = OFFSET VALUE SUITABLE FOR THE MA INSTRUCTION
+  558         *                  (3-CHARACTER ADDRESS ENCODING)
+  559         *
+  560         ***************************************************************************
+  561         CNVRTP SBR   CNVRTX&3           ENTRY POINT FOR POSITIVE OFFSETS      4  2402  H N67               74  2567
+  562                B     CNV                                                      4  2406  B M25               74  2425
+  563         *
+  564         * FORM THE COMPLEMENT OF THE OFFSET BY SUBTRACTING IT FROM 16,000
+  565         *
+  566         CNVRTN SBR   CNVRTX&3           ENTRY POINT FOR NEGATIVE OFFSETS      4  2410  H N67               74  2567
+  567                A     -16000,CNVOFF      COMPLEMENT IS -(-16000 & OFFSET)      7  2414  A R38 N72           75  2938    2572
+  568                ZS    CNVOFF                 OR 16000 - OFFSET                 4  2421  ! N72               75  2572
+  569         *
+  570         CNV    MZ    @ @,CNVOFF         CLEAR ZONE OVER THE UNITS DIGIT       7  2425  Y R21 N72           75  2921    2572
+  571         *
+  572         * SUCCESSIVELY TEST THE THOUSANDS DIGITS FOR 08, 04, 02, AND 01.
+  573         * THE C (COMPARE) INSTRUCTION USES THE COLLATING SEQUENCE, NOT ALGEBRA;
+  574         * HENCE THE ZONE BIT REMOVALS.
+  575         *
+  576                C     @08@,CNVOFF-3      8000                                  7  2432  C R40 N69           75  2940    2569
+  577                BL    *&22                                                     5  2439  B M65 T             75  2465
+  578                MA    CNV8K,CNVOFF       SET B BIT OVER UNITS DIGIT            7  2444  # N75 N72           75  2575    2572
+1                          COMPUTE PI TO 500 DECIMAL PLACES                                               PAGE   11
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  579                S     @08@,CNVOFF-3                                            7  2451  S R40 N69           76  2940    2569
+      ** ***  ** Non-blank in 73-75 would confuse "Real Autocoder"                                       WARN 
+  580                MZ    @ @,CNVOFF-3       CLEAR ZONE OVER THE THOUSANDS DIG     7  2458  Y R21 N69           76  2921    2569
+  581         *
+  582                C     @04@,CNVOFF-3      4000                                  7  2465  C R42 N69           76  2942    2569
+  583                BL    *&22                                                     5  2472  B M98 T             76  2498
+  584                MA    CNV4K,CNVOFF       SET A BIT OVER UNITS DIGIT            7  2477  # N78 N72           76  2578    2572
+  585                S     @04@,CNVOFF-3                                            7  2484  S R42 N69           77  2942    2569
+      ** ***  ** Non-blank in 73-75 would confuse "Real Autocoder"                                       WARN 
+  586                MZ    @ @,CNVOFF-3       CLEAR ZONE OVER THE THOUSANDS DIG     7  2491  Y R21 N69           77  2921    2569
+  587         *
+  588                C     @02@,CNVOFF-3      2000                                  7  2498  C R44 N69           77  2944    2569
+  589                BL    *&22                                                     5  2505  B N31 T             77  2531
+  590                MA    CNV2K,CNVOFF       SET B BIT OVER HUNDREDS DIGIT         7  2510  # N81 N72           77  2581    2572
+  591                S     @02@,CNVOFF-3                                            7  2517  S R44 N69           78  2944    2569
+      ** ***  ** Non-blank in 73-75 would confuse "Real Autocoder"                                       WARN 
+  592                MZ    @ @,CNVOFF-3       CLEAR ZONE OVER THE THOUSANDS DIG     7  2524  Y R21 N69           78  2921    2569
+  593         *
+  594                C     @01@,CNVOFF-3      1000                                  7  2531  C R46 N69           78  2946    2569
+  595                BL    *&22                                                     5  2538  B N64 T             78  2564
+  596                MA    CNV1K,CNVOFF       SET A BIT OVER HUNDREDS DIGIT         7  2543  # N84 N72           78  2584    2572
+  597                S     @01@,CNVOFF-3                                            7  2550  S R46 N69           79  2946    2569
+      ** ***  ** Non-blank in 73-75 would confuse "Real Autocoder"                                       WARN 
+  598                MZ    @ @,CNVOFF-3       CLEAR ZONE OVER THE THOUSANDS DIG     7  2557  Y R21 N69           79  2921    2569
+  599         *
+  600         CNVRTX B     000                RETURN                                4  2564  B 000               79   000
+  601         *
+  602         CNVOFF DCW   00000              OFFSET TO CONVERT                     5  2572                      79
+  603         *
+  604         CNV8K  DSA   8000                                                     3  2575  00!                 79  8000
+  605         CNV4K  DSA   4000                                                     3  2578  00'                 79  4000
+  606         CNV2K  DSA   2000                                                     3  2581  !00                 79  2000
+  607         CNV1K  DSA   1000                                                     3  2584  '00                 80  1000
+  608         ***************************************************************************
+  609         *
+  610         *     PRINT SUBROUTINE
+  611         *
+  612         *     THIS SUBROUTINE PRINTS A VALUE WITH A LARGE NUMBER OF DECIMAL
+  613         *     DIGITS, IN 10 GROUPS OF 10 DIGITS PER LINE.  NOTE: THE NUMBER OF
+  614         *     DECIMAL DIGITS MUST BE A MULTIPLE OF 500.
+  615         *
+  616         *     ENTRY POINT:  PRINT
+  617         *
+  618         *     BEFORE CALLING, THE CALLER MUST SET:
+  619         *
+  620         *         PRADDR = ADDRESS OF FIRST DECIMAL DIGIT OF VALUE TO PRINT
+  621         *         PRDP   = DP (DECIMAL PLACES)
+  622         *
+  623         *     THE CALLER MUST ALSO PROPERLY DEFINE SYMBOLS X1 AND X2
+  624         *     TO REPRESENT INDEX REGISTERS 1 AND 2.
+1                          COMPUTE PI TO 500 DECIMAL PLACES                                               PAGE   12
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  625         *
+  626         ***************************************************************************
+  627         PRINT  SBR   PRINTX&3                                                 4  2585  H Q40               80  2840
+  628         *
+  629                MCW   X1,PRSVX1          SAVE X1 AND X2                        7  2589  M 089 Q55           80   089    2855
+  630                MCW   X2,PRSVX2                                                7  2596  M 094 Q58           80   094    2858
+  631         *
+  632                MCW   PRADDR,X1          X1 = @ FIRST DECIMAL DIGIT            7  2603  M Q43 089           80  2843     089
+  633                MCW   @0001@,PRDGCT                                            7  2610  M R50 Q51           80  2950    2851
+  634                SBR   X1,10&X1           X1 = @ FIRST GROUP WITHIN X           7  2617  H 089 0/0           81   089     010+1
+  635                S     @100@,PRDP                                               7  2624  S R53 Q47           81  2953    2847
+  636         *
+  637                CS    332                PRINT A BLANK LINE                    4  2631  / 332               81   332
+  638                CS                                                             1  2635  /                   81
+  639                W                                                              1  2636  2                   81
+  640         *
+  641                SW    202,208            SET WORD MARKS TO DELIMIT GROUPS      7  2637  , 202 208           81   202     208
+  642                SW    222,233                                                  7  2644  , 222 233           81   222     233
+  643                SW    244,255                                                  7  2651  , 244 255           82   244     255
+  644                SW    266,277                                                  7  2658  , 266 277           82   266     277
+  645                SW    288,299                                                  7  2665  , 288 299           82   288     299
+  646                SW    310                                                      4  2672  , 310               82   310
+  647         *
+  648                MCW   PREDT1,220         EDIT MASK FOR FIRST GROUP             7  2676  M Q73 220           82  2873     220
+  649                MCW   PRCLON                                                   4  2683  M Q60               82  2860
+  650                MCW   PRDGCT                                                   4  2687  M Q51               83  2851
+  651         *
+  652         * LOOP ONCE PER LINE.
+  653         *
+  654         PRLNLP SBR   X2,220             X2 = 220                              7  2691  H 094 220           83   094     220
+  655                MCE   0&X1,0&X2          EDIT THE FIRST GROUP OF EACH LINE     7  2698  E 0'0 0!0           83   000+1   000+2
+  656                MCW   @8@,PRGPCT         PRGPCT = 8                            7  2705  M R54 Q52           83  2954    2852
+  657         *
+  658         * FILL THE REST OF THE LINE BY LOOPING ONCE PER GROUP WITHIN THE LINE.
+  659         *
+  660         PRGPLP SBR   X1,10&X1           BUMP X1 BY 10                         7  2712  H 089 0/0           83   089     010+1
+  661                SBR   X2,11&X2           BUMP X2 BY 11                         7  2719  H 094 0J1           83   094     011+2
+  662                MCW   0&X1,0&X2          MOVE NEXT GROUP OF 10 TO PRINT        7  2726  M 0'0 0!0           84   000+1   000+2
+  663         *
+  664                S     @1@,PRGPCT         REDUCE PRGPCT BY 1                    7  2733  S R20 Q52           84  2920    2852
+  665                BWZ   PRGPDN,PRGPCT,K    DONE WITH ALL GROUPS OF LINE?         8  2740  V P52 Q52 K         84  2752    2852
+  666                B     PRGPLP             BACK TO MOVE THE NEXT GROUP           4  2748  B P12               84  2712
+  667         *
+  668         PRGPDN MCW   @0@,0&X2                                                 7  2752  M R32 0!0           84  2932     000+2
+  669                MN    0&X1,0&X2          MOVE NUMERIC OF LAST DIGIT            7  2759  D 0'0 0!0           85   000+1   000+2
+  670                W                                                              1  2766  2                   85
+  671         *
+  672                S     @100@,PRDP                                               7  2767  S R53 Q47           85  2953    2847
+  673                BWZ   PRLNDN,PRDP,K      DONE WITH ALL LINES?                  8  2774  V Q23 Q47 K         85  2823    2847
+  674         *
+1                          COMPUTE PI TO 500 DECIMAL PLACES                                               PAGE   13
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  675                A     @100@,PRDGCT                                             7  2782  A R53 Q51           85  2953    2851
+  676                SBR   X1,10&X1           BUMP X1 BY 10                         7  2789  H 089 0/0           85   089     010+1
+  677                MCW   PREDT2,220         EDIT MASK FOR SUBSEQUENT LINES        7  2796  M Q83 220           86  2883     220
+  678                MCW   @   @                                                    4  2803  M R57               86  2957
+  679                MCW   PRCLON                                                   4  2807  M Q60               86  2860
+  680                MCW   PRDGCT                                                   4  2811  M Q51               86  2851
+  681                SW    211                                                      4  2815  , 211               86   211
+  682                B     PRLNLP             BACK TO PRINT THE NEXT LINE           4  2819  B O91               86  2691
+  683         *
+  684         PRLNDN MCW   PRSVX1,X1          RESTORE X1 AND X2                     7  2823  M Q55 089           86  2855     089
+  685                MCW   PRSVX2,X2                                                7  2830  M Q58 094           87  2858     094
+  686         PRINTX B     000                RETURN                                4  2837  B 000               87   000
+  687         *
+  688         PRADDR DSA   000                @ OF FIRST DECIMAL DIGIT              3  2843  000                 87   000
+  689         PRDP   DCW   0000               DECIMAL PLACES (DP)                   4  2847                      87
+  690         *
+  691         PRDGCT DCW   0001               GROUP COUNTER                         4  2851                      87
+  692         PRGPCT DCW   8                  DECIMAL DIGIT COUNTER                 1  2852                      87
+  693         PRSVX1 DCW   000                SAVE AREA FOR X1                      3  2855                      87
+  694         PRSVX2 DCW   000                SAVE AREA FOR X2                      3  2858                      88
+  695         *
+  696         PRCLON DCW   @: @                                                     2  2860                      88
+  697         PREDT1 DCW   @ 0.          @    EDIT MASK FOR FIRST LINE             13  2873                      88
+  698         PREDT2 DCW   @0         @       EDIT MASK FOR SUBSEQUENT LINES       10  2883                      88
+  699         ***************************************************************************
+                     DCW   @***** PI TO 500 DECIMAL PLACES *****@                  36  2919              LIT     89
+                     DCW   @1@                                                      1  2920              LIT     89
+                     DCW   @ @                                                      1  2921              LIT     89
+                     DCW   @6@                                                      1  2922              LIT     89
+                     DCW   @506@                                                    3  2925              LIT     90
+                     DCW   @002@                                                    3  2928              LIT     90
+                     DCW   @001@                                                    3  2931              LIT     90
+                     DCW   @0@                                                      1  2932              LIT     90
+                     DCW   @2@                                                      1  2933              LIT     90
+                     DCW   -16000                                                   5  2938              LIT     90
+                     DCW   @08@                                                     2  2940              LIT     90
+                     DCW   @04@                                                     2  2942              LIT     91
+                     DCW   @02@                                                     2  2944              LIT     91
+                     DCW   @01@                                                     2  2946              LIT     91
+                     DCW   @0001@                                                   4  2950              LIT     91
+                     DCW   @100@                                                    3  2953              LIT     91
+                     DCW   @8@                                                      1  2954              LIT     91
+                     DCW   @   @                                                    3  2957              LIT     91
+  700                END   START                                                             / 333 080                333
+1                                                                                                         PAGE   14
+0SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS
+
+ AI       1121: 0    CNV      2425: 0    CNV1K    2584: 0    CNV2K    2581: 0    CNV4K    2578: 0    CNV8K    2575: 0   
+ CNVOFF   2572: 0    CNVRTN   2410: 0    CNVRTP   2402: 0    CNVRTX   2564: 0    DONE     0913: 0    DP       0957: 0   
+ DPPRT    0960: 0    FINIS    0949: 0    ITERS    0961: 0    ITRMAX   0962: 0    LENN     0954: 0    LOOP     0456: 0   
+ P2AFCT   2397: 0    P2APRD  UNDEF:##    P2LENF   2401: 0    P2M      2384: 0    P2MCW    2377: 0    PI       1537: 0   
+ POW2     1647: 0    POWR2    2320: 0    POWR2X   2391: 0    PRADDR   2843: 0    PRCLON   2860: 0    PRDGCT   2851: 0   
+ PRDP     2847: 0    PREDT1   2873: 0    PREDT2   2883: 0    PRGPCT   2852: 0    PRGPDN   2752: 0    PRGPLP   2712: 0   
+ PRINT    2585: 0    PRINTX   2837: 0    PRLNDN   2823: 0    PRLNLP   2691: 0    PRSVX1   2855: 0    PRSVX2   2858: 0   
+ SQA      2265: 0    SQADRN   2310: 0    SQADRP   2316: 0    SQADRT   2319: 0    SQADRX   2313: 0    SQCW     2286: 0   
+ SQD1     2254: 0    SQD2     2279: 0    SQDP     2304: 0    SQITER   2307: 0    SQLENN   2300: 0    SQLOOP   2221: 0   
+ SQMCW    2207: 0    SQRT     1857: 0    SQRT2    1067: 0    SQRTX    2294: 0    SQSW     2261: 0    SQZA1    2214: 0   
+ SQZA2    2240: 0    SQZA3    2247: 0    SQZA4    2272: 0    START    0333: 0    TEMP1    1699: 0    TEMP2    1751: 0   
+ TEMP3    1804: 0    TWO      0963: 0    X1       0089: 0    X2       0094: 0    X3       0099: 0    Y2       1329: 0   
+ Y4       1433: 0    YI       1225: 0    YRT4     1641: 0   
+
+0UNREFERENCED SYMBOLS
+
+ X3
+      *****  **    44 Errors                                                                             ERROR

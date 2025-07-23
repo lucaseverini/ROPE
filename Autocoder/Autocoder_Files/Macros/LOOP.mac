@@ -1,0 +1,5 @@
+     LOOP      HEADR
+               A    @1@,)02             *ADD ONE TO INDEX
+               MZ   )02-1,)02           *CLEAR ZONE
+               C    )03,)02           *ARE WE THERE YET?
+               BL   )01                  *NO, GO TRY AGAIN

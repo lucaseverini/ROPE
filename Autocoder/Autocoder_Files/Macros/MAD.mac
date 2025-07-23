@@ -1,0 +1,8 @@
+     madxx     headr        MA, with zero, one or two addresses
+     )00       sw   )0b-2
+               a    )01,)0b
+               cw   )0b-2
+     )00       sw   )0a-2                                         )0s
+               a    )0a                                           )0s
+               cw   )0a-2                                         )0s
+     )00       a                                                  )0/

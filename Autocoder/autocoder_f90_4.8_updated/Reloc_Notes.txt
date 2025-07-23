@@ -1,0 +1,94 @@
+Notes on relocatable autocoder
+
+Pseudo ops:
+
+  LC   #[,R[,x00[+/-#]]] Set current location counter.  R means relocatable.
+                   Third operand controls century offset, and cannot appear
+                   if re-setting to location counter with P not zero. A
+                   location counter cannot be changed from relocatable to
+                   nonrelocatable or vice-versa.
+
+  LC   #,X,LABEL[+/-#]]  Set current location counter to LABEL.  Cannot
+                   appear if re-setting to location counter with P not
+                   zero.  LABEL shall be external.
+
+  * in column 12   Defines label XXX for external use
+
+.r file:
+
+type :: R_file
+  character(1) :: What   ! A to skip area of width FIELD(7:12) at ADR in LOC
+                         ! C to clear field of width FIELD(7:12) at ADR in LOC
+                         ! D for definition of LABEL as ADR in LOC
+                         ! E for END to LABEL + ADR in LOC or ADR in LOC
+                         ! F for a FIELD of LEN at ADR in LOC
+                         ! L for org LC to LABEL
+                         ! Q for A EQU B+Loc+ix and B is undefined,
+                         !   or A is external is external; field might be %xx
+                         ! R if ADR in LOC is a reference to LABEL with
+                         !   offset FIELD(7:12) in decimal and index IX
+                         ! X for EX or XFR to LABEL + ADR in LOC or ADR in LOC
+                         ! 0 for org LC to X00+ADR
+  character(6) :: Label
+  character(5) :: Adr    ! Decimal address
+  character(2) :: Loc    ! Location counter in decimal
+  character(1) :: R      ! R if Adr in Loc needs relocation
+  character(1) :: IX     ! Index in decimal, 0..3
+  character(5) :: Line   ! Line number in source file
+  character(2) :: Len    ! Length of field, might be zero if WM from DA
+  character(52) :: Field ! Usually an instruction or DC/DCW/DSA contents
+  character(1) :: WM     ! W If FIELD needs WM
+  character(1) :: FR(2)  ! Starting positions in FIELD needing relocation, 1,2,5
+  character(2) :: LCR(2) ! Location counters to use where FR is nonzero
+  character(20) :: Text  ! Line(16:35) for output to tape
+end type R_file
+
+Control file:
+
+<control> ::= <early>
+              <segment> [ <segment> ... ]
+              END [ label ]
+
+<early> ::= ID [ deck_id ]
+
+<early> ::= SKIP <number>
+ skip this much in every block after the first one on the core file.
+
+<segment> ::= <seg> <in> [ <in> ... ]
+
+<seg> ::= SEG dname [ [+]<number> ]
+ start relocatable location counters in segment at max of <number> or zero
+ and one more than the maximum absolute address in the segment
+
+<seg> ::= SEG dname -<number>
+ end relocatable location counters in segment at <number>
+
+<seg> ::= SEG dname *label
+ start relocatable location counters in segment at label
+
+<seg> ::= SEG dname rname [ rname... ]
+ start relocatable location counters in segment at max of beginnings
+ of segments rname [ rname ... ]
+
+<seg> ::= SEG dname ( rname [ rname... ] )
+ start segment relocatable location counters in after max of ends
+ of segments rname [ rname ... ]
+
+<in> ::= DATA file
+ include data
+
+<in> ::= SEQDATA file
+ include data, and emit sequence numbers into columns 72-75, and the
+ deck id into columns 76-80 if a "card deck" output is requested.  The
+ deck id is emitted into columns 76-80 of tape records if Autocoder-format
+ tape output is requested.
+
+<in> ::= IN file [ file ... ]
+ include specified .r files
+
+Each of rname or label must appear in a previous segment.
+
+Start the relocatable location counters in each file after the maximum of
+the absolute ones, or the maximum of the relocatable location counters in
+dependent segments.  Therefore, don't put relocatable location counters in
+the same file with top-of-core absolute location counters!

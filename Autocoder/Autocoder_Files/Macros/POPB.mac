@@ -1,0 +1,8 @@
+     ** POP MACRO **
+     ** X2 IS THE STACK POINTER
+     ** VALUE IN STACK IS COPIED IN )01
+               SBR  X2, 15999+X2
+               MCW  0+X2, )01
+     * SHOULD THE WM BE SET?
+     *         SW   )01
+  

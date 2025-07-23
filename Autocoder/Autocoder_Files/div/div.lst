@@ -1,0 +1,77 @@
+ CLEAR STORAGE 1     ,008015,022026,030037,044,049,053053N000000N00001026                                         1
+ CLEAR STORAGE 2     L068116,105106,110117B101/I9I#071029C029056B026/B001/0991,001/001117I0?                      2
+ BOOTSTRAP           ,008015,022029,036040,047054,061068,072/061039              ,0010011040                      3
+0                          DIVIDER                                                                        PAGE    1
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  101                JOB   DIVIDER
+  102                CTL   6611
+  103         *                                  A = DIVISOR
+  104         *                                  B = DIVIDEN AND QUOTENT
+  105         *                                  C = LAST ANSWER
+  106         *                                  D = REMAINDER
+  107                ORG   400                                                                0400
+  108                DCW   @A@                                                      1  0400                       4
+  109         A      DCW   00000              *DIVISOR [5]                          5  0405                       4
+  110                DCW   @B@                                                      1  0406                       4
+  111         B      DCW   0000000000          *DIVIDEN [10]                       10  0416                       4
+  112                DCW   @C@                                                      1  0417                       4
+  113         C      DCW   0000000000         *ANSWER [10]                         10  0427                       4
+  114                DCW   @D@                                                      1  0428                       4
+  115         D      DCW   00000              *REMAINDER [5]                        5  0433                       5
+  116                DCW   @BH/BL@                                                  5  0438                       5
+  117         BH     DCW   00000              *HALF THE ANSWER [5]                  5  0443                       5
+  118         BL     DC    000000             *THE OTHER HALF & 1                   6  0449                       5
+  119         COUNT  DCW   003                *LOOP COUNTER                         3  0452                       5
+  120         **************************************************************8
+  121                ORG   450                                                                0450
+  122         START  ZA    COUNT,A           *LOAD THE A FIELD                      7  0450  ? 452 405            6   452     405
+  123                ZA    @1234567890@,B                                           7  0457  ? 652 416            6   652     416
+  124                ZA    @0@,BL            *CLEAR THE BH AND BL FIELDS            7  0464  ? 653 449            6   653     449
+  125                ZA    B,BL              *LOAD THE B FIELD                      7  0471  ? 416 449            6   416     449
+  126                D     A,BH              *DIVIDE                                7  0478  % 405 443            6   405     443
+  127                MZ    BH-1,BH           *KILL THE ZONE BIT                     7  0485  Y 442 443            7   442     443
+  128                MZ    BL-1,BL           *KILL THE ZONE BIT                     7  0492  Y 448 449            7   448     449
+  129                MZ    BL-1,BL-6         *KILL THE ZONE BIT                     7  0499  Y 448 443            7   448     443
+  130                SW    BL-5              *SO I CAN PICKUP REMAINDER             4  0506  , 444                7   444
+  131                ZA    BL,D              *GET REMAINDER                         7  0510  ? 449 433            7   449     433
+  132                MZ    D-1,D             *CLEAR THE ZONE ON D                   7  0517  Y 432 433            7   432     433
+  133                CW    BL-5              *CLEAR THE WM                          4  0524  ) 444                8   444
+  134                ZA    BL-6,C            *PICK UP ANSWER                        7  0528  ? 443 427            8   443     427
+  135                MZ    C-1,C             *CLEAR THE ZONE BITS                   7  0535  Y 426 427            8   426     427
+  136         *
+  137                MCW   @COUNT = @,210                                           7  0542  M 661 210            8   661     210
+  138                MCW   COUNT,220                                                7  0549  M 452 220            8   452     220
+  139                MCW   @BL = @,230                                              7  0556  M 666 230            8   666     230
+  140                MCW   BL,240                                                   7  0563  M 449 240            9   449     240
+  141                MCW   @A=@,250                                                 7  0570  M 668 250            9   668     250
+  142                MCW   A,256                                                    7  0577  M 405 256            9   405     256
+  143                MCW   @B=@,260                                                 7  0584  M 670 260            9   670     260
+  144                MCW   B,270                                                    7  0591  M 416 270            9   416     270
+  145                MCW   @C=@,275                                                 7  0598  M 672 275           10   672     275
+  146                MCW   C,287                                                    7  0605  M 427 287           10   427     287
+  147                MCW   @D=@,290                                                 7  0612  M 674 290           10   674     290
+1                          DIVIDER                                                                        PAGE    2
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  148                MCW   D,296                                                    7  0619  M 433 296           10   433     296
+  149                W                                                              1  0626  2                   10
+  150                CS    299               *CLEAR PRINT BUFFER                    4  0627  / 299               10   299
+  151                A     @1@,COUNT                                                7  0631  A 675 452           11   675     452
+  152                H     START                                                    4  0638  . 450               11   450
+  153                H                                                              1  0642  .                   11
+                     DCW   @1234567890@                                            10  0652              LIT     11
+                     DCW   @0@                                                      1  0653              LIT     11
+                     DCW   @COUNT = @                                               8  0661              LIT     11
+                     DCW   @BL = @                                                  5  0666              LIT     11
+                     DCW   @A=@                                                     2  0668              LIT     12
+                     DCW   @B=@                                                     2  0670              LIT     12
+                     DCW   @C=@                                                     2  0672              LIT     12
+                     DCW   @D=@                                                     2  0674              LIT     12
+                     DCW   @1@                                                      1  0675              LIT     12
+  154                END   START                                                             / 450 080                450
+1                                                                                                         PAGE    3
+0SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS
+
+ A        0405: 0    B        0416: 0    BH       0443: 0    BL       0449: 0    C        0427: 0    COUNT    0452: 0   
+ D        0433: 0    START    0450: 0   

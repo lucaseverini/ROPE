@@ -1,0 +1,22 @@
+How to install g95:
+
+1) Unpack the downloaded tarball (e.g. g95-x86-linux.tgz) in a directory
+of your choice:
+
+   tar -zxvf g95-x86-linux.tgz
+
+2) For your convenience, you can create another symbolic link from a
+directory in your $PATH (e.g. ~/bin) to the executable
+
+   ln -s $PWD/g95-install/bin/*g95* ~/bin/g95
+
+You should now be able to run g95 and create executables.
+
+
+To get a list of environment variables that control the library, run a
+compiled binary with the --g95 option, ie:
+
+  ./a.out --g95
+
+   Have Fun!
+

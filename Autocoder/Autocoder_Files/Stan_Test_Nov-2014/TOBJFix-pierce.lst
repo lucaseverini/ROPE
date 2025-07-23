@@ -1,0 +1,25 @@
+ CLEAR STORAGE 1     ,008015,022026,030037,044,049,053053N000000N00001026                                         1
+ CLEAR STORAGE 2     L068116,105106,110117B101/I9I#071029C029056B026/B001/0991,001/001117I0?                      2
+ BOOTSTRAP           ,008015,022029,036040,047054,061068,072/061039              ,0010011040                      3
+0                                                                                                         PAGE    1
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  101                ORG   350                                                                0350
+  102         *
+  103         FRED   DCW   @(EOF)@                                                  5  0354                       4
+  104         FRED2  DCW   @1=1@                                                    3  0357                       4
+  105         *
+  106         START  H                                                              1  0358  .                    4
+  107                CS    201&132  *CLEAR(& == &)                                  4  0359  / 333                4   333
+  108                H                                                              1  0363  .                    4
+  109                B     START               *BRANCH TO START                     4  0364  B 358                4   358
+  110                NOP                                                            1  0368  N                    4
+  111                END   START                                                             / 358 080                358
+1                                                                                                         PAGE    2
+0SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS
+
+ FRED     0354: 0    FRED2    0357: 0    START    0358: 0   
+
+0UNREFERENCED SYMBOLS
+
+ FRED   FRED2

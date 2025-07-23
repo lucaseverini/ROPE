@@ -1,0 +1,11 @@
+     ********************* START MACRO ******************
+     kall      headr           *a call routine with one addresse
+               nop  *+33       *get the return address
+               mcw  stack,*+7  *pick up the stack index
+     *          mcw  stack,100  *pick up the stack index
+
+               mcw  *-14,987   *put into stack
+               a    @3@,stack  *increment stack
+               mz   stack-1,stack   *clear zone
+               b    )01        *go to the specified routine
+     *************************END MACRO ******************

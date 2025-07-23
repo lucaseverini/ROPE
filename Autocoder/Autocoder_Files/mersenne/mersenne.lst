@@ -1,0 +1,83 @@
+ CLEAR STORAGE 1     ,008015,022026,030037,044,049,053053N000000N00001026                                         1
+ CLEAR STORAGE 2     L068116,105106,110117B101/I9I#071029C029056B026/B001/0991,001/001117I0?                      2
+ BOOTSTRAP           ,008015,022029,036040,047054,061068,072/061039              ,0010011040                      3
+0                          COMPUTE MERSENNE PRIME 23 = 2**11213 - 1                   MERSN               PAGE    1
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  101                JOB   COMPUTE MERSENNE PRIME 23 = 2**11213 - 1
+  102                CTL   6611
+  103         *
+  104         * COMPUTE THE 23RD MERSENNE PRIME = 2**11213 - 1. WE START
+  105         * WITH THE 6 THAT'S THE LOW-ORDER DIGIT OF 2**4 IN THE
+  106         * NUMBER.  THE OVFL LOOP ADDS A HIGH-ORDER 1 TO MAKE 16.
+  107         * THEN IT PROCEEDS BY DOUBLING FROM THEN, WITH THE OVERFLOW
+  108         * LOOP MOVING OVER THE HIGH-ORDER DIGIT WORD MARK, AND
+  109         * PUTTING IN A 1.  WE DON'T NEED TO CLEAR THE OVERFLOW ZONE,
+  110         * BECAUSE THE NEXT DOUBLING WILL DO IT.
+  111         *
+  112                ORG   081                                                                0081
+  113         WHAT   DCW   @0001: @    STARTING DIGIT NUMBER PRINT FIELD            6  0086                       4
+  114         *
+  115         * X1 IS USED TO KEEP TRACK OF THE CURRENT HIGH-ORDER DIGIT
+  116         * (ACTUALLY ONE CHARACTER BEFORE IT).  AT THE END, IT'S ONE
+  117         * BEFORE THE HIGH-ORDER DIGIT FOR THE WHOLE NUMBER.  THEN,
+  118         * IT'S USED TO PRINT THE RESULT, BEING INCREMENTED BY 100 FOR
+  119         * EACH LINE.
+  120         *
+  121         X1     DSA   NUMBER-1    INITIAL CONTENT OF X1, AT 87-89              3  0089  G07                  4  3707
+  122         *
+  123         * COMPUTE THE 23RD MERSENNE PRIME.  THIS CODE RUNS THROUGH X2
+  124         * AND X3, AND INTO THE PUNCH AREA, BUT WE'RE NOT USING X2 OR
+  125         * X3, OR PUNCHING, SO WE MIGHT AS WELL USE IT.
+  126         *
+  127         START  W                 PRINT THE TITLE PRELOADED AT 201-...         1  0090  2                    4
+  128         OVFL   CW    1&X1        CLEAR WM TO MAKE MORE ROOM                   4  0091  ) 0'1                4   001+1
+  129                LCA   ONE         DO THE OVERFLOW, SET THE WM                  4  0095  L 198                4   198
+  130                SBR   X1          HIGH-ORDER DIGIT INDEX - 1                   4  0099  H 089                4   089
+  131         INNER  BWZ   DONE,NDOUBL,K  DONE IF NEGATIVE                          8  0103  V 131 G37 K          4   131    3737
+  132                S     ONE,NDOUBL                                               7  0111  S 198 G37            5   198    3737
+  133                A     NUMBER      DOUBLE IT                                    4  0118  A G08                5  3708
+  134                BAV   OVFL        OVERFLOW?                                    5  0122  B 091 Z              5   091
+  135                B     INNER       NO                                           4  0127  B 103                5   103
+  136         DONE   S     ONE,NUMBER  PUTS A ZONE ON LOW-ORDER DIGIT               7  0131  S 198 G08            5   198    3708
+  137                MZ    ONE,NUMBER  CLEAR ZONE ON LOW-ORDER DIGIT                7  0138  Y 198 G08            5   198    3708
+  138         *
+  139         * PRINT IT
+  140         *
+  141                SW    207                                                      4  0145  , 207                5   207
+  142                LCA   WHAT                                                     4  0149  L 086                6   086
+  143         PLOOP  SBR   X1,100&X1   BUMP PRINTING INDEX BY 100                   7  0153  H 089 1'0            6   089     100+1
+  144                MCS   WHAT-2,204  INDEX OF FIRST DIGIT                         7  0160  Z 084 204            6   084     204
+  145                A     ONE,WHAT-4  ADD 100 TO DIGIT NUMBER TO PRINT             7  0167  A 198 082            6   198     082
+  146                MCW   0&X1,306    NEXT HUNDRED DIGITS                          7  0174  M 0'0 306            6   000+1   306
+  147                W                 PRINT THEM                                   1  0181  2                    6
+1                          COMPUTE MERSENNE PRIME 23 = 2**11213 - 1                   MERSN               PAGE    2
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  148                BCE   FINIS,306,  DONE IF BLANK IN PRINT AREA                  8  0182  B 194 306            7   194     306
+  149                B     PLOOP       PRINT 100 MORE DIGITS                        4  0190  B 153                7   153
+  150         FINIS  H     FINIS       HALT LOOP (AS GOOD HERE AS ANYWHERE)         4  0194  . 194                7   194
+  151         ONE    DCW   1                                                        1  0198                       7
+  152         *
+  153                ORG   201         PRE-LOAD TITLE INTO PRINT AREA                         0201
+  154                DCW   @23RD MERSENNE PRIME = 2**11213 - 1@                    34  0234                       8
+  155         *
+  156         * HERE'S THE NUMBER
+  157         *
+  158                ORG   333                                                                0333
+  159                DA    1X3375                                                      0333   3707                8
+  160         NUMHI        1,1         HIGH-ORDER DIGIT                                0333              FIELD
+  161         NUMBER DCW   6           LOW-ORDER DIGIT                              1  3708                       9
+  162                DC    #24         BLANKS FOR PRINTING THE LAST LINE           24  3732                       9
+  163         *
+  164         NDOUBL DCW   11208       EXPONENT - 4 - 1                             5  3737                       9
+  165                END   START                                                             / 090 080                090
+1                                                                                                         PAGE    3
+0SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS
+
+ DONE     0131: 0    FINIS    0194: 0    INNER    0103: 0    NDOUBL   3737: 0    NUMBER   3708: 0    NUMHI    0333: 0   
+ ONE      0198: 0    OVFL     0091: 0    PLOOP    0153: 0    START    0090: 0    WHAT     0086: 0    X1       0089: 0   
+
+0UNREFERENCED SYMBOLS
+
+ NUMHI

@@ -1,0 +1,127 @@
+
+     * Useful snippets of code for 1401.
+
+     ***********************************************************************************************
+     * How to declare index registers. They must be called X1, X2, and X3 and must be at these locations.
+
+               ORG  87
+     X1        DSA  0                   Index register 1
+               ORG  92
+     X2        DSA  0                   Index register 2
+               ORG  97
+     X3        DSA  0                   Index register 3
+
+     ***********************************************************************************************
+     * Program structure
+
+     * How to make a function call:
+
+               B    FOO                 Stores next address in B register.
+
+     FOO       SBR  FOOX&3              Store B in branch of return instruction.
+               ...
+     FOOX      B    000                 Return
+
+     ***********************************************************************************************
+     * Numbers
+
+     * How to clear a number:
+
+               S    FOO                 Also sets zone bits.
+
+     * How to copy a number:
+
+               ZA   FOO,BAR             FOO can be shorter. Sets sign bits on BAR.
+
+     * How to increment a number:
+
+               A    *-6,FOO             *-6 points to "A", which is a +1. It also has
+                                        a word mark, since it's the opcode.
+
+     * How to double a number:
+
+               A    FOO
+
+     * How to compare two numbers (of the same length):
+
+               S    @0@,A               Set sign bit and fill with zeros (optional).
+               S    @0@,B               Set sign bit and fill with zeros (optional).
+               C    A,B                 Compare to see if exactly equal.
+               BE   EQUAL               Two numbers are equal.
+               ZA   A,TMP               A
+               S    B,TMP                 - B
+               BM   BBIGGER,E           Check sign bit (BM = jump if negative).
+               (else B is smaller)
+
+     * How to check if a number is zero (including blanks, positive, negative):
+
+               MCS  A,TMP               Moves, suppresses zeros, and removes all sign bits.
+               BCE  ISZERO,TMP,         There's a space after the last comma.
+               * Note that TMP must be at least one byte longer than A (don't know why,
+               * and this isn't documented in the spec).
+
+     * How to copy a number and suppress leading zeros except for the unit position:
+
+               MN   FOO,DEST            Copies last digit (loses sign bit).
+               MCS                      Copies rest, suppressing zeros.
+
+     * How to round a number:
+
+               MZ   FOO,FIVE            Make 5 have the same sign as FOO
+               A    FIVE,FOO            Add 5 (or -5) to FOO
+               MZ   @ @,FIVE            Clear zone bits of 5 (optional)
+               MZ   FOO,FOO-1           Move size bits to next digits.
+               (and use FOO-1 after that)
+
+          FIVE DCW  5
+
+     * How to divide two integers (A / B) of length LA and LB using temporary field C of size LC = LA + LB + 1:
+
+               ZA   A,C                 Move A into C and set sign bits (required).
+               D    B,C-LA+1            Divide, giving high-order address of A.
+               MCW  C-LB-1,RESULT       Move result.
+
+       See more examples, with rounding and decimal places, in "Basic Coding Techniques for the 1401
+       Computer", page 33 and 34.
+
+     ***********************************************************************************************
+     * Addresses and pointers
+
+     * How to copy an address:
+
+               MCW  FOO,BAR             Moves bytes until either has word mark.
+
+     * How to increment an address:
+
+               MA   @002@,BAR           Increments BAR address by 2.
+                                        Don't use A (add), since that doesn't know about
+                                        address encoding.
+
+     * How to set a literal address:
+
+               SBR  FOO,201             Sets FOO to 201.
+               SBR  FOO,BAR             Sets FOO to address of BAR.
+               SBR  FOO                 Sets existing B to address of BAR (for saving return address).
+
+     ***********************************************************************************************
+     * Strings
+
+     * How to copy a string:
+
+               LCD  FOO,BAR             Stops at word mark of FOO.
+
+     * How to fill a string:
+
+               MCW  @X@,FOO             Fill last character (leaves B at FOO-1)
+               MCW  FOO                 Copy FOO to FOO-1 and decrease to bottom of FOO
+
+     ***********************************************************************************************
+     * Misc
+
+     * How to print a field:
+
+               CS   332
+               CS
+               LCA  FOO,250
+               W
+

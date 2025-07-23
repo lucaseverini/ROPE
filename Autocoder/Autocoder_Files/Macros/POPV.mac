@@ -1,0 +1,4 @@
+     ** POPV MACRO **
+     ** X2 IS THE STACK POINTER
+     ** VALUE IN STACK IS NOT COPIED
+               SBR  X2, 15995+X2

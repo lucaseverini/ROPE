@@ -1,0 +1,28 @@
+TAPE FILE AS WRITTEN USING PIERCE IBM A:
+
+~B024 ~.~L%U1020R~B001L~.020~B056L~/000~H032~V0291001~L060005~B007~U%U1B~B020~ CLR&BOOT                          ~     ~}
+~L039354~N000~B007~(EOF)             DCW  @(EOF)@               ~}
+~L037357~N000~B007~1=1               DCW  @1=1@                 ~}
+~L035358~N000~B007~.                 H                          ~}
+~L038362~N000~B007~/333              CS   201&132  *CLEAR       ~}
+~L035363~N000~B007~.                 H                          ~}
+~L038367~N000~B007~B358              B    START                 ~}
+~L035368~N000~B007~N                 NOP                        ~}
+~/358080~                                                     ~}
+
+MODIFICATIONS REQUIRED:
+'(' CHANGED TO '%'
+'=' CHANGED TO '#'
+
+
+TAPE FILE AS MODIFIED:
+~B024 ~.~L%U1020R~B001L~.020~B056L~/000~H032~V0291001~L060005~B007~U%U1B~B020~ CLR&BOOT                          ~     ~}
+~L039354~N000~B007~(EOF)             DCW  @%EOF)@               ~}
+~L037357~N000~B007~1=1               DCW  @1#1@                 ~}
+~L035358~N000~B007~.                 H                          ~}
+~L038362~N000~B007~/333              CS   201&132  *CLEAR       ~}
+~L035363~N000~B007~.                 H                          ~}
+~L038367~N000~B007~B358              B    START                 ~}
+~L035368~N000~B007~N                 NOP                        ~}
+~/358080~                                                     ~}
+

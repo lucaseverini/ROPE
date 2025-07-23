@@ -1,0 +1,31 @@
+ CLEAR STORAGE 1     ,008015,022026,030037,044,049,053053N000000N00001026                                         1
+ CLEAR STORAGE 2     L068116,105106,110117B101/I9I#071029C029056B026/B001/0991,001/001117I0?                      2
+ BOOTSTRAP           ,008015,022029,036040,047054,061068,072/061039              ,0010011040                      3
+0                          80/80 CARD LISTER                                                              PAGE    1
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  101                JOB   80/80 CARD LISTER
+  102                CTL   6611
+  103         *
+  104                ORG   333                                                                0333
+  105         *
+  106         * PRINT THE HEADER.
+  107         *
+  108         START  CS    332                                                      4  0333  / 332                4   332
+  109                CS                                                             1  0337  /                    4
+  110                SW    1,201                                                    7  0338  , 001 201            4   001     201
+  111         *
+  112         READ   R                        READ A CARD                           1  0345  1                    4
+  113                MCW   @12345678@,208     MOVE TO PRINT AREA                    7  0346  M 375 208            4   375     208
+  114                W                        PRINT IT                              1  0353  2                    4
+  115                B     DONE,A             BRANCH IF LAST CARD READ              5  0354  B 363 A              4   363
+  116                B     READ               ELSE GO READ ANOTHER CARD             4  0359  B 345                5   345
+  117         *
+  118         DONE   H     DONE                                                     4  0363  . 363                5   363
+  119                H                                                              1  0367  .                    5
+                     DCW   @12345678@                                               8  0375              LIT      5
+  120                END   START                                                             / 333 080                333
+1                                                                                                         PAGE    2
+0SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS
+
+ DONE     0363: 0    READ     0345: 0    START    0333: 0   

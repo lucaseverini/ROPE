@@ -1,0 +1,39 @@
+ BOOTSTRAP FOR CLEAR ,008015,022026,030040/019,001L020100   ,047054,061068,072072)0810811022                      1
+ CLEAR OR BOOTSTRAP  ,008047/047046       /000H025B022100  4/061046,054061,068072,0010401040                      2
+0                                                                                                         PAGE    1
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  101                ORG   87                                                                 0087
+  102         X1     DCW   000                                                      3  0089                       3
+  103         *
+  104                ORG   333                                                                0333
+  105         *
+  106         START  NOP                                                            1  0333  N                    4
+  107                C     FOUR,EIGHT                                               7  0334  C 351 358            4   351     358
+  108         *         BL   END2
+  109                BH    END2                                                     5  0341  B 369 U              4   369
+  110         *
+  111         STOP   H     STOP                                                     4  0346  . 346                4   346
+  112         *
+  113                DCW   @:@                                                      1  0350                       4
+  114         FOUR   DCW   @&@                                                      1  0351                       4
+  115                DCW   @0D   @                                                  5  0356                       4
+  116                DCW   @:@                                                      1  0357                       5
+  117         EIGHT  DCW   @A@                                                      1  0358                       5
+  118                DCW   @AHI  @                                                  5  0363                       5
+  119                DCW   @:@                                                      1  0364                       5
+  120         ONE    DCW   1                                                        1  0365                       5
+  121         ZERO   DCW   @000@                                                    3  0368                       5
+  122         *
+  123         END2   H                                                              1  0369  .                    5
+  124         *
+  125                END   START                                                             / 333 080                333
+1                                                                                                         PAGE    2
+0SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS
+
+ EIGHT    0358: 0    END2     0369: 0    FOUR     0351: 0    ONE      0365: 0    START    0333: 0    STOP     0346: 0   
+ X1       0089: 0    ZERO     0368: 0   
+
+0UNREFERENCED SYMBOLS
+
+ ONE    X1     ZERO

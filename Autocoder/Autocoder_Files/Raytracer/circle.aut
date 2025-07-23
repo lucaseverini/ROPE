@@ -1,0 +1,84 @@
+               JOB  Draw a circle
+               CTL  3311
+
+     *** Index variables.
+               ORG  87
+     X1        DSA  0                   X variable.
+
+     *** Main routine.
+               ORG  333
+     START     MCW  @001@,Y             Reset Y
+
+     *** Next line.
+     NXTLN     MCW  @001@,X1            Reset X
+               CS   332                 Clear printer area
+               CS
+
+     * Center Y
+               MCW  Y,CENY              Y
+               S    @050@,CENY            - 50
+     * Square centered Y.
+               ZA   CENY,YSQR-4
+               A    CENY,YSQR-4         (    )*3  (fix aspect ratio)
+               A    CENY,YSQR-4
+               M    CENY,YSQR           (      )^2
+
+     *** Next pixel.
+
+     * Center X
+     NXTPX     MCW  X1,CENX             X
+               S    @050@,CENX            - 50
+     * Square centered X.
+               ZA   CENX,XSQR-4
+               M    CENX,XSQR           (    )^2
+
+     * Add to YSQR
+               ZA   XSQR,DSQR           (X - 50)^2
+               A    YSQR,DSQR                      + (Y - 50)^2
+
+     * See if we're inside the circle.
+               C    DSQR,RSQR           D^2 < R^2 ?
+               BL   SKIP
+
+     * Draw pixel.
+               MN   STAR,200&X1
+               MZ   STAR,200&X1
+
+     SKIP      A    +1,X1               X++
+
+     *** See if we're done.
+               C    X1,WIDTH
+               BL   DONELN
+               B    NXTPX
+
+     *** Print our line.
+     DONELN    W
+
+               A    +1,Y                Y++
+
+     *** See if we're done.
+               C    HEIGHT,Y
+               BH   FINIS
+               B    NXTLN
+
+     *** Done.
+     FINIS     H    FINIS
+               H
+
+     *** Variables.
+     Y         DCW  000
+
+     *** Constants.
+     WIDTH     DCW  100
+     HEIGHT    DCW  100
+     STAR      DC   @*@
+     RSQR      DCW  0001600
+
+     *** Work area.
+     CENX      DCW  000                 Centered X
+     CENY      DCW  000                 Centered Y
+     XSQR      DCW  0000000             Squared centered X
+     YSQR      DCW  0000000             Squared centered Y
+     DSQR      DCW  0000000             Distance from center
+
+               END  START

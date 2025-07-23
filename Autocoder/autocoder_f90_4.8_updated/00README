@@ -1,0 +1,61 @@
+Files in this archive:
+
+00README            This file
+
+Makefile            Duh
+
+autocoder.f90       Autocoder assembler
+bcd_to_ascii_m.f90
+Bootstrap_m.f90
+error_m.f90
+input_m.f90
+io_units.f90
+lexer.f90
+literals_m.f90
+machine.f90
+op_codes_m.f90
+operand_m.f90
+parser.f90
+pass_1_m.f90
+pass_2_m.f90
+pass_3_m.f90
+symtab_m.f90
+traces_m.f90
+Write_Tape_m.f90
+zone_m.f90
+
+Autocoder_doc.pdf   Documentation for Autocoder and Link.
+
+Link.f90            A linker for output from autocoder
+
+tapedump.f90        A filter that dumps the "object tape" from the -t
+                    option with word marks.  See the Write_Tape
+                    subroutine in pass_3_m.f90.
+
+to_simh.f90         Convert the "object tape" to run in simh; uses
+                    stream output, which didn't exist in f95.  It
+                    provides traditional SimH, Pierce A and H, and
+                    Icelandic encodings. The Makefile doesn't make
+                    this one as to_simh, but it can be made as
+                    to_simh_f.  "make all" doesn't do this.
+
+to_simh_direct.f90  Convert the "object tape" to run in simh; uses
+                    direct-access output to fake stream output, which
+                    didn't exist in f95.  This works on many
+                    systems.  The Makefile doesn't make this one, but
+                    it can be made as to_simh_d.  "make all" doesn't
+                    do this.
+
+to_simh.c           Convert the "object tape" to run in simh; uses C
+                    stream I/O; should work on essentially all systems.
+                    It only provides Pierce A and H encodings. 
+
+to_e11.f90          Convert the "object tape" to run in simh; uses
+                    unformatted Fortran output, which is coincidentally
+                    exactly what simh wants on many little-endian systems.
+                    This doesn't pad odd-length records, so use
+                      set mt1 FORMAT=E11
+                    before booting.
+
+Reloc_Notes.txt     Notes on Autocoder relocatable output and Linker
+                    control file syntax.

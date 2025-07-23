@@ -1,0 +1,245 @@
+ CLEAR STORAGE 1     ,008015,022026,030037,044,049,053053N000000N00001026                                         1
+ CLEAR STORAGE 2     L068116,105106,110117B101/I9I#071029C029056B026/B001/0991,001/001117I0?                      2
+ BOOTSTRAP           ,008015,022029,036040,047054,061068,072/061039              ,0010011040                      3
+0                          BIGGERPI.S 11/24/17 14:21:37                               -2097               PAGE    1
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  101                JOB   BIGGERPI.S 11/24/17 14:21:37
+  102         * OK - THE 3800 CHARACTER VERSION WORKS, 13069 CHARACTERS  :-)
+  103         * SO, CAN WE GO FOR 5090 CHARACTERS?
+  104                CTL        6611  *6=16,000C;6=16,000T;1=OBJDECK;,1=MODADD
+  105         *   1         2         3         4         5         6         7         8
+  106         *78901234567890123456789012345678901234567890123456789012345678901234567890
+  107         * LABEL   | OP | OPERATION                                         |XXXXXXX
+  108                ORG   87                                                                 0087
+  109         X1     DSA   0                  INDEX REGISTER 1                      3  0089  000                  4   000
+  110                ORG   92                                                                 0092
+  111         X2     DSA   0                  INDEX REGISTER 2                      3  0094  000                  5   000
+  112                ORG   97                                                                 0097
+  113                DSA   0                  INDEX REGISTER 3                      3  0099  000                  6   000
+  114         *
+  115         * START STORAGE AREAS
+  116         *  SMALL AREAS
+  117                ORG   100     * PUT SMALL STUFF IN PUNCH AREA                            0100
+  118         ITCNT  DCW   000000    * ITERATION COUNTER, STARTS AT ZERO            6  0105                       6
+  119         *DIVBAS   DCW  000000   * DIVISOR FOR BASET
+  120         IX2P1  DCW   000000   * ITCNT TIMES 2 PLUS 1, DIVISOR FOR INTER       6  0111                       6
+  121         C0     DCW   000000                                                   6  0117                       6
+  122         C1     DCW   000001                                                   6  0123                       6
+  123         C2     DCW   000002                                                   6  0129                       6
+  124                DCW   000005                                                   6  0135                       6
+  125         C25    DCW   000025                                                   6  0141                       7
+  126                DCW   000239                                                   6  0147                       7
+  127         C239P2 DCW   057121                                                   6  0153                       7
+  128         CNTZRO DCW   000000  * COUNT LEADING ZEROS, DONE YET?                 6  0159                       7
+  129         CF     DCW   1         *  "1"=ADD, "0" OR OTHER = SUBTRACT            1  0160                       7
+  130         LC0L9  DCW   000000000                                                9  0169                       7
+  131         *
+  132         *         ORG  200
+  133         * OVERLAY PRINT AREA
+  134         START  MCW   @000000@,ITCNT  * ZERO ITERATION CNTR                    7  0170  M I3E 105            8 15935     105
+  135                MCW   @000001@,IX2P1  * INIT INTER DIVISOR                     7  0177  M I4A 111            8 15941     111
+  136                MCW   @+@,ACCUM+5049  * ZERO ACCUMULATOR                       7  0184  M I4B I2I            8 15942   15929
+  137                MCW   @0@,ACCUM+5048                                           7  0191  M I4C I2H            8 15943   15928
+  138                MCW   ACCUM+5048,ACCUM+5047                                    7  0198  M I2H I2G            8 15928   15927
+  139                MCW   @0@,BASET+5048                                           7  0205  M I4C Y2Y            9 15943    5828
+  140                MCW   BASET+5048,BASET+5047                                    7  0212  M Y2Y Y2X            9  5828    5827
+  141                MCW   @80@,BASET+8  * SET A HIGH ORDER TO 1*5*16               7  0219  M I4E 788            9 15945     788
+  142         PH1L   MCW   @+@,BASET+5049  * SET POSITIVE SIGN                      7  0226  M I4B Y2Z            9 15942    5829
+  143                D     C25,BASET+6     * TRIAL ARITH                            7  0233  % 141 786            9   141     786
+  144                MCW   BASET+5042,BASET+5049  * SHIFT QUOTIENT                  7  0240  M Y2S Y2Z           10  5822    5829
+  145                MCW   LC0L9,BASET+6      * REMOVE UNSHIFTED                    7  0247  M 169 786           10   169     786
+  146                MCW   BASET+5049,INTER+5049  * MOVE QUOTIENT TO NEXT           7  0254  M Y2Z Q7R           10  5829   10879
+  147                MCW   @+@,INTER+5049     * SET POSITIVE SIGN                   7  0261  M I4B Q7R           10 15942   10879
+1                          BIGGERPI.S 11/24/17 14:21:37                               -2097               PAGE    2
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  148                D     IX2P1,INTER+6    DIVIDE INTERMEDIATE                     7  0268  % 111 Y3W           10   111    5836
+  149                MCW   INTER+5042,INTER+5049   * SHIFT INTERMEDIATE             7  0275  M Q7K Q7R           11 10872   10879
+  150                MCW   LC0L9,INTER+6        * REMOVE UNSHIFTED                  7  0282  M 169 Y3W           11   169    5836
+  151                MCW   @+@,INTER+5049  * SET UP BASE                            7  0289  M I4B Q7R           11 15942   10879
+  152                BCE   PH1ADD,CF,1        * COMPARE FOR ADD                     8  0296  B 322 160 1         11   322     160
+  153                MCW   @1@,CF              * SET NEXT ADD                       7  0304  M I4F 160           11 15946     160
+  154                S     INTER+5049,ACCUM+5049   * DO THE SUBTRACTION             7  0311  S Q7R I2I           12 10879   15929
+  155                B     PH1W                * GO TO WRAP-UP                      4  0318  B 336               12   336
+  156         PH1ADD A     INTER+5049,ACCUM+5049   * ADD TO ACCUMULATOR             7  0322  A Q7R I2I           12 10879   15929
+  157                MCW   @0@,CF              * SET NEXT SUBTRACT                  7  0329  M I4C 160           12 15943     160
+  158         PH1W   A     C1,ITCNT            * INC ITERATION COUNT                7  0336  A 123 105           12   123     105
+  159                A     C2,IX2P1            * FORM NEXT DIVISOR                  7  0343  A 129 111           12   129     111
+  160         PH1BCE BCE   PH1X1,BASET+X1,0   * CHAR = 0, DONE?                     8  0350  B 362 7Y0 0         13   362     780+1
+  161                B     PH1L                * GO DO ANOTHER LOOP PASS            4  0358  B 226               13   226
+  162         PH1X1  A     C1,CNTZRO           * INCREMENT # LEADING ZEROS          7  0362  A 123 159           13   123     159
+  163                SBR   X1,1+X1             * INCREMENT X1                       7  0369  H 089 0'1           13   089     001+1
+  164                C     CNTZRO,@5049@         * CHECK END                        7  0376  C 159 I5?           13   159   15950
+  165                BU    PH1BCE              * NO, CHECK MORE ZEROS               5  0383  B 350 /             13   350
+  166         *          B    START2                * DONE WITH PASS 1
+  167         *
+  168         * -------------------------------------------------------------
+  169                MCW   @000000@,ITCNT  * ZERO ITERATION CNTR                    7  0388  M I5F 105           14 15956     105
+  170                MCW   @000001@,IX2P1  * INIT INTER DIVISOR                     7  0395  M I6B 111           14 15962     111
+  171                MCW   C0,CNTZRO       * CLEAR LEADING ZERO COUNTER             7  0402  M 117 159           14   117     159
+  172         * DO NOT ZERO ACCUMULATOR
+  173                MCW   @0@,BASET+5048                                           7  0409  M I4C Y2Y           14 15943    5828
+  174                MCW   BASET+5048,BASET+5047                                    7  0416  M Y2Y Y2X           14  5828    5827
+  175                MCW   @956@,BASET+8  * SET A HIGH ORDER TO 1*4*239             7  0423  M I6E 788           15 15965     788
+  176                MCW   @0@,CF              * SET NEXT SUBTRACT                  7  0430  M I4C 160           15 15943     160
+  177         PH2L   MCW   @+@,BASET+5049  * SET POSITIVE SIGN                      7  0437  M I4B Y2Z           15 15942    5829
+  178                D     C239P2,BASET+6     * TRIAL ARITH                         7  0444  % 153 786           15   153     786
+  179                MCW   BASET+5042,BASET+5049  * SHIFT QUOTIENT                  7  0451  M Y2S Y2Z           15  5822    5829
+  180                MCW   LC0L9,BASET+6      * REMOVE UNSHIFTED                    7  0458  M 169 786           16   169     786
+  181                MCW   BASET+5049,INTER+5049  * MOVE QUOTIENT TO NEXT           7  0465  M Y2Z Q7R           16  5829   10879
+  182                MCW   @+@,INTER+5049     * SET POSITIVE SIGN                   7  0472  M I4B Q7R           16 15942   10879
+  183                D     IX2P1,INTER+6       DIVIDE INTERMEDIATE                  7  0479  % 111 Y3W           16   111    5836
+  184                MCW   INTER+5042,INTER+5049   * SHIFT INTERMEDIATE             7  0486  M Q7K Q7R           16 10872   10879
+  185                MCW   LC0L9,INTER+6        * REMOVE UNSHIFTED                  7  0493  M 169 Y3W           17   169    5836
+  186                MCW   @+@,INTER+5049  * SET UP BASE                            7  0500  M I4B Q7R           17 15942   10879
+  187                BCE   PH2ADD,CF,1        * COMPARE FOR ADD                     8  0507  B 533 160 1         17   533     160
+  188                MCW   @1@,CF              * SET NEXT ADD                       7  0515  M I4F 160           17 15946     160
+  189                S     INTER+5049,ACCUM+5049   * DO THE SUBTRACTION             7  0522  S Q7R I2I           17 10879   15929
+  190                B     PH2W                * GO TO WRAP-UP                      4  0529  B 547               18   547
+  191         PH2ADD A     INTER+5049,ACCUM+5049   * ADD TO ACCUMULATOR             7  0533  A Q7R I2I           18 10879   15929
+  192                MCW   @0@,CF              * SET NEXT SUBTRACT                  7  0540  M I4C 160           18 15943     160
+  193         PH2W   A     C1,ITCNT            * INC ITERATION COUNT                7  0547  A 123 105           18   123     105
+  194                A     C2,IX2P1            * FORM NEXT DIVISOR                  7  0554  A 129 111           18   129     111
+  195         PH2BCE BCE   PH2X2,BASET+X2,0   * CHAR = 0, DONE?                     8  0561  B 573 7Q0 0         19   573     780+2
+  196                B     PH2L                * GO DO ANOTHER LOOP PASS            4  0569  B 437               19   437
+  197         PH2X2  A     C1,CNTZRO           * INCREMENT # LEADING ZEROS          7  0573  A 123 159           19   123     159
+1                          BIGGERPI.S 11/24/17 14:21:37                               -2097               PAGE    3
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  198                SBR   X2,1+X2             * INCREMENT X1                       7  0580  H 094 0!1           19   094     001+2
+  199                C     CNTZRO,@5049@         * CHECK END                        7  0587  C 159 I5?           19   159   15950
+  200                BU    PH2BCE              * NO, CHECK MORE ZEROS               5  0594  B 561 /             19   561
+  201         *          B    PRINTD                * DONE WITH PASS 2
+  202         *  NOW WE PRINT THAT BABY OUT :-))
+  203         * PROPOSED FORMAT
+  204         * 2
+  205         * 0        1         2         3         4         5         6         7
+  206         * 1234567890123456789012345678901234567890123456789012345678901234567890123
+  207         *                                                        3. * 10E-00000
+  208         * + NNNNNNNNNN NNNNNNNNNN NNNNNNNNNN NNNNNNNNNN NNNNNNNNNN  * 10E-00050
+  209         * + NNNNNNNNNN NNNNNNNNNN NNNNNNNNNN NNNNNNNNNN NNNNNNNNNN  * 10E-00100
+  210                MCW   @008@,X1   * CLEAR PICKUP X                              7  0599  M I6H 089           20 15968     089
+  211                MCW   C0,ITCNT   * CLEAR TOTAL CH MOVED                        7  0606  M 117 105           20   117     105
+  212                CS    332    * START CLEARING DOWN TO 200, PRINT AREA          4  0613  / 332               20   332
+  213                CS                                                             1  0617  /                   20
+  214                MCW   @. * 10E-00000@,269                                      7  0618  M I8A 269           20 15981     269
+  215                SW    265        * SET WORD MARK IN EXPONENT FIELD             4  0625  , 265               20   265
+  216                MCW   ACCUM+X1,256  MOVE 5TH FIELD                             7  0629  M QY! 256           20 10880+1   256
+  217                SBR   X1,10+X1     * STEP X1                                   7  0636  H 089 0/0           21   089     010+1
+  218                W            *WRITE THE PRINT AREA TO THE PRINTER              1  0643  2                   21
+  219         *
+  220         PR1LOP CS    252        * CLEAR PREVIOUS NUMERICS                     4  0644  / 252               21   252
+  221                SW    203,214    * SET WORD MARKS FOR B FIELD                  7  0648  , 203 214           21   203     214
+  222                SW    225,236                                                  7  0655  , 225 236           21   225     236
+  223                SW    247,265                                                  7  0662  , 247 265           21   247     265
+  224                A     @00050@,269  * ADD 50 TO EXPONENT                        7  0669  A I8F 269           22 15986     269
+  225                MCW   ACCUM+X1,212  MOVE 1ST FIELD                             7  0676  M QY! 212           22 10880+1   212
+  226                SBR   X1,10+X1     * STEP X1                                   7  0683  H 089 0/0           22   089     010+1
+  227                MCW   ACCUM+X1,223  MOVE 2ND FIELD                             7  0690  M QY! 223           22 10880+1   223
+  228                SBR   X1,10+X1     * STEP X1                                   7  0697  H 089 0/0           22   089     010+1
+  229                MCW   ACCUM+X1,234  MOVE 3RD FIELD                             7  0704  M QY! 234           23 10880+1   234
+  230                SBR   X1,10+X1     * STEP X1                                   7  0711  H 089 0/0           23   089     010+1
+  231                MCW   ACCUM+X1,245  MOVE 4TH FIELD                             7  0718  M QY! 245           23 10880+1   245
+  232                SBR   X1,10+X1     * STEP X1                                   7  0725  H 089 0/0           23   089     010+1
+  233                MCW   ACCUM+X1,256  MOVE 5TH FIELD                             7  0732  M QY! 256           23 10880+1   256
+  234                SBR   X1,10+X1     * STEP X1                                   7  0739  H 089 0/0           24   089     010+1
+  235                W            *WRITE THE PRINT AREA TO THE PRINTER              1  0746  2                   24
+  236                A     @000050@,ITCNT   * ADD 50 TO TOTAL DIGITS                7  0747  A I9B 105           24 15992     105
+  237                C     @005000@,ITCNT   * TEST FOR END                          7  0754  C I9H 105           24 15998     105
+  238                BL    PR1LOP         * END IS HIGHER THAN COUNT                5  0761  B 644 T             24   644
+  239         *
+  240         HALT3  H     HALT3        * END EXPERIMENT                            4  0766  . 766               24   766
+  241         *
+  242         *  LARGE AREAS RON MAK SAYS THAT BLANKS PROCESS AS ZEROS
+  243                ORG   780                                                                0780
+  244         *FLDLEN    EQU  5050      * LENGTH OF THE 3 BIG FIELDS
+  245         BASET  DA    1X5050,C  * BASE, 1ST DIVISION HERE                         0780   5829               24
+  246         INTER  DA    1X5050,C  * INTERMEDIATE BUFFER, 2ND DIVISION HERE          5830  10879              157
+  247         ACCUM  DA    1X5050,C  * ACCUMULATOR, ANSWER IS FORMED HERE             10880  15929              290
+1                          BIGGERPI.S 11/24/17 14:21:37                               -2097               PAGE    4
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  248         *   1         2         3         4         5         6         7         8
+  249         *78901234567890123456789012345678901234567890123456789012345678901234567890
+  250         * LABEL   | OP | OPERATION                                         |XXXXXXX
+  251         *
+  252         *** NOV 15
+  253         * MACHIN'S METHOD -
+  254         * PI = 16ARCTAN(1/5) - 4ARCTAN(1/239)
+  255         * AN ARCTAN SERIES IS 1/N - 1/(3XN^3) + 1/(5XN^5) - ...
+  256         *
+  257         *** NOV 16
+  258         * IN ANY CASE,
+  259         *LETS DO ARCTAN(X),  X = 1/5
+  260         *   0.19739555984988075837004976519479
+  261         *THEN  16ARCTAN(1/5)
+  262         *   3.1583289575980921339207962431166
+  263         * THEN AECTAN(1/239)
+  264         *   0.0041840760020747238645382149592855
+  265         * TIMES 4
+  266         *   0.016736304008298895458152859837142
+  267         * PI =
+  268         *    3.1415926535897932384626433832795
+  269         * :-))
+  270         *
+  271         * SET N TO 1/X = 5      (THIS IS THE FANCY FOOTWORK :-))
+  272         *
+  273         * 1) A) FORM THREE LARGE AS PRACTICAL EQUAL SIZED AREAS IN MEMORY.
+  274         *       LETS CALL THEM "ACCUMULATOR",       ACCUM
+  275         *                      "INTERMEDIATE",      INTER
+  276         *                      "BASE OF NEXT TERM"  BASET
+  277         *     B) FORM SMALLER WORKING AREAS
+  278         *          ITERATION COUNTER ITCNT    USED FOR OBSERVATION
+  279         *                  STARTS AT ZERO, COUNTS UP AFTER A PASS
+  280         *          DIVISOR OF BASET, DIVBAS,   USUALLY 5^2 OR 239^2
+  281         *                  5^2 = 25,   239^2 = 57121
+  282         *          ADD/SUBTRACT CONTROL FLAG, CF , TOGGLED AFTER A PASS
+  283         *                0 MEANS ADD, OTHER IS SUBTRACT
+  284         *          DIVISOR OF INTER IS IX2P1 , ITCNT TIMES 2 PLUS 1
+  285         *
+  286         * 2) FIGURE WHERE THE DECIMAL POINT WILL BE
+  287         *     (SAME RELATIVE PLACE IN EACH AREA)
+  288         *     ( SEVERAL CHARACTERS OR WORDS TO THE "RIGHT" OF
+  289         *       THE TOP SIGNIFICANCE.)
+  290         *
+  291         * 3) A) ZERO THE  ACCUM
+  292         *     B) ( INTER DOES NOT NEED INITIALIZATION)
+  293         *    C) SET X (5.0 IN OUR EXAMPLE) INTO BASET
+  294         *    D) SET COUNTER N TO 1
+  295         *
+  296         * 4) WHILE BASET IS NON-ZERO
+  297         *    A) DIVIDE BASET BY X^2  ( 25 IN OUR EXAMPLE ) GIVING BASET
+1                          BIGGERPI.S 11/24/17 14:21:37                               -2097               PAGE    5
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  298         *    B) DIVIDE BASET BY (2XN - 1) GIVING INTER
+  299         *    C) IF N IS ODD, ADD INTERMEDIATE TO ACCUMULATOR
+  300         *           ELSE, SUBTRACT INTERMEDIATE FROM ACCUMULATOR
+  301         *    D) ADD 1 TO N (ASSURE THAT MACHINE CAN DIVIDE BY 2N)
+  302         *
+  303         * 5) ACCUMULATOR IS A FINE APPROXIMATION OF ARCTAN(X)   ;-))
+                     DCW   @000000@                                                 6 15935              LIT    423
+                     DCW   @000001@                                                 6 15941              LIT    423
+                     DCW   @+@                                                      1 15942              LIT    423
+                     DCW   @0@                                                      1 15943              LIT    424
+                     DCW   @80@                                                     2 15945              LIT    424
+                     DCW   @1@                                                      1 15946              LIT    424
+                     DCW   @5049@                                                   4 15950              LIT    424
+                     DCW   @000000@                                                 6 15956              LIT    424
+                     DCW   @000001@                                                 6 15962              LIT    424
+                     DCW   @956@                                                    3 15965              LIT    424
+                     DCW   @008@                                                    3 15968              LIT    425
+                     DCW   @. * 10E-00000@                                         13 15981              LIT    425
+                     DCW   @00050@                                                  5 15986              LIT    425
+                     DCW   @000050@                                                 6 15992              LIT    425
+                     DCW   @005000@                                                 6 15998              LIT    425
+  304                END   START  * LAST CARD IN DECK, TRANSFER ADDRESS                      / 170 080                170
+1                                                                                                         PAGE    6
+0SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS
+
+ ACCUM   10880: 0    BASET    0780: 0    C0       0117: 0    C1       0123: 0    C2       0129: 0    C239P2   0153: 0   
+ C25      0141: 0    CF       0160: 0    CNTZRO   0159: 0    HALT3    0766: 0    INTER    5830: 0    ITCNT    0105: 0   
+ IX2P1    0111: 0    LC0L9    0169: 0    PH1ADD   0322: 0    PH1BCE   0350: 0    PH1L     0226: 0    PH1W     0336: 0   
+ PH1X1    0362: 0    PH2ADD   0533: 0    PH2BCE   0561: 0    PH2L     0437: 0    PH2W     0547: 0    PH2X2    0573: 0   
+ PR1LOP   0644: 0    START    0170: 0    X1       0089: 0    X2       0094: 0   

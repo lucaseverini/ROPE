@@ -1,0 +1,7 @@
+     ********FIRST LINE OF THE    INDEX   MACRO**********************
+     *
+               MCW  @X1000X2000X3000@,X3   *MARK INDEX REGISTERS
+               SW   X1,X2               *SET WORD MARKS
+               SW   X3                  *SET WORD MARK
+     *
+     ********LAST LINE OF THE    INDEX   MACRO***********************

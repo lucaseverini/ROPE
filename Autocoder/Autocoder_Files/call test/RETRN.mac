@@ -1,0 +1,8 @@
+     ********************* START MACRO ******************
+     retrn     headr           *a call routine with one addresse
+               s    @3@,stack  *deccrement stack pointer
+               mz   stack-1,stack   *clear zone
+               mcw  stack,*+4  *pick up the stack index
+               mcw  000,*+4    *put into branch
+               b    000        *go to the specified routine
+     *************************END MACRO ******************

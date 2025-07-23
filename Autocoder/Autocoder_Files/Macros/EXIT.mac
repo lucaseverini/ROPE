@@ -1,0 +1,14 @@
+     * STARTS IN COLUMN 6
+     **********************************************************
+     *         GET READY TO BOOT FROM THE FOLLOWING DECK
+     *   
+     EXIT      CS   332             * CLEAR PRINT STORAGE
+               CS                   * CLEAR PRINT STORAGE
+               CS                   * CLEAR PUNCH STORAGE
+               CS                   * CLEAR READ STORAGE
+               SW   001             * SET WORDMARK IN LOCATION 1
+     NREAD     R                    * READ FIRST CARD OF NEXT OBJECT
+               BCE  001,001,,       * IS IT A COMMA? BRANCH TO THE..
+               B    NREAD           * CHECK THE NEXT ONE
+               NOP
+     *********************************************************

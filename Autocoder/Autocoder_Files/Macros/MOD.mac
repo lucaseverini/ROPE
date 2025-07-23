@@ -1,0 +1,6 @@
+     ** MODULUS MACRO **
+     ** VALUE OF MODULUS (THE REMAINDER OF OP1 / OP2) IS PUSHED ONTO STACK
+               POP  TMP2
+               POP  TMP1               
+               DIV  TMP2, TMP1, QUOT, REMAIN
+               PUSH REMAIN

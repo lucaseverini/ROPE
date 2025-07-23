@@ -1,0 +1,13 @@
+     ** MULTIPLICATION MACRO **
+     ** )01 AND )02 ARE THE OPERANDS. THE RESULT IS IN )03
+               B    *+32
+               DCW  @0000000000@                
+               DC   @00000000000@       * WHERE THE ANSWER APPEARS
+               DCW  @0000000000@
+
+               ZA   @0@, *-17           * CLEAR BL AND BH TO ZERO
+               ZA   )01, *-35           * LOAD MULTIPLIER M01 TO HIGH B
+               ZA   )02, *-21           * LOAD MULTIPLIER M02 TO MUL
+               M    *-28, *-38          * MULTIPLY MUL BL
+               ZA   *-45, )03           * GIVE THE ANSWER BACK BL TO ANS
+               MZ   )03-1, )03          * CLEANUP BITZONE

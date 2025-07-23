@@ -1,0 +1,463 @@
+ CLEAR STORAGE 1     ,008015,022026,030037,044,049,053053N000000N00001026                                         1
+ CLEAR STORAGE 2     L068116,105106,110117B101/I9I#071029C029056B026/B001/0991,001/001117I0?                      2
+ BOOTSTRAP           ,008015,022029,036040,047054,061068,072/061039              ,0010011040                      3
+0                          COMPUTE THE SQUARE ROOT OF 2 TO 1,000 DECIMAL PLACES                           PAGE    1
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  101                JOB   COMPUTE THE SQUARE ROOT OF 2 TO 1,000 DECIMAL PLACES
+  102                CTL   6611
+  103         *
+  104                ORG   87                                                                 0087
+  105         X1     DSA   0                  INDEX REGISTER 1                      3  0089  000                  4   000
+  106                ORG   92                                                                 0092
+  107         X2     DSA   0                  INDEX REGISTER 2                      3  0094  000                  5   000
+  108                ORG   97                                                                 0097
+  109         X3     DSA   0                  INDEX REGISTER 3                      3  0099  000                  6   000
+  110         *
+  111                ORG   333                                                                0333
+  112         *
+  113         * PRINT HEADER.
+  114         *
+  115         START  CS    332                                                      4  0333  / 332                7   332
+  116                CS                                                             1  0337  /                    7
+  117                MCW   N,319                                                    7  0338  M 417 319            7   417     319
+  118                MCW   LABEL1                                                   4  0345  M 706                7   706
+  119                W                                                              1  0349  2                    7
+  120         *
+  121         * CALL THE SQUARE ROOT SUBROUTINE.
+  122         *
+  123                ZA    LENN,SQLENN        SQLENN = LENN                         7  0350  ? 680 /97            7   680    1197
+  124                ZA    DP,SQDP            SQDP   = DP                           7  0357  ? 684 S01            7   684    1201
+  125         *
+  126                SBR   SQADRN,N           SQADRN = @N                           7  0364  H S07 417            8  1207     417
+  127                SBR   SQADRX,X           SQADRX = @X                           7  0371  H S10 521            8  1210     521
+  128                SBR   SQADRP,XPREV       SQADRP = @XPREV                       7  0378  H S13 575            8  1213     575
+  129                SBR   SQADRT,TEMP        SQADRT = @TEMP                        7  0385  H S16 627            8  1216     627
+  130                B     SQRT                                                     4  0392  B 718                8   718
+  131         *
+  132         * PRINT THE NUMBER OF ITERATIONS.
+  133         *
+  134                CS    332                                                      4  0396  / 332                8   332
+  135                CS                                                             1  0400  /                    8
+  136                W                                                              1  0401  2                    9
+  137                MCW   LABEL2,319                                               7  0402  M 717 319            9   717     319
+      ** ***  ** Name too long                                                                           ERROR
+  138                MCW   SQITERS                                                  1  0409  #                    9  BAD STATEMENT
+  139                W                                                              1  0410  2                    9
+  140         *
+  141         FINIS  H     FINIS                                                    4  0411  . 411                9   411
+  142                H                                                              1  0415  .                    9
+  143         *
+  144         N      DCW   02                                                       2  0417                       9
+      ** ***  ** DCW specifies area of more than 52 characters                                           ERROR
+  145                DC    #2000              LEN = 2*DP [DECIMAL PLACES]          52  0469                      11  BAD STATEMENT
+1                          COMPUTE THE SQUARE ROOT OF 2 TO 1,000 DECIMAL PLACES                           PAGE    2
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  146         *
+      ** ***  ** DCW specifies area of more than 52 characters                                           ERROR
+  147         X      DCW   #1002              LEN = LEN(N) + DP                    52  0521                      13  BAD STATEMENT
+  148                DC    #2                 REMAINDER OF /2: LEN = 2              2  0523                      13
+  149         *
+      ** ***  ** DCW specifies area of more than 52 characters                                           ERROR
+  150         XPREV  DCW   #1002              LEN = LEN(X)                         52  0575                      15  BAD STATEMENT
+  151         *
+      ** ***  ** DCW specifies area of more than 52 characters                                           ERROR
+  152         TEMP   DCW   #2002              LEN = LEN(N) + 2*DP                  52  0627                      17  BAD STATEMENT
+      ** ***  ** DCW specifies area of more than 52 characters                                           ERROR
+  153                DC    #1003              REMAINDER OF /X: LEN = LEN(X) + 1    52  0679                      19  BAD STATEMENT
+  154         *
+  155         LENN   DCW   2                  LEN(N)                                1  0680                      19
+  156         DP     DCW   1000               NUMBER OF DECIMAL PLACES (DP)         4  0684                      19
+  157         ITERS  DCW   000                ITERATION COUNTER                     3  0687                      19
+  158         *
+  159         LABEL1 DCW   @THE SQUARE ROOT OF @                                   19  0706                      20
+  160         LABEL2 DCW   @ ITERATIONS@                                           11  0717                      20
+  161         ***************************************************************************
+  162         *
+  163         *     SQUARE ROOT SUBROUTINE
+  164         *
+  165         *     THIS SUBROUTINE COMPUTES THE SQUARE ROOT OF N TO DP DECIMAL PLACES
+  166         *     USING NEWTON'S ALGORITHM:
+  167         *
+  168         *         X = (X + N/X)/2
+  169         *
+  170         *     WHERE X IS INITIALIZED TO N, AND THE FORMULA ITERATES UNTIL TWO
+  171         *     SUCCESSIVE VALUES OF X (X AND XPREV) ARE THE SAME.  THE CALLER
+  172         *     MUST ALSO SUPPLY A TEMPORARY WORK AREA.
+  173         *
+  174         *     ENTRY POINT:  SQRT
+  175         *
+  176         *     BEFORE CALLING, THE CALLER MUST SET:
+  177         *
+  178         *         SQLENN = LEN(N)
+  179         *         SQDP   = DP
+  180         *         SQADRN = @N
+  181         *         SQADRX = @X
+  182         *         SQADRP = @XPREV
+  183         *         SQADRT = @TEMP
+  184         *
+  185         *     UPON RETURN:
+  186         *
+  187         *         X      = SQRT(N)
+  188         *         SQITER = NUMBER OF ITERATIONS
+  189         *
+  190         *     NOTES:
+  191         *
+1                          COMPUTE THE SQUARE ROOT OF 2 TO 1,000 DECIMAL PLACES                           PAGE    3
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  192         *         (1) N MUST BE FOLLOWED IN MEMORY BY 2*DP ZEROES (OR BLANKS)
+  193         *         (2) LEN(X) MUST BE LEN(N) + DP, AND IT MUST BE FOLLOWED IN
+  194         *             MEMORY BY 2 ZEROES (OR BLANKS)
+  195         *         (3) LEN(XPREV) MUST BE LEN(X)
+  196         *         (4) LEN(TEMP) MUST BE LEN(N) + 2*DP, AND IT MUST BE FOLLOWED
+  197         *             IN MEMORY BY (LEN(X) + 1) ZEROES (OR BLANKS)
+  198         *
+  199         ***************************************************************************
+  200         SQRT   SBR   SQRTX&3                                                  4  0718  H /94               20  1194
+  201         *
+  202         * SET @X, @XPREV, AND @TEMP
+  203         *
+  204                MCW   SQADRX,SQZA1&6     @X                                    7  0722  M S10 '99           21  1210    1099
+  205                MCW   SQADRX,SQLOOP&3    @X                                    7  0729  M S10 /03           21  1210    1103
+  206                MCW   SQADRX,SQZA2&3     @X                                    7  0736  M S10 /22           21  1210    1122
+  207                MCW   SQADRX,SQD1&3      @X                                    7  0743  M S10 /36           21  1210    1136
+  208                MCW   SQADRX,SQA&3       @X                                    7  0750  M S10 /47           21  1210    1147
+  209                MCW   SQADRP,SQLOOP&6    @XPREV                                7  0757  M S13 /06           22  1213    1106
+  210                MCW   SQADRP,SQZA2&6     @XPREV                                7  0764  M S13 /25           22  1213    1125
+  211                MCW   SQADRT,SQA&6       @TEMP                                 7  0771  M S16 /50           22  1216    1150
+  212                MCW   SQADRT,SQZA4&3     @TEMP                                 7  0778  M S16 /54           22  1216    1154
+  213         *
+  214         * COMPUTE AND SET @X + 2
+  215         *
+  216                MCW   SQADRX,SQZA4&6     @X                                    7  0785  M S10 /57           22  1210    1157
+  217                MA    @002@,SQZA4&6         + 2                                7  0792  # X01 /57           23  1701    1157
+  218         *
+  219         * COMPUTE AND SET @X - DP
+  220         *
+  221                MCW   SQADRX,SQSBR&6     @X                                    7  0799  M S10 /75           23  1210    1175
+  222                ZA    SQDP,CNVOFF           - DP                               7  0806  ? S01 T87           23  1201    1387
+  223                B     CNVRTN                                                   4  0813  B S25               23  1225
+  224                MA    CNVOFF,SQSBR&6                                           7  0817  # T87 /75           23  1387    1175
+  225         *
+  226         * COMPUTE AND SET @X - (LEN(N) + DP) + 2
+  227         *
+  228                MCW   SQADRX,SQD2&6      @X                                    7  0824  M S10 /64           23  1210    1164
+  229                ZA    SQLENN,CNVOFF         - LEN(N)                           7  0831  ? /97 T87           24  1197    1387
+  230                B     CNVRTN                                                   4  0838  B S25               24  1225
+  231                MA    CNVOFF,SQD2&6                                            7  0842  # T87 /64           24  1387    1164
+  232                ZA    SQDP,CNVOFF                    - DP                      7  0849  ? S01 T87           24  1201    1387
+  233                B     CNVRTN                                                   4  0856  B S25               24  1225
+  234                MA    CNVOFF,SQD2&6                                            7  0860  # T87 /64           24  1387    1164
+  235                MA    @002@,SQD2&6                        + 2                  7  0867  # X01 /64           25  1701    1164
+  236         *
+  237         * COMPUTE AND SET @N + DP
+  238         *
+  239                MCW   SQADRN,SQZA1&3     @N                                    7  0874  M S07 '96           25  1207    1096
+  240                ZA    SQDP,CNVOFF           + DP                               7  0881  ? S01 T87           25  1201    1387
+  241                B     CNVRTP                                                   4  0888  B S17               25  1217
+1                          COMPUTE THE SQUARE ROOT OF 2 TO 1,000 DECIMAL PLACES                           PAGE    4
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  242                MA    CNVOFF,SQZA1&3                                           7  0892  # T87 '96           25  1387    1096
+  243         *
+  244         * COMPUTE AND SET @N + 2*DP
+  245         *
+  246                MCW   SQADRN,SQZA3&3     @N                                    7  0899  M S07 /29           25  1207    1129
+  247                ZA    SQDP,CNVOFF           + DP                               7  0906  ? S01 T87           26  1201    1387
+  248                A     CNVOFF                     + DP                          4  0913  A T87               26  1387
+  249                B     CNVRTP                                                   4  0917  B S17               26  1217
+  250                MA    CNVOFF,SQZA3&3                                           7  0921  # T87 /29           26  1387    1129
+  251         *
+  252         * COMPUTE AND SET @TEMP + LEN(N) + DP + 1
+  253         *
+  254                MCW   SQADRT,SQZA3&6     @TEMP                                 7  0928  M S16 /32           26  1216    1132
+  255                ZA    SQLENN,CNVOFF            + LEN(N)                        7  0935  ? /97 T87           26  1197    1387
+  256                B     CNVRTP                                                   4  0942  B S17               27  1217
+  257                MA    CNVOFF,SQZA3&6                                           7  0946  # T87 /32           27  1387    1132
+  258                ZA    SQDP,CNVOFF                       + DP                   7  0953  ? S01 T87           27  1201    1387
+  259                B     CNVRTP                                                   4  0960  B S17               27  1217
+  260                MA    CNVOFF,SQZA3&6                                           7  0964  # T87 /32           27  1387    1132
+  261                MA    @001@,SQZA3&6                          + 1               7  0971  # X04 /32           27  1704    1132
+  262         *
+  263         * COMPUTE AND SET @TEMP + LEN(N) - DP + 1
+  264         *
+  265                MCW   SQADRT,SQD1&6      @TEMP                                 7  0978  M S16 /39           28  1216    1139
+  266                ZA    SQLENN,CNVOFF            + LEN(N)                        7  0985  ? /97 T87           28  1197    1387
+  267                B     CNVRTP                                                   4  0992  B S17               28  1217
+  268                MA    CNVOFF,SQD1&6                                            7  0996  # T87 /39           28  1387    1139
+  269                ZA    SQDP,CNVOFF                       - DP                   7  1003  ? S01 T87           28  1201    1387
+  270                B     CNVRTN                                                   4  1010  B S25               28  1225
+  271                MA    CNVOFF,SQD1&6                                            7  1014  # T87 /39           29  1387    1139
+  272                MA    @001@,SQD1&6                           + 1               7  1021  # X04 /39           29  1704    1139
+  273         *
+  274         * COMPUTE AND SET @TEMP - (LEN(N) + DP)
+  275         *
+  276                MCW   SQADRT,SQSW&3      @TEMP                                 7  1028  M S16 /43           29  1216    1143
+  277                ZA    SQLENN,CNVOFF            - LEN(N)                        7  1035  ? /97 T87           29  1197    1387
+  278                B     CNVRTN                                                   4  1042  B S25               29  1225
+  279                MA    CNVOFF,SQSW&3                                            7  1046  # T87 /43           29  1387    1143
+  280                ZA    SQDP,CNVOFF                       - DP                   7  1053  ? S01 T87           30  1201    1387
+  281                B     CNVRTN                                                   4  1060  B S25               30  1225
+  282                MA    CNVOFF,SQSW&3                                            7  1064  # T87 /43           30  1387    1143
+  283         *
+  284                SW    SQCW&1                                                   4  1071  , /66               30  1166
+  285                MCW   SQSW&3,SQCW&3                                            7  1075  M /43 /68           30  1143    1168
+  286                CW    SQCW&1                                                   4  1082  ) /66               30  1166
+  287         *
+  288         * NEWTON'S ALGORITHM:
+  289         *
+  290         *     X = XPREV;
+  291         *     WHILE (X != XPREV) {
+1                          COMPUTE THE SQUARE ROOT OF 2 TO 1,000 DECIMAL PLACES                           PAGE    5
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  292         *         XPREV = X;
+  293         *         X = (X + N/X)/2;
+  294         *     }
+  295         *
+  296                MCW   @0@,SQITER         SQITER = 0                            7  1086  M X05 S04           31  1705    1204
+  297         SQZA1  ZA    000,000            X = UPPER HALF OF N                   7  1093  ? 000 000           31   000     000
+  298         *
+  299         SQLOOP C     000,000            IF X = XPREV?                         7  1100  C 000 000           31   000     000
+  300                B     SQRTX,S                THEN DONE                         5  1107  B /91 S             31  1191
+  301                A     @1@,SQITER             ELSE BUMP SQITER BY 1             7  1112  A X06 S04           31  1706    1204
+  302         *
+  303         SQZA2  ZA    000,000            XPREV = X                             7  1119  ? 000 000           32   000     000
+  304         SQZA3  ZA    000,000            TEMP = N                              7  1126  ? 000 000           32   000     000
+  305         SQD1   D     000,000                    /X                            7  1133  % 000 000           32   000     000
+  306         SQSW   SW    000                                                      4  1140  , 000               32   000
+  307         SQA    A     000,000                       + X                        7  1144  A 000 000           32   000     000
+  308         SQZA4  ZA    000,000                                                  7  1151  ? 000 000           32   000     000
+  309         SQD2   D     @2@,000            X = TEMP/2                            7  1158  % X07 000           33  1707     000
+  310         SQCW   CW    000                                                      4  1165  ) 000               33   000
+  311         *
+  312         * PRINT X AND LOOP AGAIN.
+  313         *
+  314         SQSBR  SBR   PRADDR,000         PRADDR = @X - DP                      7  1169  H W58 000           33  1658     000
+  315                MCW   SQDP,PRDP          PRDP = DP                             7  1176  M S01 W62           33  1201    1662
+  316                B     PRINT                                                    4  1183  B U00               33  1400
+  317                B     SQLOOP                                                   4  1187  B /00               33  1100
+  318         *
+  319         SQRTX  B     0000               RETURN                                4  1191  B 000               33   000
+  320         *
+  321         SQLENN DCW   000                LEN(N)                                3  1197                      34
+  322         SQDP   DCW   0000               NUMBER OF DECIMAL PLACES (DP)         4  1201                      34
+  323         SQITER DCW   000                ITERATION COUNTER                     3  1204                      34
+  324         *
+  325         SQADRN DSA   000                @N                                    3  1207  000                 34   000
+  326         SQADRX DSA   000                @X                                    3  1210  000                 34   000
+  327         SQADRP DSA   000                @XPREV                                3  1213  000                 34   000
+  328         SQADRT DSA   000                @TEMP                                 3  1216  000                 34   000
+  329         ***************************************************************************
+  330         *
+  331         *     CONVERT OFFSET SUBROUTINE
+  332         *
+  333         *     THIS SUBROUTINE CONVERTS AN OFFSET THAT IS A 5-DIGIT NUMBER
+  334         *     INTO ITS 3-CHARACTER ADDRESS ENCODING.
+  335         *
+  336         *     ENTRY POINTS:  CNVRTP FOR POSITIVE OFFSETS
+  337         *                    CNVRTN FOR NEGATIVE OFFSETS
+  338         *                               (PASSED IN AS A POSITIVE VALUE)
+  339         *
+  340         *     BEFORE CALLING, THE CALLER MUST SET:
+  341         *
+1                          COMPUTE THE SQUARE ROOT OF 2 TO 1,000 DECIMAL PLACES                           PAGE    6
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  342         *         CNVOFF = OFFSET TO ADD OR SUBTRACT FROM AN ADDRESS
+  343         *                  (5-DIGIT NUMBER)
+  344         *
+  345         *     UPON RETURN:
+  346         *
+  347         *         CNVOFF = OFFSET VALUE SUITABLE FOR THE MA INSTRUCTION
+  348         *                  (3-CHARACTER ADDRESS ENCODING)
+  349         *
+  350         ***************************************************************************
+  351         CNVRTP SBR   CNVRTX&3           ENTRY POINT FOR POSITIVE OFFSETS      4  1217  H T82               35  1382
+  352                B     CNV                                                      4  1221  B S40               35  1240
+  353         *
+  354         * FORM THE COMPLEMENT OF THE OFFSET BY SUBTRACTING IT FROM 16,000
+  355         *
+  356         CNVRTN SBR   CNVRTX&3           ENTRY POINT FOR NEGATIVE OFFSETS      4  1225  H T82               35  1382
+  357                A     -16000,CNVOFF      COMPLEMENT IS -(-16000 + OFFSET)      7  1229  A X12 T87           35  1712    1387
+  358                ZS    CNVOFF                 OR 16000 - OFFSET                 4  1236  ! T87               35  1387
+  359         *
+  360         CNV    MZ    @ @,CNVOFF         CLEAR ZONE OVER THE UNITS DIGIT       7  1240  Y X13 T87           35  1713    1387
+  361         *
+  362         * SUCCESSIVELY TEST THE THOUSANDS DIGITS FOR 08, 04, 02, AND 01.
+  363         * THE C (COMPARE) INSTRUCTION USES THE COLLATING SEQUENCE, NOT ALGEBRA;
+  364         * HENCE THE ZONE BIT REMOVALS.
+  365         *
+  366                C     @08@,CNVOFF-3      8000                                  7  1247  C X15 T84           35  1715    1384
+  367                BL    *&22                                                     5  1254  B S80 T             36  1280
+  368                MA    CNV8K,CNVOFF       SET B BIT OVER UNITS DIGIT            7  1259  # T90 T87           36  1390    1387
+  369                S     @08@,CNVOFF-3                                            7  1266  S X15 T84           36  1715    1384
+      ** ***  ** Non-blank in 73-75 would confuse "Real Autocoder"                                       WARN 
+  370                MZ    @ @,CNVOFF-3       CLEAR ZONE OVER THE THOUSANDS DIG     7  1273  Y X13 T84           36  1713    1384
+  371         *
+  372                C     @04@,CNVOFF-3      4000                                  7  1280  C X17 T84           36  1717    1384
+  373                BL    *&22                                                     5  1287  B T13 T             36  1313
+  374                MA    CNV4K,CNVOFF       SET A BIT OVER UNITS DIGIT            7  1292  # T93 T87           37  1393    1387
+  375                S     @04@,CNVOFF-3                                            7  1299  S X17 T84           37  1717    1384
+      ** ***  ** Non-blank in 73-75 would confuse "Real Autocoder"                                       WARN 
+  376                MZ    @ @,CNVOFF-3       CLEAR ZONE OVER THE THOUSANDS DIG     7  1306  Y X13 T84           37  1713    1384
+  377         *
+  378                C     @02@,CNVOFF-3      2000                                  7  1313  C X19 T84           37  1719    1384
+  379                BL    *&22                                                     5  1320  B T46 T             37  1346
+  380                MA    CNV2K,CNVOFF       SET B BIT OVER HUNDREDS DIGIT         7  1325  # T96 T87           38  1396    1387
+  381                S     @02@,CNVOFF-3                                            7  1332  S X19 T84           38  1719    1384
+      ** ***  ** Non-blank in 73-75 would confuse "Real Autocoder"                                       WARN 
+  382                MZ    @ @,CNVOFF-3       CLEAR ZONE OVER THE THOUSANDS DIG     7  1339  Y X13 T84           38  1713    1384
+  383         *
+  384                C     @01@,CNVOFF-3      1000                                  7  1346  C X21 T84           38  1721    1384
+  385                BL    *&22                                                     5  1353  B T79 T             38  1379
+  386                MA    CNV1K,CNVOFF       SET A BIT OVER HUNDREDS DIGIT         7  1358  # T99 T87           39  1399    1387
+  387                S     @01@,CNVOFF-3                                            7  1365  S X21 T84           39  1721    1384
+      ** ***  ** Non-blank in 73-75 would confuse "Real Autocoder"                                       WARN 
+1                          COMPUTE THE SQUARE ROOT OF 2 TO 1,000 DECIMAL PLACES                           PAGE    7
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  388                MZ    @ @,CNVOFF-3       CLEAR ZONE OVER THE THOUSANDS DIG     7  1372  Y X13 T84           39  1713    1384
+  389         *
+  390         CNVRTX B     000                RETURN                                4  1379  B 000               39   000
+  391         *
+  392         CNVOFF DCW   00000              OFFSET TO CONVERT                     5  1387                      39
+  393         *
+  394         CNV8K  DSA   8000                                                     3  1390  00!                 39  8000
+  395         CNV4K  DSA   4000                                                     3  1393  00'                 39  4000
+  396         CNV2K  DSA   2000                                                     3  1396  !00                 40  2000
+  397         CNV1K  DSA   1000                                                     3  1399  '00                 40  1000
+  398         ***************************************************************************
+  399         *
+  400         *     PRINT SUBROUTINE
+  401         *
+  402         *     THIS SUBROUTINE PRINTS A VALUE WITH A LARGE NUMBER OF DECIMAL
+  403         *     DIGITS, IN 10 GROUPS OF 10 DIGITS PER LINE.  NOTE: THE NUMBER OF
+  404         *     DECIMAL DIGITS MUST BE A MULTIPLE OF 100.
+  405         *
+  406         *     ENTRY POINT:  PRINT
+  407         *
+  408         *     BEFORE CALLING, THE CALLER MUST SET:
+  409         *
+  410         *         PRADDR = ADDRESS OF FIRST DECIMAL DIGIT OF VALUE TO PRINT
+  411         *         PRDP   = DP (DECIMAL PLACES)
+  412         *
+  413         *     THE CALLER MUST ALSO PROPERLY DEFINE SYMBOLS X1 AND X2
+  414         *     TO REPRESENT INDEX REGISTERS 1 AND 2.
+  415         *
+  416         ***************************************************************************
+  417         PRINT  SBR   PRINTX&3                                                 4  1400  H W55               40  1655
+  418         *
+  419                MCW   X1,PRSVX1          SAVE X1 AND X2                        7  1404  M 089 W70           40   089    1670
+  420                MCW   X2,PRSVX2                                                7  1411  M 094 W73           40   094    1673
+  421         *
+  422                MCW   PRADDR,X1          X1 = @ FIRST DECIMAL DIGIT            7  1418  M W58 089           40  1658     089
+  423                MCW   @0001@,PRDGCT                                            7  1425  M X25 W66           40  1725    1666
+  424                SBR   X1,10&X1           X1 = @ FIRST GROUP WITHIN X           7  1432  H 089 0/0           41   089     010+1
+  425                S     @100@,PRDP                                               7  1439  S X28 W62           41  1728    1662
+  426         *
+  427                CS    332                PRINT A BLANK LINE                    4  1446  / 332               41   332
+  428                CS                                                             1  1450  /                   41
+  429                W                                                              1  1451  2                   41
+  430         *
+  431                SW    202,208            SET WORD MARKS TO DELIMIT GROUPS      7  1452  , 202 208           41   202     208
+  432                SW    222,233                                                  7  1459  , 222 233           41   222     233
+  433                SW    244,255                                                  7  1466  , 244 255           42   244     255
+  434                SW    266,277                                                  7  1473  , 266 277           42   266     277
+  435                SW    288,299                                                  7  1480  , 288 299           42   288     299
+  436                SW    310                                                      4  1487  , 310               42   310
+  437         *
+1                          COMPUTE THE SQUARE ROOT OF 2 TO 1,000 DECIMAL PLACES                           PAGE    8
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  438                MCW   PREDT1,220         EDIT MASK FOR FIRST GROUP             7  1491  M W88 220           42  1688     220
+  439                MCW   PRCLON                                                   4  1498  M W75               42  1675
+  440                MCW   PRDGCT                                                   4  1502  M W66               43  1666
+  441         *
+  442         * LOOP ONCE PER LINE.
+  443         *
+  444         PRLNLP SBR   X2,220             X2 = 220                              7  1506  H 094 220           43   094     220
+  445                MCE   0&X1,0&X2          EDIT THE FIRST GROUP OF EACH LINE     7  1513  E 0'0 0!0           43   000+1   000+2
+  446                MCW   @8@,PRGPCT         PRGPCT = 8                            7  1520  M X29 W67           43  1729    1667
+  447         *
+  448         * FILL THE REST OF THE LINE BY LOOPING ONCE PER GROUP WITHIN THE LINE.
+  449         *
+  450         PRGPLP SBR   X1,10&X1           BUMP X1 BY 10                         7  1527  H 089 0/0           43   089     010+1
+  451                SBR   X2,11&X2           BUMP X2 BY 11                         7  1534  H 094 0J1           43   094     011+2
+  452                MCW   0&X1,0&X2          MOVE NEXT GROUP OF 10 TO PRINT        7  1541  M 0'0 0!0           44   000+1   000+2
+  453         *
+  454                S     @1@,PRGPCT         REDUCE PRGPCT BY 1                    7  1548  S X06 W67           44  1706    1667
+  455                BWZ   PRGPDN,PRGPCT,K    DONE WITH ALL GROUPS OF LINE?         8  1555  V V67 W67 K         44  1567    1667
+  456                B     PRGPLP             BACK TO MOVE THE NEXT GROUP           4  1563  B V27               44  1527
+  457         *
+  458         PRGPDN MCW   @0@,0&X2                                                 7  1567  M X05 0!0           44  1705     000+2
+  459                MN    0&X1,0&X2          MOVE NUMERIC OF LAST DIGIT            7  1574  D 0'0 0!0           45   000+1   000+2
+  460                W                                                              1  1581  2                   45
+  461         *
+  462                S     @100@,PRDP                                               7  1582  S X28 W62           45  1728    1662
+  463                BWZ   PRLNDN,PRDP,K      DONE WITH ALL LINES?                  8  1589  V W38 W62 K         45  1638    1662
+  464         *
+  465                A     @100@,PRDGCT                                             7  1597  A X28 W66           45  1728    1666
+  466                SBR   X1,10&X1           BUMP X1 BY 10                         7  1604  H 089 0/0           45   089     010+1
+  467                MCW   PREDT2,220         EDIT MASK FOR SUBSEQUENT LINES        7  1611  M W98 220           46  1698     220
+  468                MCW   @   @                                                    4  1618  M X32               46  1732
+  469                MCW   PRCLON                                                   4  1622  M W75               46  1675
+  470                MCW   PRDGCT                                                   4  1626  M W66               46  1666
+  471                SW    211                                                      4  1630  , 211               46   211
+  472                B     PRLNLP             BACK TO PRINT THE NEXT LINE           4  1634  B V06               46  1506
+  473         *
+  474         PRLNDN MCW   PRSVX1,X1          RESTORE X1 AND X2                     7  1638  M W70 089           46  1670     089
+  475                MCW   PRSVX2,X2                                                7  1645  M W73 094           47  1673     094
+  476         PRINTX B     000                RETURN                                4  1652  B 000               47   000
+  477         *
+  478         PRADDR DSA   000                @ OF FIRST DECIMAL DIGIT              3  1658  000                 47   000
+  479         PRDP   DCW   0000               DECIMAL PLACES (DP)                   4  1662                      47
+  480         *
+  481         PRDGCT DCW   0001               GROUP COUNTER                         4  1666                      47
+  482         PRGPCT DCW   8                  DECIMAL DIGIT COUNTER                 1  1667                      47
+  483         PRSVX1 DCW   000                SAVE AREA FOR X1                      3  1670                      47
+  484         PRSVX2 DCW   000                SAVE AREA FOR X2                      3  1673                      48
+  485         *
+  486         PRCLON DCW   @: @                                                     2  1675                      48
+  487         PREDT1 DCW   @ 0.          @    EDIT MASK FOR FIRST LINE             13  1688                      48
+1                          COMPUTE THE SQUARE ROOT OF 2 TO 1,000 DECIMAL PLACES                           PAGE    9
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  488         PREDT2 DCW   @0         @       EDIT MASK FOR SUBSEQUENT LINES       10  1698                      48
+  489         ***************************************************************************
+                     DCW   @002@                                                    3  1701              LIT     48
+                     DCW   @001@                                                    3  1704              LIT     48
+                     DCW   @0@                                                      1  1705              LIT     48
+                     DCW   @1@                                                      1  1706              LIT     49
+                     DCW   @2@                                                      1  1707              LIT     49
+                     DCW   -16000                                                   5  1712              LIT     49
+                     DCW   @ @                                                      1  1713              LIT     49
+                     DCW   @08@                                                     2  1715              LIT     49
+                     DCW   @04@                                                     2  1717              LIT     49
+                     DCW   @02@                                                     2  1719              LIT     49
+                     DCW   @01@                                                     2  1721              LIT     50
+                     DCW   @0001@                                                   4  1725              LIT     50
+                     DCW   @100@                                                    3  1728              LIT     50
+                     DCW   @8@                                                      1  1729              LIT     50
+                     DCW   @   @                                                    3  1732              LIT     50
+  490                END   START                                                             / 333 080                333
+1                                                                                                         PAGE   10
+0SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS
+
+ CNV      1240: 0    CNV1K    1399: 0    CNV2K    1396: 0    CNV4K    1393: 0    CNV8K    1390: 0    CNVOFF   1387: 0   
+ CNVRTN   1225: 0    CNVRTP   1217: 0    CNVRTX   1379: 0    DP       0684: 0    FINIS    0411: 0    ITERS    0687: 0   
+ LABEL1   0706: 0    LABEL2   0717: 0    LENN     0680: 0    N        0417: 0    PRADDR   1658: 0    PRCLON   1675: 0   
+ PRDGCT   1666: 0    PRDP     1662: 0    PREDT1   1688: 0    PREDT2   1698: 0    PRGPCT   1667: 0    PRGPDN   1567: 0   
+ PRGPLP   1527: 0    PRINT    1400: 0    PRINTX   1652: 0    PRLNDN   1638: 0    PRLNLP   1506: 0    PRSVX1   1670: 0   
+ PRSVX2   1673: 0    SQA      1144: 0    SQADRN   1207: 0    SQADRP   1213: 0    SQADRT   1216: 0    SQADRX   1210: 0   
+ SQCW     1165: 0    SQD1     1133: 0    SQD2     1158: 0    SQDP     1201: 0    SQITER   1204: 0    SQLENN   1197: 0   
+ SQLOOP   1100: 0    SQRT     0718: 0    SQRTX    1191: 0    SQSBR    1169: 0    SQSW     1140: 0    SQZA1    1093: 0   
+ SQZA2    1119: 0    SQZA3    1126: 0    SQZA4    1151: 0    START    0333: 0    TEMP     0627: 0    X        0521: 0   
+ X1       0089: 0    X2       0094: 0    X3       0099: 0    XPREV    0575: 0   
+
+0UNREFERENCED SYMBOLS
+
+ ITERS  X3
+      *****  **    12 Errors                                                                             ERROR

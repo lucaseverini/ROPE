@@ -1,0 +1,32 @@
+ CLEAR STORAGE 1     ,008015,022026,030037,044,049,053053N000000N00001026                                         1
+ CLEAR STORAGE 2     L068116,105106,110117B101/I9I#071029C029056B026/B001/0991,001/001117I0?                      2
+ BOOTSTRAP           ,008015,022029,036040,047054,061068,072/061039              ,0010011040                      3
+0                                                                                                         PAGE    1
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  101         * TEST PROGRAM TO BE USED WITH SOME DATA FILE ATTACHED --------------------
+  102         * IN RUNTIME DATA DIALOG
+  103         *
+1                          FIRST PROGRAM                                                                  PAGE    2
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  104                JOB   FIRST PROGRAM
+  105                CTL   6611  *6=16,000C;6=16,000T;1=OBJDECK;,1=MODADD
+  106         *
+  107                ORG   350                                                                0350
+  108         *
+  109         START  H                                                              1  0350  .                    4
+  110                SW    001                                                      4  0351  , 001                4   001
+  111         READ   R                                                              1  0355  1                    4
+  112                MCW   080,280                                                  7  0356  M 080 280            4   080     280
+  113                W                                                              1  0363  2                    4
+  114                B     EXIT,A                                                   5  0364  B 373 A              4   373
+  115                B     READ                                                     4  0369  B 355                4   355
+  116         EXIT   H     START                                                    4  0373  . 350                5   350
+  117                NOP                                                            1  0377  N                    5
+  118                NOP                                                            1  0378  N                    5
+  119                END   START                                                             / 350 080                350
+1                                                                                                         PAGE    3
+0SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS
+
+ EXIT     0373: 0    READ     0355: 0    START    0350: 0   

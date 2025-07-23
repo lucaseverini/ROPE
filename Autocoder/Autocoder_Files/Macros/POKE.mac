@@ -1,0 +1,5 @@
+     ** POKE MACRO **
+     ** X2 IS THE STACK POINTER     
+     ** VALUE IN )01 IS COPIED IN STACK WITHOUT TO CHANGE THE STACK POINTER
+               MCW  )01, 0+X2
+               SW   15996+X2

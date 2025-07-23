@@ -1,0 +1,72 @@
+ CLEAR STORAGE 1     ,008015,022026,030037,044,049,053053N000000N00001026                                         1
+ CLEAR STORAGE 2     L068116,105106,110117B101/I9I#071029C029056B026/B001/0991,001/001117I0?                      2
+ BOOTSTRAP           ,008015,022029,036040,047054,061068,072/061039              ,0010011040                      3
+0                                                                                                         PAGE    1
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  101                HEAD                                                                                MACRO
+              *>>>>>>>>>                                                                                 GEN  
+  102         .READ  EQU   001                                                         0001              GEN
+  103         .PUNCH EQU   101                                                         0101              GEN
+  104         .PRINT EQU   201                                                         0201              GEN
+  105                ORG   85                                                                 0085
+  106                DCW   @X1@      *IDENTIFING FILLER                             2  0086              GEN      4
+  107         X1     DCW   000       *INDEX REGISTER 1                              3  0089              GEN      4
+  108                DCW   @X2@      *IDENTIFING FILLER                             2  0091              GEN      4
+  109         X2     DCW   000       *INDEX REGISTER 2                              3  0094              GEN      4
+  110                DCW   @X3@      *IDENTIFING FILLER                             2  0096              GEN      4
+  111         X3     DCW   000       *INDEX REGISTER 3                              3  0099              GEN      4
+  112                ORG   181       *JUST AFTER PUNCH LOCATIOM                               0181
+  113                B     START     *UNIVERSIAL START LOCATION                     4  0181  B 363       GEN      5   363
+  114                NOP             *TERMINATING WORDMARK                          1  0185  N           GEN      5
+  115                ORG   340       *ORG JUST AFTER PRINT BUFFER                             0340
+              *<<<<<<<<<                                                                                 GEN  
+  116         BUFFL  DCW   @1@                 *LEFT HAND SIDE OF BUFFER            1  0340                       6
+  117         WORK   DC    #20                 *FILL                               20  0360                       6
+  118         BUFFR  DC    @9@                 *RIGHT HAND SIDE OF BUFFER           1  0361                       6
+  119                DCW   @"@                 *GMWM                                1  0362              GMARK    6
+  120         *
+  121         START  H                         *START WITH A HALT                   1  0363  .                    6
+  122         *          MCW  @HELLOW WORLD@,BUFFL+13  *MOVE TEXT TO BUFFER
+  123         *          MCW  %T0,BUFFL,W         *SEND IT TO 1407
+  124         *          H                        * JUST BE CAUSE
+  125                MCW   %T0,201,R           *READ FROM 1407                      8  0364  M %T0 201 R          6   %T0     201
+  126                SW    209                                                      4  0372  , 209                6   209
+  127                MCW   @"@,220                                                  7  0376  M 446 220            7   446     220
+  128                SW    220                                                      4  0383  , 220                7   220
+  129                W                         *PRINT IT                            1  0387  2                    7
+  130                H     START                                                    4  0388  . 363                7   363
+  131                EXIT                      *LEAVE IN AN ORDERLY FASHION                              MACRO
+              *>>>>>>>>>                                                                                 GEN  
+  132         EXIT   NOP   999,999         *LOAD THE A AND B REGISTERS              7  0392  N 999 999   GEN      7   999     999
+  133                H                     *HALT OR I WILL SHOOT                    1  0399  .           GEN      7
+  134                B     START,G         *IF G IS ON, RETURN TO START             5  0400  B 363 G     GEN      7   363
+  135                CS    332             *CLEAR PRINT STORAGE                     4  0405  / 332       GEN      8   332
+  136                CS                    *CLEAR PRINT STORAGE                     1  0409  /           GEN      8
+  137                CS                    *CLEAR PUNCH STORAGE                     1  0410  /           GEN      8
+  138                CS                    *CLEAR READ STORAGE                      1  0411  /           GEN      8
+  139                C     @SHAY@,14007    *WERE WE LOADED WITH THE LOADER?         7  0412  C 450 !0G   GEN      8   450   14007
+  140                BE    14008           *YES WE WERE. TURN CONTROL               5  0419  B !0H S     GEN      8 14008
+  141                CS    080             *CLEAR THE CARD BUFFER                   4  0424  / 080       GEN      8   080
+  142                SW    001             *SET WORDMARK IN LOCATION 1              4  0428  , 001       GEN      9   001
+  143         EXRED  R                     *READ FIRST CARD OF NEXT  DECK           1  0432  1           GEN      9
+  144                BCE   001,001,,       *IS IT A COMMA?                          8  0433  B 001 001 , GEN      9   001     001
+1                                                                                                         PAGE    2
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  145                B     EXRED           *CHECK THE NEXT ONE                      4  0441  B 432       GEN      9   432
+  146                NOP                                                            1  0445  N           GEN      9
+              *<<<<<<<<<                                                                                 GEN  
+              *                                                                                          GEN  
+                     DCW   @"@                                                      1  0446              LIT      9
+                     DCW   @SHAY@                                                   4  0450              LIT      9
+  147                END   START                                                             / 363 080                363
+1                                                                                                         PAGE    3
+0SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS
+
+ .PRINT   0201: 0    .PUNCH   0101: 0    .READ    0001: 0    BUFFL    0340: 0    BUFFR    0361: 0    EXIT     0392: 0   
+ EXRED    0432: 0    START    0363: 0    WORK     0360: 0    X1       0089: 0    X2       0094: 0    X3       0099: 0   
+
+0UNREFERENCED SYMBOLS
+
+ .PRINT .PUNCH .READ  BUFFL  BUFFR  EXIT   WORK   X1     X2     X3

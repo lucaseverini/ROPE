@@ -1,0 +1,501 @@
+ CLEAR STORAGE 1     ,008015,022026,030037,044,049,053053N000000N00001026                                         1
+ CLEAR STORAGE 2     L068116,105106,110117B101/I9I#071029C029056B026/B001/0991,001/001117I0?                      2
+ BOOTSTRAP           ,008015,022029,036040,047054,061068,072/061039              ,0010011040                      3
+0                          LINCOLN.S 11/16/17 01:24:57                                -4297               PAGE    1
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  101                JOB   LINCOLN.S 11/16/17 01:24:57
+  102                CTL   3312
+  103         *******************************************************************
+  104         *  LINCOLN'S BIRTHDAY PROGRAM
+  105         *      BY RONALD MAK
+  106         *
+  107         *  ORIGINAL VERSION: FEBRUARY 1969
+  108         *  RESURRECTED:      FEBRUARY 2005
+  109         *******************************************************************
+  110                ORG   87                                                                 0087
+  111         X1     DSA   0                  INDEX REGISTER 1                      3  0089  000                  4   000
+  112                ORG   92                                                                 0092
+  113         X2     DSA   0                  INDEX REGISTER 2                      3  0094  000                  5   000
+  114                ORG   97                                                                 0097
+  115         X3     DSA   0                  INDEX REGISTER 3                      3  0099  000                  6   000
+  116                ORG   333                                                                0333
+  117         *
+  118         * LINCOLN'S GETTYSBURG ADDRESS
+  119         *
+  120         GETTYS DCW   0                                                        1  0333                       7
+  121                DCW   @FOUR SCORE AND SEVEN YEARS AGO@                        30  0363                       7
+  122                DCW   @OUR FATHERS BROUGHT FORTH@                             25  0388                       8
+  123                DCW   @ON THIS CONTINENT A NEW NATION,@                       31  0419                       9
+  124                DCW   @CONCEIVED IN LIBERTY AND@                              24  0443                      10
+  125                DCW   @DEDICATED TO THE PROPOSITION@                          28  0471                      11
+  126                DCW   @THAT ALL MEN ARE CREATED EQUAL.@                       31  0502                      12
+  127                DCW   @NOW WE ARE ENGAGED IN A GREAT@                         29  0531                      13
+  128                DCW   @CIVIL WAR, TESTING WHETHER THAT@                       31  0562                      14
+  129                DCW   @NATION OR ANY NATION SO@                               23  0585                      15
+  130                DCW   @CONCEIVED AND SO DEDICATED@                            26  0611                      16
+  131                DCW   @CAN LONG ENDURE. WE ARE MET ON@                        30  0641                      17
+  132                DCW   @A GREAT BATTLEFIELD OF THAT WAR.@                      32  0673                      18
+  133                DCW   @WE HAVE COME TO DEDICATE A@                            26  0699                      19
+  134                DCW   @PORTION OF THAT FIELD AS A FINAL@                      32  0731                      20
+  135                DCW   @RESTING PLACE FOR THOSE WHO HERE@                      32  0763                      21
+  136                DCW   @GAVE THEIR LIVES THAT THAT NATION@                     33  0796                      22
+  137                DCW   @MIGHT LIVE. IT IS ALTOGETHER@                          28  0824                      23
+  138                DCW   @FITTING AND PROPER THAT WE SHOULD@                     33  0857                      24
+  139                DCW   @DO THIS. BUT IN A LARGER SENSE,@                       31  0888                      25
+  140                DCW   @WE CANNOT HALLOW THIS GROUND.@                         29  0917                      26
+  141                DCW   @THE BRAVE MEN, LIVING AND@                             25  0942                      27
+  142                DCW   @DEAD WHO STRUGGLED HERE HAVE@                          28  0970                      28
+  143                DCW   @CONSECRATED IT FAR ABOVE OUR POOR@                     33  1003                      29
+  144                DCW   @POWER TO ADD OR DETRACT. THE WORLD@                    34  1037                      30
+  145                DCW   @WILL LITTLE NOTE NOR LONG REMEMBER@                    34  1071                      31
+  146                DCW   @WHAT WE SAY HERE, BUT IT CAN NEVER@                    34  1105                      32
+  147                DCW   @FORGET WHAT THEY DID HERE. IT IS@                      32  1137                      33
+1                          LINCOLN.S 11/16/17 01:24:57                                -4297               PAGE    2
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  148                DCW   @FOR US THE LIVING RATHER TO BE@                        30  1167                      34
+  149                DCW   @DEDICATED HERE TO THE UNFINISHED@                      32  1199                      35
+  150                DCW   @WORK WHICH THEY WHO FOUGHT HERE@                       31  1230                      36
+  151                DCW   @HAVE THUS FAR SO NOBLY ADVANCED.@                      32  1262                      37
+  152                DCW   @IT IS RATHER FOR US TO BE HERE@                        30  1292                      38
+  153                DCW   @DEDICATED TO THE GREAT TASK@                           27  1319                      39
+  154                DCW   @REMAINING BEFORE US, THAT FROM@                        30  1349                      40
+  155                DCW   @THESE HONORED DEAD WE TAKE@                            26  1375                      41
+  156                DCW   @INCREASED DEVOTION TO THAT CAUSE@                      32  1407                      42
+  157                DCW   @FOR WHICH THEY GAVE THE LAST FULL@                     33  1440                      43
+  158                DCW   @MEASURE OF DEVOTION, THAT WE HERE@                     33  1473                      44
+  159                DCW   @HIGHLY RESOLVE THAT THESE DEAD@                        30  1503                      45
+  160                DCW   @SHALL NOT HAVE DIED IN VAIN,@                          28  1531                      46
+  161                DCW   @THAT THIS NATION UNDER GOD SHALL@                      32  1563                      47
+  162                DCW   @HAVE A NEW BIRTH OF FREEDOM, AND@                      32  1595                      48
+  163                DCW   @THAT GOVERNMENT OF THE PEOPLE,@                        30  1625                      49
+  164                DCW   @BY THE PEOPLE, FOR THE PEOPLE@                         29  1654                      50
+  165                DCW   @SHALL NOT PERISH FROM THIS EARTH.@                     33  1687                      51
+  166         *
+  167         * PROGRAM START.  SET INDEX REGISTER X1 TO POINT TO THE
+  168         * FIRST PRINT MAP VALUE, AND INDEX REGISTER X2 TO POINT
+  169         * TO THE FIRST CHARACTER OF THE GETTYSBURG ADDRESS.
+  170         * INDEX REGISTER X3 WILL LATER POINT INTO THE PRINT AREA.
+  171         *
+  172         START  SBR   X1,MAP             POINT X1 TO PRINT MAP                 7  1688  H 089 Y75           52   089    1875
+  173                SBR   X2,GETTYS+1        POINT X2 TO GETTYSBURG ADDRESS        7  1695  H 094 334           52   094     334
+  174         *
+  175         * LOOP ONCE PER PRINT MAP VALUE.  FIRST CHECK IF IT'S THE
+  176         * END OF THE PRINT MAP.  IF THE MAP VALUE IS NEGATIVE, THEN
+  177         * PRINT OUT THE CURRENT LINE AND START A NEW ONE.
+  178         *
+  179         LOOP   MCW   0+X1,MAPVAL        MAPVAL = CURENT MAP VALUE             7  1702  M 0'0 Y73           52   000+1  1873
+  180                SBR   X1,2+X1            POINT X1 TO THE NEXT VALUE            7  1709  H 089 0'2           52   089     002+1
+  181                C     @00@,MAPVAL        IF MAPVAL = 0                         7  1716  C N21 Y73           52  2521    1873
+  182                BE    DONE               THEN DONE                             5  1723  B Y63 S             53  1863
+  183         *
+  184                BWZ   TEST,MAPVAL,2      IF MAPVAL < 0, THEN                   8  1728  V X55 Y73 2         53  1755    1873
+  185                MZ    @ @,MAPVAL              MAPVAL = ABS(MAPVAL)             7  1736  Y N22 Y73           53  2522    1873
+  186                W                             PRINT OUT CURRENT LINE           1  1743  2                   53
+  187                CS    299                     CLEAR THE PRINT AREA             4  1744  / 299               53   299
+  188                SBR   X3,200                  POINT X3 TO PRINT AREA           7  1748  H 099 200           53   099     200
+  189         *
+  190         * EACH LINE ALTERNATES BETWEEN 'SKIP' AND 'TAKE'.
+  191         *
+  192         TEST   BCE   DOSKIP,NEXTDO,0    IF 'SKIP' THEN DO SKIP                8  1755  B Y45 Y71 0         54  1845    1871
+  193         *
+  194         * DO 'TAKE': TAKE MAPVAL NUMBER OF LETTERS FROM THE GETTYSBURG
+  195         *            ADDRESS AND APPEND THEM TO THE CURRENT PRINT LINE.
+  196         *
+  197         DOTAKE BCE   NEXTCH,0+X2,        DON'T TAKE ANY BLANKS                8  1763  B Y15 0!0           54  1815     000+2
+1                          LINCOLN.S 11/16/17 01:24:57                                -4297               PAGE    3
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  198                BCE   NEXTCH,0+X2,,       NOR COMMAS                           8  1771  B Y15 0!0 ,         54  1815     000+2
+  199                BCE   NEXTCH,0+X2,.       NOR PERIODS                          8  1779  B Y15 0!0 .         54  1815     000+2
+  200         *
+  201                MN    0+X2,0+X3           APPEND LETTER TO PRINT LINE          7  1787  D 0!0 0?0           54   000+2   000+3
+  202                MZ    0+X2,0+X3                                                7  1794  Y 0!0 0?0           55   000+2   000+3
+  203                S     @1@,MAPVAL          MAPVAL = MAPVAL - 1                  7  1801  S N23 Y73           55  2523    1873
+  204                SBR   X3,1+X3             POINT X3 TO NEXT PRINT POSITION      7  1808  H 099 0?1           55   099     001+3
+  205         *
+  206         NEXTCH SBR   X2,1+X2             POINT X2 TO NEXT GETTYSBURG CHAR     7  1815  H 094 0!1           55   094     001+2
+  207                C     +00,MAPVAL          IF MAPVAL > 0                        7  1822  C N25 Y73           55  2525    1873
+  208                BH    DOTAKE                  THEN TAKE SOME MORE CHARS        5  1829  B X63 U             56  1763
+  209                MCW   SKIP,NEXTDO             ELSE NEXT DO 'SKIP'              7  1834  M Y69 Y71           56  1869    1871
+  210                B     LOOP                                                     4  1841  B X02               56  1702
+  211         *
+  212         * DO 'SKIP': SKIP MAPVAL NUMBER OF BLANKS IN THE PRINT LINE.
+  213         *
+  214         DOSKIP A     MAPVAL,X3           X3 = X3 + MAPVAL                     7  1845  A Y73 099           56  1873     099
+  215                MCW   TAKE,NEXTDO         NEXT DO 'TAKE'                       7  1852  M Y70 Y71           56  1870    1871
+  216                B     LOOP                                                     4  1859  B X02               56  1702
+  217         *
+  218         * DONE WITH ALL PRINT MAP VALUES.  PRINT THE FINAL LINE AND QUIT.
+  219         *
+  220         DONE   W                                                              1  1863  2                   56
+  221         FINIS  H     FINIS                                                    4  1864  . Y64               57  1864
+  222                H                                                              1  1868  .                   57
+  223         *
+  224         SKIP   DCW   0                   'SKIP' CODE                          1  1869                      57
+  225         TAKE   DCW   1                   'TAKE' CODE                          1  1870                      57
+  226         NEXTDO DCW   0                   WHAT TO DO NEXT IN THE LINE          1  1871                      57
+  227         MAPVAL DCW   00                  PRINT MAP VALUE                      2  1873                      57
+  228         *
+  229         * THE PRINT MAP.  A NEGATIVE NUMBER DENOTES THE START OF A NEW +++
+  230         * LINE, AND ITS ABSOLUTE VALUE BECOMES THE INITIAL 'SKIP' VALUE.
+  231         * EACH LINE'S MAP VALUES ALTERNATE BETWEEN 'SKIP' AND 'TAKE'
+  232         * VALUES.  THE FINAL ZERO DENOTES THE END OF THE PRINT MAP.
+  233         * MAP VALUES MUST EACH BE TWO DIGITS IN LENGTH.
+  234         *
+  235         MAP    DCW   -43                                                      2  1875                      57
+  236                DCW   17                                                       2  1877                      58
+  237                DCW   -34                                                      2  1879                      58
+  238                DCW   28                                                       2  1881                      58
+  239                DCW   -31                                                      2  1883                      58
+  240                DCW   33                                                       2  1885                      58
+  241                DCW   -29                                                      2  1887                      58
+  242                DCW   37                                                       2  1889                      58
+  243                DCW   -28                                                      2  1891                      59
+  244                DCW   39                                                       2  1893                      59
+  245                DCW   -27                                                      2  1895                      59
+  246                DCW   12                                                       2  1897                      59
+  247                DCW   06                                                       2  1899                      59
+1                          LINCOLN.S 11/16/17 01:24:57                                -4297               PAGE    4
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  248                DCW   23                                                       2  1901                      59
+  249                DCW   -26                                                      2  1903                      59
+  250                DCW   10                                                       2  1905                      60
+  251                DCW   10                                                       2  1907                      60
+  252                DCW   23                                                       2  1909                      60
+  253                DCW   -26                                                      2  1911                      60
+  254                DCW   08                                                       2  1913                      60
+  255                DCW   17                                                       2  1915                      60
+  256                DCW   18                                                       2  1917                      60
+  257                DCW   -26                                                      2  1919                      61
+  258                DCW   07                                                       2  1921                      61
+  259                DCW   21                                                       2  1923                      61
+  260                DCW   16                                                       2  1925                      61
+  261                DCW   -25                                                      2  1927                      61
+  262                DCW   09                                                       2  1929                      61
+  263                DCW   20                                                       2  1931                      61
+  264                DCW   10                                                       2  1933                      62
+  265                DCW   01                                                       2  1935                      62
+  266                DCW   06                                                       2  1937                      62
+  267                DCW   -25                                                      2  1939                      62
+  268                DCW   09                                                       2  1941                      62
+  269                DCW   21                                                       2  1943                      62
+  270                DCW   10                                                       2  1945                      62
+  271                DCW   01                                                       2  1947                      63
+  272                DCW   05                                                       2  1949                      63
+  273                DCW   -24                                                      2  1951                      63
+  274                DCW   10                                                       2  1953                      63
+  275                DCW   26                                                       2  1955                      63
+  276                DCW   03                                                       2  1957                      63
+  277                DCW   04                                                       2  1959                      63
+  278                DCW   05                                                       2  1961                      64
+  279                DCW   -22                                                      2  1963                      64
+  280                DCW   13                                                       2  1965                      64
+  281                DCW   33                                                       2  1967                      64
+  282                DCW   04                                                       2  1969                      64
+  283                DCW   -21                                                      2  1971                      64
+  284                DCW   04                                                       2  1973                      64
+  285                DCW   02                                                       2  1975                      65
+  286                DCW   08                                                       2  1977                      65
+  287                DCW   08                                                       2  1979                      65
+  288                DCW   04                                                       2  1981                      65
+  289                DCW   22                                                       2  1983                      65
+  290                DCW   03                                                       2  1985                      65
+  291                DCW   -20                                                      2  1987                      65
+  292                DCW   03                                                       2  1989                      66
+  293                DCW   05                                                       2  1991                      66
+  294                DCW   06                                                       2  1993                      66
+  295                DCW   05                                                       2  1995                      66
+  296                DCW   10                                                       2  1997                      66
+  297                DCW   20                                                       2  1999                      66
+1                          LINCOLN.S 11/16/17 01:24:57                                -4297               PAGE    5
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  298                DCW   04                                                       2  2001                      66
+  299                DCW   -17                                                      2  2003                      67
+  300                DCW   04                                                       2  2005                      67
+  301                DCW   08                                                       2  2007                      67
+  302                DCW   05                                                       2  2009                      67
+  303                DCW   04                                                       2  2011                      67
+  304                DCW   05                                                       2  2013                      67
+  305                DCW   06                                                       2  2015                      67
+  306                DCW   01                                                       2  2017                      68
+  307                DCW   07                                                       2  2019                      68
+  308                DCW   09                                                       2  2021                      68
+  309                DCW   03                                                       2  2023                      68
+  310                DCW   04                                                       2  2025                      68
+  311                DCW   -17                                                      2  2027                      68
+  312                DCW   03                                                       2  2029                      68
+  313                DCW   08                                                       2  2031                      69
+  314                DCW   05                                                       2  2033                      69
+  315                DCW   04                                                       2  2035                      69
+  316                DCW   04                                                       2  2037                      69
+  317                DCW   14                                                       2  2039                      69
+  318                DCW   05                                                       2  2041                      69
+  319                DCW   02                                                       2  2043                      69
+  320                DCW   05                                                       2  2045                      70
+  321                DCW   02                                                       2  2047                      70
+  322                DCW   05                                                       2  2049                      70
+  323                DCW   -18                                                      2  2051                      70
+  324                DCW   03                                                       2  2053                      70
+  325                DCW   07                                                       2  2055                      70
+  326                DCW   04                                                       2  2057                      70
+  327                DCW   09                                                       2  2059                      71
+  328                DCW   02                                                       2  2061                      71
+  329                DCW   01                                                       2  2063                      71
+  330                DCW   04                                                       2  2065                      71
+  331                DCW   01                                                       2  2067                      71
+  332                DCW   01                                                       2  2069                      71
+  333                DCW   05                                                       2  2071                      71
+  334                DCW   01                                                       2  2073                      72
+  335                DCW   05                                                       2  2075                      72
+  336                DCW   04                                                       2  2077                      72
+  337                DCW   03                                                       2  2079                      72
+  338                DCW   07                                                       2  2081                      72
+  339                DCW   -18                                                      2  2083                      72
+  340                DCW   03                                                       2  2085                      72
+  341                DCW   07                                                       2  2087                      73
+  342                DCW   03                                                       2  2089                      73
+  343                DCW   09                                                       2  2091                      73
+  344                DCW   01                                                       2  2093                      73
+  345                DCW   02                                                       2  2095                      73
+  346                DCW   05                                                       2  2097                      73
+  347                DCW   01                                                       2  2099                      73
+1                          LINCOLN.S 11/16/17 01:24:57                                -4297               PAGE    6
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  348                DCW   01                                                       2  2101                      74
+  349                DCW   06                                                       2  2103                      74
+  350                DCW   03                                                       2  2105                      74
+  351                DCW   03                                                       2  2107                      74
+  352                DCW   03                                                       2  2109                      74
+  353                DCW   01                                                       2  2111                      74
+  354                DCW   09                                                       2  2113                      74
+  355                DCW   -18                                                      2  2115                      75
+  356                DCW   03                                                       2  2117                      75
+  357                DCW   07                                                       2  2119                      75
+  358                DCW   02                                                       2  2121                      75
+  359                DCW   11                                                       2  2123                      75
+  360                DCW   01                                                       2  2125                      75
+  361                DCW   02                                                       2  2127                      75
+  362                DCW   02                                                       2  2129                      76
+  363                DCW   02                                                       2  2131                      76
+  364                DCW   01                                                       2  2133                      76
+  365                DCW   08                                                       2  2135                      76
+  366                DCW   01                                                       2  2137                      76
+  367                DCW   01                                                       2  2139                      76
+  368                DCW   02                                                       2  2141                      76
+  369                DCW   02                                                       2  2143                      77
+  370                DCW   02                                                       2  2145                      77
+  371                DCW   02                                                       2  2147                      77
+  372                DCW   07                                                       2  2149                      77
+  373                DCW   -18                                                      2  2151                      77
+  374                DCW   03                                                       2  2153                      77
+  375                DCW   08                                                       2  2155                      77
+  376                DCW   02                                                       2  2157                      78
+  377                DCW   26                                                       2  2159                      78
+  378                DCW   01                                                       2  2161                      78
+  379                DCW   09                                                       2  2163                      78
+  380                DCW   06                                                       2  2165                      78
+  381                DCW   -19                                                      2  2167                      78
+  382                DCW   03                                                       2  2169                      78
+  383                DCW   07                                                       2  2171                      79
+  384                DCW   03                                                       2  2173                      79
+  385                DCW   25                                                       2  2175                      79
+  386                DCW   01                                                       2  2177                      79
+  387                DCW   10                                                       2  2179                      79
+  388                DCW   01                                                       2  2181                      79
+  389                DCW   -19                                                      2  2183                      79
+  390                DCW   04                                                       2  2185                      80
+  391                DCW   06                                                       2  2187                      80
+  392                DCW   03                                                       2  2189                      80
+  393                DCW   26                                                       2  2191                      80
+  394                DCW   01                                                       2  2193                      80
+  395                DCW   09                                                       2  2195                      80
+  396                DCW   01                                                       2  2197                      80
+  397                DCW   -20                                                      2  2199                      81
+1                          LINCOLN.S 11/16/17 01:24:57                                -4297               PAGE    7
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  398                DCW   12                                                       2  2201                      81
+  399                DCW   25                                                       2  2203                      81
+  400                DCW   01                                                       2  2205                      81
+  401                DCW   10                                                       2  2207                      81
+  402                DCW   01                                                       2  2209                      81
+  403                DCW   -21                                                      2  2211                      81
+  404                DCW   11                                                       2  2213                      82
+  405                DCW   17                                                       2  2215                      82
+  406                DCW   03                                                       2  2217                      82
+  407                DCW   06                                                       2  2219                      82
+  408                DCW   01                                                       2  2221                      82
+  409                DCW   09                                                       2  2223                      82
+  410                DCW   01                                                       2  2225                      82
+  411                DCW   -22                                                      2  2227                      83
+  412                DCW   10                                                       2  2229                      83
+  413                DCW   15                                                       2  2231                      83
+  414                DCW   02                                                       2  2233                      83
+  415                DCW   08                                                       2  2235                      83
+  416                DCW   01                                                       2  2237                      83
+  417                DCW   09                                                       2  2239                      83
+  418                DCW   01                                                       2  2241                      84
+  419                DCW   -25                                                      2  2243                      84
+  420                DCW   07                                                       2  2245                      84
+  421                DCW   07                                                       2  2247                      84
+  422                DCW   01                                                       2  2249                      84
+  423                DCW   04                                                       2  2251                      84
+  424                DCW   02                                                       2  2253                      84
+  425                DCW   02                                                       2  2255                      85
+  426                DCW   01                                                       2  2257                      85
+  427                DCW   08                                                       2  2259                      85
+  428                DCW   02                                                       2  2261                      85
+  429                DCW   07                                                       2  2263                      85
+  430                DCW   01                                                       2  2265                      85
+  431                DCW   -26                                                      2  2267                      85
+  432                DCW   07                                                       2  2269                      86
+  433                DCW   06                                                       2  2271                      86
+  434                DCW   04                                                       2  2273                      86
+  435                DCW   05                                                       2  2275                      86
+  436                DCW   09                                                       2  2277                      86
+  437                DCW   02                                                       2  2279                      86
+  438                DCW   01                                                       2  2281                      86
+  439                DCW   05                                                       2  2283                      87
+  440                DCW   01                                                       2  2285                      87
+  441                DCW   -26                                                      2  2287                      87
+  442                DCW   08                                                       2  2289                      87
+  443                DCW   05                                                       2  2291                      87
+  444                DCW   01                                                       2  2293                      87
+  445                DCW   12                                                       2  2295                      87
+  446                DCW   01                                                       2  2297                      88
+  447                DCW   06                                                       2  2299                      88
+1                          LINCOLN.S 11/16/17 01:24:57                                -4297               PAGE    8
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  448                DCW   01                                                       2  2301                      88
+  449                DCW   04                                                       2  2303                      88
+  450                DCW   01                                                       2  2305                      88
+  451                DCW   -26                                                      2  2307                      88
+  452                DCW   08                                                       2  2309                      88
+  453                DCW   05                                                       2  2311                      89
+  454                DCW   01                                                       2  2313                      89
+  455                DCW   06                                                       2  2315                      89
+  456                DCW   01                                                       2  2317                      89
+  457                DCW   02                                                       2  2319                      89
+  458                DCW   01                                                       2  2321                      89
+  459                DCW   02                                                       2  2323                      89
+  460                DCW   02                                                       2  2325                      90
+  461                DCW   07                                                       2  2327                      90
+  462                DCW   01                                                       2  2329                      90
+  463                DCW   01                                                       2  2331                      90
+  464                DCW   01                                                       2  2333                      90
+  465                DCW   -27                                                      2  2335                      90
+  466                DCW   07                                                       2  2337                      90
+  467                DCW   05                                                       2  2339                      91
+  468                DCW   01                                                       2  2341                      91
+  469                DCW   03                                                       2  2343                      91
+  470                DCW   17                                                       2  2345                      91
+  471                DCW   02                                                       2  2347                      91
+  472                DCW   01                                                       2  2349                      91
+  473                DCW   -27                                                      2  2351                      91
+  474                DCW   05                                                       2  2353                      92
+  475                DCW   15                                                       2  2355                      92
+  476                DCW   11                                                       2  2357                      92
+  477                DCW   04                                                       2  2359                      92
+  478                DCW   01                                                       2  2361                      92
+  479                DCW   -27                                                      2  2363                      92
+  480                DCW   08                                                       2  2365                      92
+  481                DCW   26                                                       2  2367                      93
+  482                DCW   02                                                       2  2369                      93
+  483                DCW   -28                                                      2  2371                      93
+  484                DCW   15                                                       2  2373                      93
+  485                DCW   17                                                       2  2375                      93
+  486                DCW   04                                                       2  2377                      93
+  487                DCW   -28                                                      2  2379                      93
+  488                DCW   37                                                       2  2381                      94
+  489                DCW   -28                                                      2  2383                      94
+  490                DCW   36                                                       2  2385                      94
+  491                DCW   -28                                                      2  2387                      94
+  492                DCW   36                                                       2  2389                      94
+  493                DCW   -27                                                      2  2391                      94
+  494                DCW   01                                                       2  2393                      94
+  495                DCW   01                                                       2  2395                      95
+  496                DCW   34                                                       2  2397                      95
+  497                DCW   -26                                                      2  2399                      95
+1                          LINCOLN.S 11/16/17 01:24:57                                -4297               PAGE    9
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  498                DCW   01                                                       2  2401                      95
+  499                DCW   03                                                       2  2403                      95
+  500                DCW   33                                                       2  2405                      95
+  501                DCW   -25                                                      2  2407                      95
+  502                DCW   01                                                       2  2409                      96
+  503                DCW   06                                                       2  2411                      96
+  504                DCW   30                                                       2  2413                      96
+  505                DCW   -25                                                      2  2415                      96
+  506                DCW   01                                                       2  2417                      96
+  507                DCW   08                                                       2  2419                      96
+  508                DCW   27                                                       2  2421                      96
+  509                DCW   -24                                                      2  2423                      97
+  510                DCW   01                                                       2  2425                      97
+  511                DCW   11                                                       2  2427                      97
+  512                DCW   21                                                       2  2429                      97
+  513                DCW   04                                                       2  2431                      97
+  514                DCW   01                                                       2  2433                      97
+  515                DCW   -21                                                      2  2435                      97
+  516                DCW   04                                                       2  2437                      98
+  517                DCW   14                                                       2  2439                      98
+  518                DCW   16                                                       2  2441                      98
+  519                DCW   07                                                       2  2443                      98
+  520                DCW   01                                                       2  2445                      98
+  521                DCW   -12                                                      2  2447                      98
+  522                DCW   06                                                       2  2449                      98
+  523                DCW   26                                                       2  2451                      99
+  524                DCW   07                                                       2  2453                      99
+  525                DCW   12                                                       2  2455                      99
+  526                DCW   01                                                       2  2457                      99
+  527                DCW   -10                                                      2  2459                      99
+  528                DCW   05                                                       2  2461                      99
+  529                DCW   49                                                       2  2463                      99
+  530                DCW   01                                                       2  2465                     100
+  531                DCW   -06                                                      2  2467                     100
+  532                DCW   04                                                       2  2469                     100
+  533                DCW   55                                                       2  2471                     100
+  534                DCW   01                                                       2  2473                     100
+  535                DCW   -03                                                      2  2475                     100
+  536                DCW   03                                                       2  2477                     100
+  537                DCW   60                                                       2  2479                     101
+  538                DCW   01                                                       2  2481                     101
+  539                DCW   -40                                                      2  2483                     101
+  540                DCW   01                                                       2  2485                     101
+  541                DCW   14                                                       2  2487                     101
+  542                DCW   01                                                       2  2489                     101
+  543                DCW   -36                                                      2  2491                     101
+  544                DCW   10                                                       2  2493                     102
+  545                DCW   04                                                       2  2495                     102
+  546                DCW   10                                                       2  2497                     102
+  547                DCW   -34                                                      2  2499                     102
+1                          LINCOLN.S 11/16/17 01:24:57                                -4297               PAGE   10
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  548                DCW   28                                                       2  2501                     102
+  549                DCW   -36                                                      2  2503                     102
+  550                DCW   10                                                       2  2505                     102
+  551                DCW   05                                                       2  2507                     103
+  552                DCW   09                                                       2  2509                     103
+  553                DCW   -40                                                      2  2511                     103
+  554                DCW   01                                                       2  2513                     103
+  555                DCW   14                                                       2  2515                     103
+  556                DCW   01                                                       2  2517                     103
+  557                DCW   00                                                       2  2519                     103
+                     DCW   @00@                                                     2  2521              LIT    104
+                     DCW   @ @                                                      1  2522              LIT    104
+                     DCW   @1@                                                      1  2523              LIT    104
+                     DCW   +00                                                      2  2525              LIT    104
+  558                END   START                                                             / W88 080               1688
+1                                                                                                         PAGE   11
+0SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS
+
+ DONE     1863: 0    DOSKIP   1845: 0    DOTAKE   1763: 0    FINIS    1864: 0    GETTYS   0333: 0    LOOP     1702: 0   
+ MAP      1875: 0    MAPVAL   1873: 0    NEXTCH   1815: 0    NEXTDO   1871: 0    SKIP     1869: 0    START    1688: 0   
+ TAKE     1870: 0    TEST     1755: 0    X1       0089: 0    X2       0094: 0    X3       0099: 0   

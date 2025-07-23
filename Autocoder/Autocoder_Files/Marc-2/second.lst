@@ -1,0 +1,44 @@
+ CLEAR STORAGE 1     ,008015,022026,030037,044,049,053053N000000N00001026                                         1
+ CLEAR STORAGE 2     L068116,105106,110117B101/I9I#071029C029056B026/B001/0991,001/001117I0?                      2
+ BOOTSTRAP           ,008015,022029,036040,047054,061068,072/061039              ,0010011040                      3
+0                          SECOND.S 03/28/17 23:09:37                                 -7777               PAGE    1
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  101                JOB   SECOND.S 03/28/17 23:09:37
+  102                HEAD                                                                                MACRO
+              *>>>>>>>>>                                                                                 GEN  
+  103         .READ  EQU   001                                                         0001              GEN
+  104         .PUNCH EQU   101                                                         0101              GEN
+  105         .PRINT EQU   201                                                         0201              GEN
+  106                ORG   87                                                                 0087
+  107         X1     DSA   0                * INDEX REGISTER 1                      3  0089  000         GEN      4   000
+  108                ORG   92                                                                 0092
+  109         X2     DSA   0                * INDEX REGISTER 2                      3  0094  000         GEN      5   000
+  110                ORG   97                                                                 0097
+  111         X3     DSA   0                * INDEX REGISTER 3                      3  0099  000         GEN      6   000
+              *                                                                                          GEN  
+  112                ORG   340              *ORG JUST AFTER PRINT BUFFER                      0340
+              *<<<<<<<<<                                                                                 GEN  
+      ** ***  ** Previous OP code not pseudo op                                                          ERROR
+      ** ***  ** Previous OP code not DA                                                                 ERROR
+  114         NOZONE DCW   @ 1234567890=':>{@     *NO ZONE                         16  0355                       7
+  115         AZONE  DCW   @^/STUVWXYZ|,(~\"@     * A ZONE                         16  0371                       7
+  116         BZONE  DCW   @-JKLMNOPQR!$*];_@     * B ZONE                         16  0387                       8
+  117         ABZONE DCW   @&ABCDEFGHI?.)[<}@     *AB ZONE                         16  0403                       8
+  118         START  H                                                              1  0404  .                    8
+  119                MCW   @SECOND PROGRAM@,215                                     7  0405  M 431 215            9   431     215
+  120                W                                                              1  0412  2                    9
+  121                B     START                                                    4  0413  B 404                9   404
+  122                NOP                                                            1  0417  N                    9
+                     DCW   @SECOND PROGRAM@                                        14  0431              LIT      9
+  123                END   START                                                             / 404 080                404
+1                                                                                                         PAGE    2
+0SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS
+
+ .PRINT   0201: 0    .PUNCH   0101: 0    .READ    0001: 0    ABZONE   0403: 0    AZONE    0371: 0    BZONE    0387: 0   
+ NOZONE   0355: 0    START    0404: 0    X1       0089: 0    X2       0094: 0    X3       0099: 0   
+
+0UNREFERENCED SYMBOLS
+
+ .PRINT .PUNCH .READ  ABZONE AZONE  BZONE  NOZONE X1     X2     X3
+      *****  **     2 Errors                                                                             ERROR

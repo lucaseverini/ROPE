@@ -1,0 +1,42 @@
+ CLEAR STORAGE 1     ,008015,022026,030037,044,049,053053N000000N00001026                                         1
+ CLEAR STORAGE 2     L068116,105106,110117B101/I9I#071029C029056B026/B001/0991,001/001117I0?                      2
+ BOOTSTRAP           ,008015,022029,036040,047054,061068,072/061039              ,0010011040                      3
+0                               POWER2NOTEPAD                                                             PAGE    1
+0 SEQ PG LIN  LABEL  OP    OPERANDS                                            SFX CT  LOCN  INSTRUCTION TYPE  CARD A-ADDR  B-ADDR
+
+  101                JOB        POWER2NOTEPAD
+  102         *
+  103                CTL        6611  *6=16,000C;6=16,000T;1=OBJDECK;,1=MODADD
+  104         *   1         2         3         4         5         6         7         8
+  105         *78901234567890123456789012345678901234567890123456789012345678901234567890
+  106         * LABEL   | OP | OPERATION                                         |XXXXXXX
+  107                ORG   100          * START ABOVE INDEX "REGISTERS"                       0100
+  108         PRINTD CS    633          * START CLEARING DOWN TO 200, PRINT ARE     4  0100  / 633                4   633
+  109                CS                 * 500S  500 IS HIGH ORDER OF WORK AREA      1  0104  /                    4
+  110                CS                 * 400S                                      1  0105  /                    4
+  111                CS                 * 300S  350 IS HIGH ORDER OF WORK AREA      1  0106  /                    4
+  112                CS                 * 200S  201 IS HIGH ORDER OF PRINT AREA     1  0107  /                    4
+  113                SW    500,350      * SET WORD MARKS FOR WORK AREAS             7  0108  , 500 350            4   500     350
+  114                SW    200          * SET WORD MARK FOR PRINT AREA COMPARE      4  0115  , 200                4   200
+  115                MCW   @1@,632      * SET INITIAL 2^0                           7  0119  M 187 632            5   187     632
+  116                MCW   @56789@,204  * SET TEST PATTERN FOR BUG CHECK ;-))       7  0126  M 192 204            5   192     204
+  117                W                  *WRITE THE TEST PATTERN  AREA TO THE PR     1  0133  2                    5
+  118         *                       SEE IF LOCATION 202 IS KLOBBERED :-))
+  119         PR1LOP ZA    @1@,334      * SET ZEROS FOR EDIT COMMAND INTO PRINT     7  0134  ? 187 334            5   187     334
+  120                MCE   632,332      * EDIT FROM WORK AREA 2 INTO PRINT BUFF     7  0141  E 632 332            5   632     332
+  121                W                  *WRITE THE PRINT AREA TO THE PRINTER        1  0148  2                    5
+  122                MCW   632,482      * COPY  WORK AREA 1 INTO WORK AREA 2        7  0149  M 632 482            5   632     482
+  123                SW    200          * RESTORE WORD MARK OBLITERATED BY MCW      4  0156  , 200                6   200
+  124                A     482,632      * ADD WORK AREA 2 TO WORK AREA 1            7  0160  A 482 632            6   482     632
+  125                C     @  @,201     * ARE WE DONE WITH RON'S PRINT VERSION      7  0167  C 194 201            6   194     201
+  126                BE    PR1LOP           *  NO, DO SOME MORE                     5  0174  B 134 S              6   134
+  127                H     PRINTD           * HALT  - OH RATS, I FORGOT TO EJEC     4  0179  . 100                6   100
+  128                B     PRINTD           * AND DO IT AGAIN :-)                   4  0183  B 100                6   100
+                     DCW   @1@                                                      1  0187              LIT      6
+                     DCW   @56789@                                                  5  0192              LIT      7
+                     DCW   @  @                                                     2  0194              LIT      7
+  129                END   PRINTD           * LAST CARD IN DECK, TRANSFER ADDRE              / 100 080                100
+1                                                                                                         PAGE    2
+0SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS    SYMBOL   ADDRESS
+
+ PR1LOP   0134: 0    PRINTD   0100: 0   
